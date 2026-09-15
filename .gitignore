@@ -11,3 +11,6 @@ research/
 *.sqlite
 *.db
 *.log
+.netlify/
+*.backup_*
+.vercelignore
