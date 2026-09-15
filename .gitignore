@@ -1,0 +1,13 @@
+.vercel/
+images_preview/
+fonts/*.otf
+fonts/Licenses/
+images/Osmos.png
+.DS_Store
+**/.DS_Store
+**/._*
+research/
+*.py
+*.sqlite
+*.db
+*.log

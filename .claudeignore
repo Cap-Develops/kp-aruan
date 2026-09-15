@@ -1,0 +1,26 @@
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.pdf
+
+# Большие JS файлы с данными — читать через database.sqlite
+database-equipment-a.js
+database-equipment-b.js
+
+# Временные и служебные файлы
+split_db.py
+*.backup_*
+
+# Технические страницы (не нужны в основном чате)
+catalog_check.html
+maintenance_check.html
+
+# Шрифты
+*.otf
+*.ttf
+*.woff
+*.woff2
+
+# SQLite бинарник
+database.sqlite

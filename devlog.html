@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>Журнал доработок - Конструктор КП</title>
+<style>
+@font-face{font-family:'Muller';src:url('fonts/muller-regular.woff2') format('woff2');font-display:swap;font-weight:400;font-style:normal}
+@font-face{font-family:'Muller';src:url('fonts/muller-medium.woff2') format('woff2');font-display:swap;font-weight:500;font-style:normal}
+@font-face{font-family:'Muller';src:url('fonts/muller-bold.woff2') format('woff2');font-display:swap;font-weight:700;font-style:normal}
+@font-face{font-family:'Muller';src:url('fonts/muller-extrabold.woff2') format('woff2');font-display:swap;font-weight:800;font-style:normal}
+@font-face{font-family:'Muller';src:url('fonts/muller-black.woff2') format('woff2');font-display:swap;font-weight:900;font-style:normal}
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--blue:#1565C0;--blue-dark:#0D47A1;--blue-light:#E3F2FD;--muted:#64748b;--border:#e2e8f0;--shadow:0 2px 8px rgba(0,0,0,.06),0 8px 24px rgba(0,0,0,.06);--glass:rgba(255,255,255,.72);--radius:16px}
+body{font-family:'Muller',Arial,sans-serif;background:linear-gradient(180deg,#EEF2F7 0%,#E1E8F0 100%);color:#1a2332;min-height:100vh;overflow-x:hidden}
+a{text-decoration:none;color:inherit}
+
+/* ── Шапка ── */
+.header{background:linear-gradient(135deg,#0a3d8f 0%,#1565C0 50%,#2979d6 100%);position:relative;overflow:hidden}
+.header::after{content:'';position:absolute;top:-80px;right:-60px;width:340px;height:340px;border-radius:50%;background:rgba(255,255,255,.06)}
+.header::before{content:'';position:absolute;bottom:-120px;left:20%;width:280px;height:280px;border-radius:50%;background:rgba(255,255,255,.05)}
+.header-in{max-width:980px;margin:0 auto;padding:34px 24px 30px;position:relative;z-index:1}
+.back-link{display:inline-flex;align-items:center;gap:7px;color:rgba(255,255,255,.75);font-size:13px;font-weight:500;margin-bottom:18px;transition:color .2s}
+.back-link:hover{color:#fff}
+.h-title{font-size:32px;font-weight:900;color:#fff;letter-spacing:-.5px;line-height:1.15}
+.h-sub{margin-top:8px;color:rgba(255,255,255,.72);font-size:14px;font-weight:400}
+.h-sub b{color:#fff;font-weight:700}
+
+/* ── Плитки цифр ── */
+.stats{max-width:980px;margin:-26px auto 0;padding:0 24px;position:relative;z-index:2;display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.stat{background:var(--glass);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.8);border-radius:14px;box-shadow:var(--shadow);padding:16px 18px;text-align:center;opacity:0;animation:rise .55s cubic-bezier(.2,.7,.3,1) forwards}
+.stat:nth-child(2){animation-delay:.07s}.stat:nth-child(3){animation-delay:.14s}.stat:nth-child(4){animation-delay:.21s}
+.stat b{display:block;font-size:26px;font-weight:900;color:var(--blue);line-height:1.1}
+.stat span{display:block;margin-top:4px;font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.6px}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+/* ── Фильтры ── */
+.wrap{max-width:980px;margin:0 auto;padding:26px 24px 60px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:26px}
+.chip{padding:8px 16px;border-radius:20px;border:1.5px solid rgba(21,101,192,.18);background:#fff;color:var(--blue);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s}
+.chip:hover{border-color:var(--blue);transform:translateY(-1px)}
+.chip.on{background:linear-gradient(135deg,#1565C0,#1E88E5);color:#fff;border-color:transparent;box-shadow:0 4px 14px rgba(21,101,192,.3)}
+.chip small{font-weight:500;opacity:.75;margin-left:4px}
+
+/* ── Лента ── */
+.timeline{position:relative;padding-left:34px}
+.timeline::before{content:'';position:absolute;left:9px;top:6px;bottom:6px;width:2px;background:linear-gradient(180deg,#1565C0 0%,rgba(21,101,192,.15) 100%)}
+.day{margin-bottom:30px;opacity:0;animation:rise .5s cubic-bezier(.2,.7,.3,1) forwards}
+.day-head{position:relative;margin-bottom:12px}
+.day-head::before{content:'';position:absolute;left:-32px;top:3px;width:12px;height:12px;border-radius:50%;background:#fff;border:3px solid var(--blue);box-shadow:0 0 0 4px rgba(21,101,192,.12)}
+.day-date{font-size:16px;font-weight:800;color:var(--blue-dark)}
+.day-date small{font-weight:500;color:var(--muted);font-size:12px;margin-left:8px}
+.entry{background:var(--glass);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.85);border-left:4px solid var(--tint,#1565C0);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px 20px;margin-bottom:10px;transition:transform .2s ease,box-shadow .2s ease}
+.entry:hover{transform:translateX(4px);box-shadow:0 4px 14px rgba(0,0,0,.08),0 12px 32px rgba(21,101,192,.10)}
+.entry-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+.entry-title{font-size:15.5px;font-weight:800;color:#14213d}
+.badge{font-size:10.5px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;padding:3px 9px;border-radius:20px;white-space:nowrap}
+.entry-text{font-size:13.5px;color:#42526b;line-height:1.6}
+.b-feature{background:#E3F2FD;color:#0D47A1}
+.b-fix{background:#E8F5E9;color:#2E7D32}
+.b-design{background:#FFF3E0;color:#E65100}
+.b-infra{background:#ECEFF1;color:#455A64}
+.b-rollback{background:#FFEBEE;color:#C62828}
+.b-plan{background:#EDE7F6;color:#4527A0}
+.tint-feature{--tint:#1565C0}.tint-fix{--tint:#4CAF50}.tint-design{--tint:#FF9800}.tint-infra{--tint:#78909C}.tint-rollback{--tint:#E53935}.tint-plan{--tint:#7E57C2}
+
+.footer{text-align:center;padding:26px 20px 40px;color:#90A4AE;font-size:12px}
+.footer b{color:var(--muted)}
+
+@media(max-width:640px){
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .h-title{font-size:24px}
+  .timeline{padding-left:26px}
+  .day-head::before{left:-24px}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-in">
+    <a class="back-link" href="hub.html">← Рабочее пространство</a>
+    <div class="h-title">Журнал доработок</div>
+    <div class="h-sub">Конструктор коммерческих предложений · лог внедрений с <b>23 июня 2026</b></div>
+  </div>
+</div>
+
+<div class="stats" id="stats"></div>
+
+<div class="wrap">
+  <div class="chips" id="chips"></div>
+  <div class="timeline" id="timeline"></div>
+</div>
+
+<div class="footer"><b>ООО «Техноинтеллект»</b> · внутренняя страница · обновляется после каждой доработки</div>
+
+<script src="devlog-data.js"></script>
+<script>
+(function(){
+  var TYPES={
+    feature:{label:'Внедрение'},
+    fix:{label:'Исправление'},
+    design:{label:'Дизайн'},
+    infra:{label:'Инфраструктура'},
+    rollback:{label:'Откат'},
+    plan:{label:'План'}
+  };
+  var MONTHS=['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+  var DAYS=['воскресенье','понедельник','вторник','среда','четверг','пятница','суббота'];
+  var LOG=(typeof DEVLOG!=='undefined')?DEVLOG:[];
+  var filter='all';
+
+  function fmtDate(iso){
+    var p=iso.split('-');
+    return (+p[2])+' '+MONTHS[+p[1]-1];
+  }
+  function weekday(iso){
+    var d=new Date(iso+'T12:00:00');
+    return DAYS[d.getDay()];
+  }
+
+  function renderStats(){
+    var days={};LOG.forEach(function(e){days[e.date]=1;});
+    var since=Math.round((Date.now()-new Date('2026-06-23T00:00:00'))/864e5);
+    var feat=LOG.filter(function(e){return e.type==='feature';}).length;
+    document.getElementById('stats').innerHTML=
+      '<div class="stat"><b>'+LOG.length+'</b><span>записей</span></div>'+
+      '<div class="stat"><b>'+feat+'</b><span>внедрений</span></div>'+
+      '<div class="stat"><b>'+Object.keys(days).length+'</b><span>активных дней</span></div>'+
+      '<div class="stat"><b>'+since+'</b><span>дней ведётся лог</span></div>';
+  }
+
+  function renderChips(){
+    var counts={all:LOG.length};
+    LOG.forEach(function(e){counts[e.type]=(counts[e.type]||0)+1;});
+    var html='<button class="chip'+(filter==='all'?' on':'')+'" data-t="all">Все <small>'+counts.all+'</small></button>';
+    Object.keys(TYPES).forEach(function(t){
+      if(!counts[t])return;
+      html+='<button class="chip'+(filter===t?' on':'')+'" data-t="'+t+'">'+TYPES[t].label+' <small>'+counts[t]+'</small></button>';
+    });
+    var box=document.getElementById('chips');
+    box.innerHTML=html;
+    box.querySelectorAll('.chip').forEach(function(c){
+      c.onclick=function(){filter=c.getAttribute('data-t');renderChips();renderTimeline();};
+    });
+  }
+
+  function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');}
+
+  function renderTimeline(){
+    var list=LOG.filter(function(e){return filter==='all'||e.type===filter;});
+    var byDate={};var order=[];
+    list.forEach(function(e){
+      if(!byDate[e.date]){byDate[e.date]=[];order.push(e.date);}
+      byDate[e.date].push(e);
+    });
+    var html='';
+    order.forEach(function(d,i){
+      var approx=byDate[d].every(function(e){return e.approx;});
+      html+='<div class="day" style="animation-delay:'+(i*70)+'ms">'+
+        '<div class="day-head"><span class="day-date">'+(approx?'≈ ':'')+fmtDate(d)+
+        '<small>'+weekday(d)+'</small></span></div>';
+      byDate[d].forEach(function(e){
+        var t=TYPES[e.type]||{label:e.type};
+        html+='<div class="entry tint-'+e.type+'">'+
+          '<div class="entry-top"><span class="badge b-'+e.type+'">'+t.label+'</span>'+
+          '<span class="entry-title">'+esc(e.title)+'</span></div>'+
+          '<div class="entry-text">'+esc(e.text)+'</div>'+
+        '</div>';
+      });
+      html+='</div>';
+    });
+    document.getElementById('timeline').innerHTML=html||'<div style="color:#90A4AE;font-size:14px">Записей нет</div>';
+  }
+
+  renderStats();renderChips();renderTimeline();
+})();
+</script>
+</body>
+</html>

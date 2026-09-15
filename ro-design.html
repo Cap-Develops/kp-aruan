@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RO-проектирование - Аруан</title>
+<style>
+@font-face{font-family:'Muller';src:url('fonts/muller-regular.woff2') format('woff2');font-display:swap;font-weight:400;font-style:normal}
+@font-face{font-family:'Muller';src:url('fonts/muller-medium.woff2') format('woff2');font-display:swap;font-weight:500;font-style:normal}
+@font-face{font-family:'Muller';src:url('fonts/muller-bold.woff2') format('woff2');font-display:swap;font-weight:700;font-style:normal}
+@font-face{font-family:'Muller';src:url('fonts/muller-extrabold.woff2') format('woff2');font-display:swap;font-weight:800;font-style:normal}
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--blue:#1565C0;--blue-dark:#0D47A1;--blue-light:#E3F2FD;--accent:#FF6F00;--muted:#64748b;--border:#e2e8f0;--shadow:0 2px 8px rgba(0,0,0,.06),0 8px 24px rgba(0,0,0,.06);--glass:rgba(255,255,255,.75);--radius:14px}
+body{font-family:'Muller',Arial,sans-serif;background:linear-gradient(180deg,#EEF2F7 0%,#E1E8F0 100%);color:#1a2332;min-height:100vh}
+input,select,button{font-family:inherit;transition:all .2s ease}
+input:focus,select:focus{outline:none;border-color:var(--blue)!important;box-shadow:0 0 0 3px rgba(21,101,192,.12)}
+button:active{transform:scale(.97)}
+.header{background:linear-gradient(135deg,#0a3d8f,#1565C0,#2979d6);padding:16px 28px;display:flex;align-items:center;gap:16px;box-shadow:0 4px 20px rgba(13,71,161,.25);flex-wrap:wrap}
+.header h1{color:#fff;font-size:20px;font-weight:800}
+.header .sub{color:rgba(255,255,255,.75);font-size:12.5px}
+.header-logo{width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:22px}
+.wrap{max-width:1280px;margin:0 auto;padding:20px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+@media(max-width:980px){.grid{grid-template-columns:1fr}}
+.card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--border);overflow:hidden;margin-bottom:20px}
+.card-head{padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:linear-gradient(180deg,#fafcff,#f4f8fc)}
+.card-head h2{font-size:15.5px;font-weight:800;color:var(--blue-dark)}
+.card-body{padding:18px 20px}
+label{font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:4px}
+.inp{width:100%;padding:9px 12px;border-radius:9px;border:1.5px solid var(--border);font-size:14px;background:#fff}
+.row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.row>div{flex:1;min-width:110px}
+.seg{display:inline-flex;background:#eef2f7;border-radius:9px;padding:3px;gap:2px}
+.seg button{border:none;background:transparent;padding:7px 14px;border-radius:7px;font-size:12.5px;font-weight:700;color:var(--muted);cursor:pointer;white-space:nowrap}
+.seg button.on{background:linear-gradient(135deg,#1565C0,#1E88E5);color:#fff;box-shadow:0 2px 8px rgba(21,101,192,.3)}
+.ion-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:560px){.ion-grid{grid-template-columns:1fr}}
+.ion-row{display:grid;grid-template-columns:52px 1fr 74px;gap:8px;align-items:center;margin-bottom:6px}
+.ion-row .nm{font-size:13px;font-weight:700}
+.ion-row .mq{font-size:11px;color:var(--muted);text-align:right}
+.ion-row input{padding:7px 10px;border-radius:8px;border:1.5px solid var(--border);font-size:13.5px;width:100%}
+.sumline{display:flex;gap:16px;flex-wrap:wrap;background:var(--blue-light);border-radius:10px;padding:10px 14px;font-size:12.5px;margin-top:10px}
+.sumline b{font-weight:800}
+.balance-ok{color:#188038}.balance-bad{color:#d93025}
+.btn{border:none;border-radius:10px;padding:11px 18px;font-size:13.5px;font-weight:700;cursor:pointer}
+.btn-primary{background:linear-gradient(135deg,#1565C0,#1E88E5);color:#fff;box-shadow:0 3px 10px rgba(21,101,192,.3)}
+.btn-accent{background:linear-gradient(135deg,#E65100,#FF6F00);color:#fff;box-shadow:0 3px 10px rgba(230,81,0,.3);font-size:15px;padding:13px 26px}
+.btn-outline{background:#fff;border:1.5px solid var(--border);color:#1a2332}
+.btn-sm{padding:7px 12px;font-size:12px;border-radius:8px}
+.stage-row{display:grid;grid-template-columns:auto 64px 64px 1fr auto;gap:8px;align-items:end;margin-bottom:8px;background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:10px 12px}
+.stage-row .stg-n{font-size:12px;font-weight:800;color:var(--blue-dark);padding-bottom:9px}
+.stage-row input,.stage-row select{padding:8px 10px;border-radius:8px;border:1.5px solid var(--border);font-size:13px;width:100%}
+.del-x{background:none;border:none;color:#d93025;font-size:16px;cursor:pointer;padding:6px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px}
+.tile{background:linear-gradient(180deg,#f8fbff,#eef5fc);border:1px solid #d7e5f4;border-radius:12px;padding:12px 14px}
+.tile .tv{font-size:21px;font-weight:800;color:var(--blue-dark)}
+.tile .tl{font-size:11px;color:var(--muted);font-weight:700;margin-top:2px}
+table.res{width:100%;border-collapse:collapse;font-size:12.5px}
+table.res th{background:var(--blue-light);color:var(--blue-dark);font-weight:800;padding:7px 9px;text-align:right;white-space:nowrap}
+table.res th:first-child,table.res td:first-child{text-align:left}
+table.res td{padding:6px 9px;border-bottom:1px solid var(--border);text-align:right;font-variant-numeric:tabular-nums}
+.tbl-scroll{overflow-x:auto}
+.warnbox{background:#FFF8E1;border:1px solid #FFE082;border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:12.5px}
+.warnbox div{margin:3px 0}
+.okbox{background:#E8F5E9;border:1px solid #A5D6A7;border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:12.5px;color:#188038;font-weight:700}
+.satbar{height:8px;border-radius:4px;background:#e8eef5;overflow:hidden;margin-top:3px}
+.satbar i{display:block;height:100%;border-radius:4px}
+.sat-item{margin-bottom:10px;font-size:12.5px}
+.sat-item .sv{float:right;font-weight:800}
+.advice{font-size:12.5px;background:#f4f8fc;border-left:3px solid var(--blue);border-radius:0 8px 8px 0;padding:8px 12px;margin:6px 0}
+.section-h{font-size:13px;font-weight:800;color:var(--blue-dark);margin:16px 0 8px;text-transform:uppercase;letter-spacing:.4px}
+.muted{color:var(--muted);font-size:12px}
+.footer-note{text-align:center;font-size:11.5px;color:var(--muted);padding:10px 0 30px}
+#printArea{display:none}
+@media print{
+  *{font-family:'Muller',Arial,sans-serif!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  .ecosystem-nav{display:none!important}
+  body>*:not(#printArea){display:none!important}
+  #printArea{display:block!important;margin:0;padding:0}
+  @page{size:A4;margin:12mm}
+}
+#printArea h2{font-size:16px;margin:12px 0 6px;color:#0D47A1}
+#printArea h3{font-size:13px;margin:10px 0 5px;color:#0D47A1}
+#printArea table{width:100%;border-collapse:collapse;font-size:11px;margin-bottom:8px}
+#printArea th{background:#E3F2FD;padding:5px 7px;text-align:right;border:0.5px solid #b9cfe4}
+#printArea td{padding:4px 7px;border:0.5px solid #ccd9e6;text-align:right}
+#printArea th:first-child,#printArea td:first-child{text-align:left}
+.pr-head{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #0D47A1;padding-bottom:6px;margin-bottom:10px}
+.pr-head img{height:11mm}
+.pr-head .c{font-size:10.5px;text-align:right;color:#333}
+</style>
+</head>
+<body>
+<nav id="ecoNav" class="ecosystem-nav" style="background:#1a2332;display:flex;gap:20px;padding:6px 24px;font-size:13px;align-items:center;position:sticky;top:0;z-index:1000;box-shadow:0 2px 8px rgba(0,0,0,0.2)">
+<a href="hub.html" style="color:rgba(255,255,255,.6);text-decoration:none;transition:color .2s">🏠 Главная</a>
+<a href="index.html" style="color:rgba(255,255,255,.6);text-decoration:none;transition:color .2s">📋 Конструктор КП</a>
+<a href="catalog.html" style="color:rgba(255,255,255,.6);text-decoration:none;transition:color .2s">📦 Каталог</a>
+<a href="calculator.html" style="color:rgba(255,255,255,.6);text-decoration:none;transition:color .2s">🔧 Калькулятор</a>
+<a href="ro-design.html" style="color:#fff;text-decoration:none;font-weight:600">💧 RO-проект</a>
+</nav>
+
+<div class="header">
+  <div class="header-logo">💧</div>
+  <div>
+    <h1>RO-проектирование</h1>
+    <div class="sub">Расчёт систем обратного осмоса на мембранах Vontron - аналог Vontron RO Design 6.1</div>
+  </div>
+  <div style="margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+    <select id="projSelect" class="inp" style="width:auto;min-width:170px" onchange="loadProject(this.value)">
+      <option value="">- проекты -</option>
+    </select>
+    <button class="btn btn-outline btn-sm" onclick="saveProject()">💾 Сохранить</button>
+    <button class="btn btn-outline btn-sm" onclick="deleteProject()">🗑</button>
+  </div>
+</div>
+
+<div class="wrap">
+<div class="grid">
+
+<!-- ===== АНАЛИЗ ВОДЫ ===== -->
+<div class="card">
+  <div class="card-head">
+    <h2>1. Анализ воды</h2>
+    <div class="seg">
+      <button id="modeTds" class="on" onclick="setMode('tds')">Только TDS</button>
+      <button id="modeFull" onclick="setMode('full')">Полный анализ</button>
+    </div>
+  </div>
+  <div class="card-body">
+    <div class="row">
+      <div style="flex:2;min-width:200px">
+        <label>Тип исходной воды</label>
+        <select id="waterType" class="inp"></select>
+      </div>
+      <div><label>Температура, °C</label><input id="temp" class="inp" type="number" value="25" step="1" min="1" max="45"></div>
+      <div><label>pH</label><input id="ph" class="inp" type="number" value="7.5" step="0.1" min="2" max="11"></div>
+    </div>
+    <div id="tdsBlock">
+      <div class="row"><div style="max-width:240px">
+        <label>Солесодержание (TDS), мг/л</label>
+        <input id="tds" class="inp" type="number" value="2000" step="10" min="10" oninput="renderSummary()">
+      </div></div>
+      <div class="muted">Расчёт как эквивалент NaCl (как в оригинальной программе). Для scaling-прогноза нужен полный анализ.</div>
+    </div>
+    <div id="fullBlock" style="display:none">
+      <div class="ion-grid">
+        <div id="colCations"><div class="section-h" style="margin-top:0">Катионы, мг/л</div></div>
+        <div id="colAnions"><div class="section-h" style="margin-top:0">Анионы и прочее, мг/л</div></div>
+      </div>
+      <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-outline btn-sm" onclick="doAutoBalance()">⚖ Автобаланс (Na/Cl)</button>
+      </div>
+    </div>
+    <div class="sumline" id="sumline"></div>
+  </div>
+</div>
+
+<!-- ===== КОНФИГУРАЦИЯ ===== -->
+<div class="card">
+  <div class="card-head">
+    <h2>2. Конфигурация системы</h2>
+    <button class="btn btn-outline btn-sm" onclick="autoConfig()">✨ Автоподбор</button>
+  </div>
+  <div class="card-body">
+    <div class="row">
+      <div style="flex:0 0 auto">
+        <label>Задать производительность</label>
+        <div class="seg">
+          <button id="byPerm" class="on" onclick="setFlowMode('perm')">По пермеату</button>
+          <button id="byFeed" onclick="setFlowMode('feed')">По подаче</button>
+        </div>
+      </div>
+      <div><label id="flowLabel">Пермеат, м³/ч</label><input id="flow" class="inp" type="number" value="1.0" step="0.1" min="0.05"></div>
+      <div><label>Recovery, %</label><input id="recovery" class="inp" type="number" value="75" step="1" min="30" max="90"></div>
+      <div><label>Fouling factor</label><input id="ff" class="inp" type="number" value="0.85" step="0.05" min="0.5" max="1"></div>
+    </div>
+    <div class="section-h">Проход 1 - ступени концентрирования</div>
+    <div id="stages1"></div>
+    <button class="btn btn-outline btn-sm" onclick="addStage(1)">+ Ступень</button>
+    <div style="margin-top:14px">
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;color:#1a2332">
+        <input type="checkbox" id="pass2on" onchange="renderStages()" style="width:16px;height:16px"> Второй проход (доочистка пермеата)
+      </label>
+    </div>
+    <div id="pass2block" style="display:none;margin-top:10px">
+      <div class="row">
+        <div style="max-width:170px"><label>Recovery 2-го прохода, %</label><input id="rec2" class="inp" type="number" value="85" step="1" min="50" max="95"></div>
+        <div style="flex:2;padding-top:20px">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12.5px;color:#1a2332;font-weight:400">
+            <input type="checkbox" id="recycle2" checked style="width:15px;height:15px"> Рецикл концентрата 2-го прохода в подачу
+          </label>
+        </div>
+      </div>
+      <div class="section-h">Проход 2 - ступени</div>
+      <div id="stages2"></div>
+      <button class="btn btn-outline btn-sm" onclick="addStage(2)">+ Ступень</button>
+    </div>
+    <div style="margin-top:18px;text-align:center">
+      <button class="btn btn-accent" onclick="calculate()">Рассчитать систему</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- /grid -->
+
+<!-- ===== РЕЗУЛЬТАТЫ ===== -->
+<div class="card" id="resultsCard" style="display:none">
+  <div class="card-head">
+    <h2>3. Результаты проектирования</h2>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-primary btn-sm" onclick="printReport()">🖨 Отчёт PDF</button>
+      <button class="btn btn-primary btn-sm" onclick="toKP()">📋 В КП</button>
+    </div>
+  </div>
+  <div class="card-body" id="resultsBody"></div>
+</div>
+
+<div class="footer-note">Модуль RO-проектирования экосистемы КП-конструктора. Расчёт по модели растворения-диффузии;
+база мембран и лимиты - Vontron RO Design 6.1 + официальные datasheet. Результат носит проектный характер и
+подлежит проверке технологом.</div>
+</div>
+
+<div id="printArea"></div>
+
+<script src="ro-membranes-data.js"></script>
+<script src="ro-engine.js"></script>
+<script src="database-fills.js"></script>
+<script src="database-equipment-a.js"></script>
+<script src="database-equipment-b.js"></script>
+<script src="database.js"></script>
+<script>
+'use strict';
+// ================= состояние =================
+var mode = 'tds';          // tds | full
+var flowMode = 'perm';     // perm | feed
+var stages = { 1: [{ vessels: 1, elements: 3, membrane: 'ULP21-4040' }], 2: [{ vessels: 1, elements: 3, membrane: 'ULP21-4040' }] };
+var lastResult = null, lastCfg = null;
+
+var ION_LABELS = {
+  Na: 'Na⁺ натрий', Ca: 'Ca²⁺ кальций', Mg: 'Mg²⁺ магний', K: 'K⁺ калий', NH4: 'NH₄⁺ аммоний',
+  Ba: 'Ba²⁺ барий', Sr: 'Sr²⁺ стронций', Cl: 'Cl⁻ хлорид', SO4: 'SO₄²⁻ сульфат', HCO3: 'HCO₃⁻ гидрокарбонат',
+  CO3: 'CO₃²⁻ карбонат', NO3: 'NO₃⁻ нитрат', F: 'F⁻ фторид', SiO2: 'SiO₂ кремний', B: 'B бор'
+};
+var CATIONS = ['Na', 'Ca', 'Mg', 'K', 'NH4', 'Ba', 'Sr'];
+var ANIONS = ['Cl', 'HCO3', 'SO4', 'CO3', 'NO3', 'F', 'SiO2', 'B'];
+
+// ================= инициализация =================
+(function init() {
+  var wt = document.getElementById('waterType');
+  RO_WATER_TYPES.forEach(function (w) {
+    var o = document.createElement('option');
+    o.value = w.key; o.textContent = w.label;
+    if (w.key === 'well') o.selected = true;
+    wt.appendChild(o);
+  });
+  buildIonInputs();
+  renderStages();
+  renderSummary();
+  refreshProjectList();
+})();
+
+function buildIonInputs() {
+  function rows(keys, el) {
+    keys.forEach(function (k) {
+      var d = document.createElement('div');
+      d.className = 'ion-row';
+      d.innerHTML = '<span class="nm">' + ION_LABELS[k].split(' ')[0] + '</span>' +
+        '<input type="number" min="0" step="0.1" value="0" id="ion_' + k + '" oninput="renderSummary()" title="' + ION_LABELS[k] + '">' +
+        '<span class="mq" id="meq_' + k + '">0 мэкв</span>';
+      el.appendChild(d);
+    });
+  }
+  rows(CATIONS, document.getElementById('colCations'));
+  rows(ANIONS, document.getElementById('colAnions'));
+}
+
+function num(id) { return parseFloat(document.getElementById(id).value) || 0; }
+
+function currentIons() {
+  if (mode === 'tds') return RO.ionsFromTDS(num('tds'));
+  var ions = RO.blankIons();
+  RO.ION_KEYS.forEach(function (k) {
+    var el = document.getElementById('ion_' + k);
+    if (el) ions[k] = parseFloat(el.value) || 0;
+  });
+  return ions;
+}
+
+function setMode(m) {
+  mode = m;
+  document.getElementById('modeTds').classList.toggle('on', m === 'tds');
+  document.getElementById('modeFull').classList.toggle('on', m === 'full');
+  document.getElementById('tdsBlock').style.display = m === 'tds' ? '' : 'none';
+  document.getElementById('fullBlock').style.display = m === 'full' ? '' : 'none';
+  renderSummary();
+}
+
+function setFlowMode(m) {
+  flowMode = m;
+  document.getElementById('byPerm').classList.toggle('on', m === 'perm');
+  document.getElementById('byFeed').classList.toggle('on', m === 'feed');
+  document.getElementById('flowLabel').textContent = m === 'perm' ? 'Пермеат, м³/ч' : 'Подача, м³/ч';
+}
+
+function renderSummary() {
+  var ions = currentIons();
+  var s = RO.summarize(ions);
+  if (mode === 'full') {
+    RO.ION_KEYS.forEach(function (k) {
+      var el = document.getElementById('meq_' + k);
+      if (el) el.textContent = RO.meq(k, ions[k] || 0).toFixed(2) + ' мэкв';
+    });
+  }
+  var balCls = Math.abs(s.balancePct) < 2 ? 'balance-ok' : 'balance-bad';
+  document.getElementById('sumline').innerHTML =
+    '<span>Катионы: <b>' + s.cationsMeq.toFixed(2) + '</b> мэкв/л</span>' +
+    '<span>Анионы: <b>' + s.anionsMeq.toFixed(2) + '</b> мэкв/л</span>' +
+    '<span class="' + balCls + '">Баланс: <b>' + s.balancePct.toFixed(1) + '%</b></span>' +
+    '<span>TDS: <b>' + s.tds.toFixed(0) + '</b> мг/л</span>' +
+    '<span>π ≈ <b>' + RO.osmoticPressure(ions, num('temp')).toFixed(2) + '</b> бар</span>';
+}
+
+function doAutoBalance() {
+  var b = RO.autoBalance(currentIons());
+  RO.ION_KEYS.forEach(function (k) {
+    var el = document.getElementById('ion_' + k);
+    if (el) el.value = (Math.round(b[k] * 100) / 100) || 0;
+  });
+  renderSummary();
+}
+
+// ================= ступени =================
+function membraneOptions(sel) {
+  var g8 = RO_MEMBRANES.filter(function (m) { return m.form === '8040'; });
+  var g4 = RO_MEMBRANES.filter(function (m) { return m.form !== '8040'; });
+  function opts(list) {
+    return list.map(function (m) {
+      return '<option value="' + m.name + '"' + (m.name === sel ? ' selected' : '') + '>' + m.name + '</option>';
+    }).join('');
+  }
+  return '<optgroup label="8040 (промышленные)">' + opts(g8) + '</optgroup>' +
+         '<optgroup label="4040 и малые">' + opts(g4) + '</optgroup>';
+}
+
+function renderStages() {
+  [1, 2].forEach(function (p) {
+    var host = document.getElementById('stages' + p);
+    host.innerHTML = '';
+    stages[p].forEach(function (st, i) {
+      var d = document.createElement('div');
+      d.className = 'stage-row';
+      d.innerHTML =
+        '<span class="stg-n">Ст. ' + (i + 1) + '</span>' +
+        '<div><label>Корпусов</label><input type="number" min="1" max="40" value="' + st.vessels + '" onchange="stages[' + p + '][' + i + '].vessels=parseInt(this.value)||1"></div>' +
+        '<div><label>Элементов</label><input type="number" min="1" max="8" value="' + st.elements + '" onchange="stages[' + p + '][' + i + '].elements=parseInt(this.value)||1"></div>' +
+        '<div><label>Мембрана</label><select onchange="stages[' + p + '][' + i + '].membrane=this.value">' + membraneOptions(st.membrane) + '</select></div>' +
+        (stages[p].length > 1 ? '<button class="del-x" onclick="delStage(' + p + ',' + i + ')" title="Удалить ступень">✕</button>' : '<span></span>');
+      host.appendChild(d);
+    });
+  });
+  document.getElementById('pass2block').style.display = document.getElementById('pass2on').checked ? '' : 'none';
+}
+
+function addStage(p) {
+  if (stages[p].length >= 4) return;
+  var prev = stages[p][stages[p].length - 1];
+  stages[p].push({ vessels: Math.max(1, Math.ceil(prev.vessels / 2)), elements: prev.elements, membrane: prev.membrane });
+  renderStages();
+}
+function delStage(p, i) { stages[p].splice(i, 1); renderStages(); }
+
+// ================= автоподбор конфигурации =================
+function autoConfig() {
+  var ions = currentIons();
+  var tds = RO.summarize(ions).tds;
+  var rec = num('recovery') / 100 || 0.75;
+  var permQ = flowMode === 'perm' ? num('flow') : num('flow') * rec;
+  if (permQ <= 0) { alert('Укажите производительность'); return; }
+  var small = permQ < 1.8; // до ~1.8 м3/ч пермеата - типоразмер 4040
+  var name;
+  if (tds > 12000) name = small ? 'SW4040HR' : 'SW8040HR-400';
+  else if (tds > 3000) name = small ? 'LP21-4040' : 'LP22-8040';
+  else if (tds > 800) name = small ? 'ULP21-4040' : 'ULP22-8040';
+  else name = small ? 'XLP11-4040' : 'XLP12-8040';
+  var mem = RO_MEMBRANES.find(function (m) { return m.name === name; });
+  var wt = document.getElementById('waterType').value;
+  var lim = mem.limits[wt] || mem.limits.well;
+  stages[1] = sizePass(permQ, rec, name, lim);
+  // если включён второй проход - подобрать и его (питание пермеатом)
+  if (document.getElementById('pass2on').checked) {
+    var rec2 = num('rec2') / 100 || 0.85;
+    var name2 = permQ < 1.8 ? 'ULP21-4040' : 'ULP22-8040';
+    var mem2 = RO_MEMBRANES.find(function (m) { return m.name === name2; });
+    stages[2] = sizePass(permQ * rec2, rec2, name2, mem2.limits.ro_permeate);
+  }
+  renderStages();
+}
+
+// подбор массива корпусов под требуемый пермеат: flux с запасом 15% от лимита,
+// при recovery >= 60% и 2+ корпусах - двухступенчатая схема ~2:1
+function sizePass(permQ, rec, memName, lim) {
+  var mem = RO_MEMBRANES.find(function (m) { return m.name === memName; });
+  var small = mem.form !== '8040';
+  var flux = lim.fluxMax_lmh * 0.85;
+  var elems = Math.max(1, Math.ceil(permQ * 1000 / flux / mem.area_m2));
+  var perVessel = small ? Math.min(4, Math.max(2, elems)) : 6;
+  var vessels = Math.max(1, Math.ceil(elems / perVessel));
+  if (vessels >= 2 && rec >= 0.6) {
+    var v1 = Math.max(1, Math.round(vessels * 2 / 3));
+    var v2 = vessels - v1;
+    if (v2 >= 1) return [
+      { vessels: v1, elements: perVessel, membrane: memName },
+      { vessels: v2, elements: perVessel, membrane: memName }
+    ];
+  }
+  return [{ vessels: vessels, elements: small ? Math.max(2, Math.min(6, elems)) : perVessel, membrane: memName }];
+}
+
+// ================= расчёт =================
+function buildCfg() {
+  var ions = currentIons();
+  var rec = num('recovery') / 100;
+  var feedQ = flowMode === 'feed' ? num('flow') : num('flow') / rec;
+  var passes = [{ stages: stages[1].map(function (s) { return { vessels: s.vessels, elements: s.elements, membrane: s.membrane }; }) }];
+  if (document.getElementById('pass2on').checked) {
+    passes.push({
+      stages: stages[2].map(function (s) { return { vessels: s.vessels, elements: s.elements, membrane: s.membrane }; }),
+      recovery: num('rec2') / 100 || 0.85
+    });
+  }
+  return {
+    ions: ions, ph: num('ph'), tempC: num('temp'),
+    waterType: document.getElementById('waterType').value,
+    feedFlow_m3h: feedQ, recovery: rec, ff: num('ff') || 0.85,
+    recycleP2Conc: document.getElementById('recycle2').checked,
+    passes: passes
+  };
+}
+
+function calculate() {
+  var cfg = buildCfg();
+  if (!(cfg.feedFlow_m3h > 0) || !(cfg.recovery > 0)) { alert('Проверьте производительность и recovery'); return; }
+  try {
+    lastResult = RO.project(cfg, RO_MEMBRANES);
+    lastCfg = cfg;
+  } catch (e) {
+    alert('Ошибка расчёта: ' + e.message);
+    return;
+  }
+  renderResults();
+  document.getElementById('resultsCard').style.display = '';
+  document.getElementById('resultsCard').scrollIntoView({ behavior: 'smooth' });
+}
+
+function fmt(x, d) { return x === null || x === undefined || isNaN(x) ? '-' : x.toFixed(d === undefined ? 2 : d); }
+
+function renderResults() {
+  var r = lastResult;
+  var h = '';
+  // плитки
+  h += '<div class="tiles">';
+  h += '<div class="tile"><div class="tv">' + fmt(r.passes[0].pressure, 1) + '</div><div class="tl">Давление подачи, бар</div></div>';
+  if (r.passes.length > 1) h += '<div class="tile"><div class="tv">' + fmt(r.passes[1].pressure, 1) + '</div><div class="tl">Давление 2-го прохода, бар</div></div>';
+  h += '<div class="tile"><div class="tv">' + fmt(r.permeate.q, 2) + '</div><div class="tl">Пермеат, м³/ч</div></div>';
+  h += '<div class="tile"><div class="tv">' + fmt(r.permeate.tds, 1) + '</div><div class="tl">TDS пермеата, мг/л</div></div>';
+  h += '<div class="tile"><div class="tv">' + fmt(r.systemRecovery * 100, 1) + '%</div><div class="tl">Recovery системы</div></div>';
+  h += '<div class="tile"><div class="tv">' + fmt(r.concentrate.q, 2) + '</div><div class="tl">Концентрат (дренаж), м³/ч</div></div>';
+  h += '</div>';
+  // предупреждения
+  if (r.warnings.length) {
+    h += '<div class="warnbox"><b>⚠ Предупреждения (' + r.warnings.length + '):</b>';
+    r.warnings.forEach(function (w) { h += '<div>• ' + w + '</div>'; });
+    h += '</div>';
+  } else {
+    h += '<div class="okbox">✓ Конфигурация в пределах проектных лимитов для выбранного типа воды</div>';
+  }
+  // потоки
+  h += '<div class="section-h">Балансы потоков</div><div class="tbl-scroll"><table class="res"><tr><th>Поток</th><th>Расход, м³/ч</th><th>TDS, мг/л</th><th>pH</th></tr>';
+  h += '<tr><td>Подача</td><td>' + fmt(r.feed.q) + '</td><td>' + fmt(r.feed.tds, 0) + '</td><td>' + fmt(r.feed.ph, 1) + '</td></tr>';
+  h += '<tr><td>Пермеат</td><td>' + fmt(r.permeate.q) + '</td><td>' + fmt(r.permeate.tds, 1) + '</td><td>' + fmt(r.permeate.ph, 2) + '</td></tr>';
+  h += '<tr><td>Концентрат</td><td>' + fmt(r.concentrate.q) + '</td><td>' + fmt(r.concentrate.tds, 0) + '</td><td>' + fmt(r.concentrate.ph, 2) + '</td></tr>';
+  h += '</table></div>';
+  // поэлементно
+  h += '<div class="section-h">Поэлементный расчёт</div><div class="tbl-scroll"><table class="res">';
+  h += '<tr><th>Проход/ступень/эл.</th><th>Подача, м³/ч</th><th>Пермеат, м³/ч</th><th>Flux, LMH</th><th>β</th><th>P вх, бар</th><th>TDS перм., мг/л</th></tr>';
+  r.passes.forEach(function (pr, pi) {
+    var pIn = pr.pressure; // давление входа сквозное: элемент -> элемент -> следующая ступень
+    pr.res.stages.forEach(function (st, si) {
+      st.elements.forEach(function (el, ei) {
+        h += '<tr><td>' + (r.passes.length > 1 ? 'П' + (pi + 1) + ' / ' : '') + 'Ст.' + (si + 1) + ' / эл.' + (ei + 1) +
+          ' <span class="muted">' + st.mem.name + '</span></td>' +
+          '<td>' + fmt(ei === 0 ? st.feedPerVessel : st.elements[ei - 1].qConc) + '</td>' +
+          '<td>' + fmt(el.qPerm, 3) + '</td>' +
+          '<td>' + fmt(el.flux, 1) + '</td>' +
+          '<td>' + fmt(el.beta, 2) + '</td>' +
+          '<td>' + fmt(pIn, 1) + '</td>' +
+          '<td>' + fmt(RO.summarize(el.cPerm).tds, 1) + '</td></tr>';
+        pIn = el.pOut;
+      });
+    });
+  });
+  h += '</table></div>';
+  // ионный состав
+  if (mode === 'full') {
+    h += '<div class="section-h">Ионный состав, мг/л</div><div class="tbl-scroll"><table class="res"><tr><th>Ион</th><th>Подача</th><th>Пермеат</th><th>Концентрат</th></tr>';
+    RO.ION_KEYS.forEach(function (k) {
+      if ((r.feed.ions[k] || 0) < 0.01) return;
+      h += '<tr><td>' + ION_LABELS[k] + '</td><td>' + fmt(r.feed.ions[k]) + '</td><td>' +
+        fmt(r.permeate.ions[k], 3) + '</td><td>' + fmt(r.concentrate.ions[k], 1) + '</td></tr>';
+    });
+    h += '</table></div>';
+  }
+  // scaling
+  h += '<div class="section-h">Осадкообразование в концентрате</div>';
+  var sc = r.scaling;
+  h += '<div class="row" style="align-items:stretch">';
+  h += '<div style="flex:1;min-width:220px">';
+  if (sc.lsi !== null) {
+    var lsiPct = Math.min(100, Math.max(0, (sc.lsi + 1) / 3 * 100));
+    h += satRow('LSI (индекс Ленжелье)', fmt(sc.lsi, 2), lsiPct, sc.lsi > 0 ? '#d93025' : '#188038');
+  } else {
+    h += '<div class="sat-item">LSI: <b>нет данных</b> <span class="muted">(нужны Ca и HCO₃ в анализе)</span></div>';
+  }
+  [['CaSO4', 'CaSO₄ (гипс)'], ['BaSO4', 'BaSO₄ (барит)'], ['SrSO4', 'SrSO₄'], ['CaF2', 'CaF₂'], ['SiO2', 'SiO₂ (кремний)']].forEach(function (p) {
+    var v = sc.sat[p[0]];
+    h += satRow(p[1], fmt(v, 0) + '%', Math.min(100, v), v > 80 ? '#d93025' : v > 50 ? '#f9ab00' : '#188038');
+  });
+  h += '</div><div style="flex:1.4;min-width:260px">';
+  sc.advice.forEach(function (a) { h += '<div class="advice">' + a + '</div>'; });
+  h += '</div></div>';
+  document.getElementById('resultsBody').innerHTML = h;
+}
+
+function satRow(label, val, pct, color) {
+  return '<div class="sat-item">' + label + '<span class="sv" style="color:' + color + '">' + val + '</span>' +
+    '<div class="satbar"><i style="width:' + pct + '%;background:' + color + '"></i></div></div>';
+}
+
+// ================= отчёт (печать) =================
+function printReport() {
+  if (!lastResult) return;
+  var r = lastResult, cfg = lastCfg;
+  var today = new Date().toLocaleDateString('ru-RU');
+  var wtLabel = RO_WATER_TYPES.find(function (w) { return w.key === cfg.waterType; }).label;
+  var h = '';
+  h += '<div class="pr-head"><div style="display:flex;gap:6mm;align-items:center"><img src="assets/logo_aruan.png"><img src="assets/logo_aurus.png"></div>' +
+    '<div class="c">📞 8-800-100-39-54 · ✉ prom10@aruan.ru · 🌐 www.filtr-aruan.ru</div></div>';
+  h += '<h2>Проектный расчёт системы обратного осмоса</h2>';
+  h += '<div style="font-size:11px;color:#555;margin-bottom:8px">Дата: ' + today + ' · Тип воды: ' + wtLabel +
+    ' · Температура: ' + cfg.tempC + ' °C · Fouling factor: ' + cfg.ff + '</div>';
+  h += '<h3>Конфигурация</h3><table><tr><th>Проход</th><th>Ступень</th><th>Корпусов</th><th>Элементов в корпусе</th><th>Мембрана</th></tr>';
+  cfg.passes.forEach(function (p, pi) {
+    p.stages.forEach(function (s, si) {
+      h += '<tr><td>' + (pi + 1) + '</td><td>' + (si + 1) + '</td><td>' + s.vessels + '</td><td>' + s.elements + '</td><td>' + s.membrane + '</td></tr>';
+    });
+  });
+  h += '</table>';
+  h += '<h3>Основные результаты</h3><table>';
+  h += '<tr><td>Давление подачи</td><td><b>' + fmt(r.passes[0].pressure, 1) + ' бар</b></td></tr>';
+  if (r.passes.length > 1) h += '<tr><td>Давление 2-го прохода</td><td>' + fmt(r.passes[1].pressure, 1) + ' бар</td></tr>';
+  h += '<tr><td>Производительность по пермеату</td><td><b>' + fmt(r.permeate.q, 2) + ' м³/ч</b></td></tr>';
+  h += '<tr><td>TDS пермеата</td><td><b>' + fmt(r.permeate.tds, 1) + ' мг/л</b> (подача ' + fmt(r.feed.tds, 0) + ' мг/л)</td></tr>';
+  h += '<tr><td>Recovery системы</td><td>' + fmt(r.systemRecovery * 100, 1) + ' %</td></tr>';
+  h += '<tr><td>Концентрат в дренаж</td><td>' + fmt(r.concentrate.q, 2) + ' м³/ч (TDS ' + fmt(r.concentrate.tds, 0) + ' мг/л)</td></tr>';
+  h += '<tr><td>pH пермеата / концентрата</td><td>' + fmt(r.permeate.ph, 2) + ' / ' + fmt(r.concentrate.ph, 2) + '</td></tr>';
+  h += '</table>';
+  h += '<h3>Балансы потоков</h3><table><tr><th>Поток</th><th>Расход, м³/ч</th><th>TDS, мг/л</th><th>pH</th></tr>';
+  h += '<tr><td>Подача</td><td>' + fmt(r.feed.q) + '</td><td>' + fmt(r.feed.tds, 0) + '</td><td>' + fmt(r.feed.ph, 1) + '</td></tr>';
+  h += '<tr><td>Пермеат</td><td>' + fmt(r.permeate.q) + '</td><td>' + fmt(r.permeate.tds, 1) + '</td><td>' + fmt(r.permeate.ph, 2) + '</td></tr>';
+  h += '<tr><td>Концентрат</td><td>' + fmt(r.concentrate.q) + '</td><td>' + fmt(r.concentrate.tds, 0) + '</td><td>' + fmt(r.concentrate.ph, 2) + '</td></tr></table>';
+  h += '<h3>Осадкообразование (концентрат)</h3><table><tr><th>Показатель</th><th>Значение</th></tr>';
+  if (r.scaling.lsi !== null) h += '<tr><td>LSI</td><td>' + fmt(r.scaling.lsi, 2) + '</td></tr>';
+  h += '<tr><td>CaSO₄</td><td>' + fmt(r.scaling.sat.CaSO4, 0) + ' %</td></tr>';
+  h += '<tr><td>BaSO₄</td><td>' + fmt(r.scaling.sat.BaSO4, 0) + ' %</td></tr>';
+  h += '<tr><td>SiO₂</td><td>' + fmt(r.scaling.sat.SiO2, 0) + ' %</td></tr></table>';
+  r.scaling.advice.forEach(function (a) { h += '<div style="font-size:11px;margin:2px 0">• ' + a + '</div>'; });
+  if (r.warnings.length) {
+    h += '<h3>Предупреждения</h3>';
+    r.warnings.forEach(function (w) { h += '<div style="font-size:11px;margin:2px 0">⚠ ' + w + '</div>'; });
+  }
+  h += '<div style="font-size:9.5px;color:#777;margin-top:10px">Расчёт выполнен в модуле RO-проектирования (модель растворения-диффузии, база мембран Vontron). ' +
+    'Носит проектный характер: качество пермеата указано для новых мембран, фактические параметры зависят от состояния воды и мембран.</div>';
+  document.getElementById('printArea').innerHTML = h;
+  window.print();
+}
+
+// ================= В КП =================
+function toKP() {
+  if (!lastResult) return;
+  var r = lastResult;
+  var permLh = r.permeate.q * 1000;
+  // подбор установки из каталога по производительности (категория RO)
+  var roItems = EQUIPMENT_DB.filter(function (e) {
+    return e.category === 'Системы обратного осмоса' && /RO[- ]?(\d+)/i.test(e.name);
+  }).map(function (e) {
+    return { eq: e, lh: parseInt(e.name.match(/RO[- ]?(\d+)/i)[1], 10) };
+  }).sort(function (a, b) { return a.lh - b.lh; });
+  var pick = null, qty = 1;
+  var fit = roItems.filter(function (x) { return x.lh >= permLh * 0.95; });
+  if (fit.length) pick = fit[0];
+  else if (roItems.length) { pick = roItems[roItems.length - 1]; qty = Math.ceil(permLh / pick.lh); }
+  var items = [];
+  if (pick) {
+    var eq = pick.eq;
+    items.push({ id: eq.id, name: eq.name, specs: eq.specs, unit: eq.unit, price: eq.price,
+      productivity: eq.productivity, category: eq.category, brand: eq.brand, img: eq.img,
+      quantity: qty, customPrice: eq.price });
+  }
+  var specTxt = 'Проектный расчёт: пермеат ' + fmt(r.permeate.q, 2) + ' м³/ч, TDS ' + fmt(r.permeate.tds, 1) +
+    ' мг/л (подача ' + fmt(r.feed.tds, 0) + ' мг/л), давление ' + fmt(r.passes[0].pressure, 1) +
+    ' бар, recovery ' + fmt(r.systemRecovery * 100, 0) + '%. Мембраны: ' +
+    lastCfg.passes.map(function (p) { return p.stages.map(function (s) { return s.vessels + 'x' + s.elements + ' ' + s.membrane; }).join(' + '); }).join(' // ');
+  items.push({ id: -(Date.now()), name: 'Проектирование системы обратного осмоса (расчёт по анализу воды)',
+    specs: specTxt, unit: 'усл.', price: 0, customPrice: 0, quantity: 1, img: null, category: '', brand: '' });
+  var needSoft = r.scaling.advice.some(function (a) { return a.indexOf('умягчени') >= 0; });
+  var needAnti = r.scaling.advice.some(function (a) { return a.indexOf('антискалант') >= 0; });
+  if (needAnti) {
+    items.push({ id: -(Date.now() + 1), name: 'Станция дозирования антискаланта',
+      specs: 'По результатам scaling-прогноза: ' + r.scaling.advice[0], unit: 'компл.', price: 0,
+      customPrice: 0, quantity: 1, img: null, category: '', brand: '' });
+  }
+  var hist;
+  try { hist = JSON.parse(localStorage.getItem('kp_history') || '[]'); } catch (e) { hist = []; }
+  var entry = {
+    id: Date.now(),
+    client: { name: '', company: '', phone: '', email: '', kpNum: '', kpDate: new Date().toISOString().split('T')[0] },
+    items: items, discount: 0
+  };
+  hist.unshift(entry);
+  localStorage.setItem('kp_history', JSON.stringify(hist));
+  if (confirm('Черновик КП создан (' + items.length + ' позиций' + (pick ? ', установка ' + pick.eq.name : '') +
+    (needSoft ? ', требуется умягчение - добавьте колонну' : '') + ').\n\nОткрыть конструктор КП?')) {
+    location.href = 'index.html';
+  }
+}
+
+// ================= проекты =================
+function projStore() { try { return JSON.parse(localStorage.getItem('ro_projects') || '{}'); } catch (e) { return {}; } }
+function refreshProjectList() {
+  var sel = document.getElementById('projSelect');
+  var cur = sel.value;
+  sel.innerHTML = '<option value="">- проекты -</option>';
+  Object.keys(projStore()).sort().forEach(function (k) {
+    var o = document.createElement('option');
+    o.value = k; o.textContent = k;
+    sel.appendChild(o);
+  });
+  sel.value = cur || '';
+}
+function collectState() {
+  var ions = {};
+  RO.ION_KEYS.forEach(function (k) {
+    var el = document.getElementById('ion_' + k);
+    if (el) ions[k] = parseFloat(el.value) || 0;
+  });
+  return {
+    mode: mode, flowMode: flowMode, tds: num('tds'), ions: ions,
+    temp: num('temp'), ph: num('ph'), waterType: document.getElementById('waterType').value,
+    flow: num('flow'), recovery: num('recovery'), ff: num('ff'),
+    pass2: document.getElementById('pass2on').checked, rec2: num('rec2'),
+    recycle2: document.getElementById('recycle2').checked, stages: stages
+  };
+}
+function applyState(s) {
+  setMode(s.mode); setFlowMode(s.flowMode);
+  document.getElementById('tds').value = s.tds;
+  RO.ION_KEYS.forEach(function (k) {
+    var el = document.getElementById('ion_' + k);
+    if (el) el.value = (s.ions && s.ions[k]) || 0;
+  });
+  document.getElementById('temp').value = s.temp;
+  document.getElementById('ph').value = s.ph;
+  document.getElementById('waterType').value = s.waterType;
+  document.getElementById('flow').value = s.flow;
+  document.getElementById('recovery').value = s.recovery;
+  document.getElementById('ff').value = s.ff;
+  document.getElementById('pass2on').checked = !!s.pass2;
+  document.getElementById('rec2').value = s.rec2 || 85;
+  document.getElementById('recycle2').checked = s.recycle2 !== false;
+  stages = s.stages || stages;
+  renderStages(); renderSummary();
+}
+function saveProject() {
+  var name = prompt('Название проекта:', document.getElementById('projSelect').value || 'RO_' + new Date().toISOString().slice(0, 10));
+  if (!name) return;
+  var st = projStore();
+  st[name] = collectState();
+  localStorage.setItem('ro_projects', JSON.stringify(st));
+  refreshProjectList();
+  document.getElementById('projSelect').value = name;
+}
+function loadProject(name) {
+  if (!name) return;
+  var st = projStore();
+  if (st[name]) applyState(st[name]);
+}
+function deleteProject() {
+  var name = document.getElementById('projSelect').value;
+  if (!name || !confirm('Удалить проект «' + name + '»?')) return;
+  var st = projStore();
+  delete st[name];
+  localStorage.setItem('ro_projects', JSON.stringify(st));
+  refreshProjectList();
+}
+
+// demo mode как на остальных страницах
+(function(){var p=new URLSearchParams(location.search);if(p.get('demo')==='1'){var n=document.getElementById('ecoNav');if(n)n.style.display='none';}})();
+</script>
+</body>
+</html>

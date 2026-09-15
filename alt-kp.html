@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Альтернативные коммерческие предложения</title>
+<style>
+/* latin */ @font-face {
+  font-display:swap;font-family: 'Dancing Script';
+  font-style: normal;
+  font-weight: 700;
+  src: url(fonts/dancing-700-latin.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+</style>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;font-size:13px;color:#111;background:#e8e8e8}
+#controls{background:#1a2332;color:#fff;padding:10px 18px;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.4)}
+#controls label{font-size:12px;display:flex;align-items:center;gap:5px;white-space:nowrap}
+#controls input[type=number]{width:58px;padding:4px 6px;border:1px solid #555;border-radius:4px;background:#2a3444;color:#fff;font-size:12px;text-align:center}
+.ctrl-sep{width:1px;background:#444;height:22px;flex-shrink:0}
+.cbtn{padding:7px 14px;border-radius:5px;border:none;cursor:pointer;font-size:12px;font-weight:600;white-space:nowrap}
+.cbtn-primary{background:#1565C0;color:#fff}
+.cbtn-outline{background:transparent;color:#ccc;border:1px solid #555}
+.cbtn:hover{opacity:.8}
+.tab-grp{display:flex;gap:6px}
+.tab-btn{padding:5px 13px;border-radius:4px;border:1px solid #555;background:transparent;color:#aaa;cursor:pointer;font-size:11px}
+.tab-btn.active{background:#42A5F5;color:#fff;border-color:#42A5F5}
+.kp-wrapper{max-width:880px;margin:24px auto;padding:0 16px 40px}
+.kp-page{background:#fff;padding:28px 34px;box-shadow:0 2px 16px rgba(0,0,0,.15);margin-bottom:28px}
+.kp-page.hidden{display:none}
+
+/* ─── Template 1 ─── */
+.t1-head-top{display:flex;justify-content:space-between;align-items:flex-start}
+.t1-type{font-size:11px;color:#555;margin-bottom:1px}
+.t1-name{font-size:20px;font-weight:900;color:#1a237e;line-height:1.1}
+.t1-addr{font-size:10px;color:#555;text-align:right;line-height:1.7}
+.t1-banner{background:linear-gradient(90deg,#1b5e20,#2e7d32,#43a047,#66bb6a,#a5d6a7,#c8e6c9);height:62px;margin:8px -34px 0;display:flex;align-items:center;justify-content:flex-end;padding-right:16px}
+.t1-title{text-align:center;margin:16px 0 12px;font-style:italic;font-weight:bold;font-size:13px}
+.t1-section{font-weight:bold;text-decoration:underline;margin-bottom:6px;font-size:13px}
+.t1-tbl{width:100%;border-collapse:collapse;border:1px solid #000;font-size:11.5px}
+.t1-tbl th,.t1-tbl td{border:1px solid #000;padding:5px 7px;vertical-align:top}
+.t1-tbl th{color:#c62828;text-decoration:underline;font-size:11px;text-align:center;font-weight:bold;background:#fafafa}
+.t1-tbl td{vertical-align:middle}
+.t1-total td{background:#3949ab;color:#fff;font-weight:bold;font-size:11.5px}
+.t1-footer td{font-size:11.5px}
+.t1-sign{margin-top:26px;display:flex;align-items:flex-end;gap:16px}
+
+/* ─── Template 2 ─── */
+.t2-req{font-size:9px;color:#111;line-height:1.55;margin-bottom:14px;border-bottom:1px solid #000;padding-bottom:10px}
+.t2-title{text-align:center;margin:14px 0 5px;font-weight:bold;font-size:14px;line-height:1.4}
+.t2-from{text-align:center;margin-bottom:12px;font-weight:bold;font-size:12px}
+.t2-intro{font-size:12px;line-height:1.65;margin-bottom:12px;text-indent:24px}
+.t2-tbl{width:100%;border-collapse:collapse;border:1px solid #000;font-size:12px;margin-bottom:10px}
+.t2-tbl th{border:1px solid #000;padding:7px 8px;background:#f0f0f0;font-weight:bold;text-align:center;vertical-align:middle}
+.t2-tbl td{border:1px solid #000;padding:6px 8px;vertical-align:middle}
+.t2-tbl .t2-num{text-align:center;width:32px}
+.t2-tbl .t2-qty{text-align:center;width:50px}
+.t2-tbl .t2-price{text-align:right;width:90px}
+.t2-tbl .t2-sum{text-align:right;width:100px;font-weight:600}
+.t2-tbl .t2-sub td{color:#555;font-size:11px}
+.t2-tbl .t2-bold td{font-weight:bold}
+.t2-note{font-size:11.5px;line-height:1.65;margin-top:8px;text-indent:24px;color:#222}
+.t2-sign{margin-top:22px}
+.sig-cursive{font-family:'Dancing Script',cursive;font-size:30px;color:#1a1a8c;display:inline-block;transform:rotate(-4deg);line-height:1}
+
+@media print{
+  @page{margin:0}
+  body{background:#fff}
+  #controls{display:none!important}
+  .kp-wrapper{margin:0;padding:0;max-width:100%}
+  .kp-page{box-shadow:none;margin-bottom:0;padding:12mm 10mm}
+  .kp-page.hidden{display:none!important}
+  body.print-kp1 #kp2{display:none!important}
+  body.print-kp2 #kp1{display:none!important}
+  body.print-both #kp1{page-break-after:always}
+  body.print-both #kp2{display:block!important}
+}
+</style>
+</head>
+<body>
+
+<div id="controls">
+  <button class="cbtn cbtn-outline" onclick="window.opener?window.close():history.back()">← Назад</button>
+  <div class="ctrl-sep"></div>
+  <label>ЮНИОРСПЕЦСНАБ +<input type="number" id="altM1" value="20" min="1" max="500">%</label>
+  <label>ИП Потапенко +<input type="number" id="altM2" value="35" min="1" max="500">%</label>
+  <label>Срок поставки <input type="text" id="deliveryDays" value="15" style="width:120px" title="Число дней или свободный текст"> дней</label>
+  <button class="cbtn cbtn-primary" onclick="rerender()">Обновить</button>
+  <div class="ctrl-sep"></div>
+  <div class="tab-grp">
+    <button class="tab-btn active" id="tab1" onclick="switchTab(1)">КП 1 — ЮНИОРСПЕЦСНАБ</button>
+    <button class="tab-btn" id="tab2" onclick="switchTab(2)">КП 2 — ИП Потапенко</button>
+    <button class="tab-btn" id="tab0" onclick="switchTab(0)">Оба</button>
+  </div>
+  <div class="ctrl-sep"></div>
+  <button class="cbtn cbtn-primary" onclick="printKP(activeTab)">🖨 Печатать</button>
+</div>
+
+<div class="kp-wrapper">
+  <div id="kp1" class="kp-page">Загрузка…</div>
+  <div id="kp2" class="kp-page hidden">Загрузка…</div>
+</div>
+
+<script>
+var SUPA_URL='https://uclzyzztoripulpcpshp.supabase.co';
+var ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVjbHp5enp0b3JpcHVscGNwc2hwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3ODIyNzMsImV4cCI6MjA5MjM1ODI3M30.rX-WT1WdZiwRakVcUEkcg-_dnWzfU49LvgTNHYgBYQ0';
+var params=new URLSearchParams(location.search);
+var kpData=null;
+var activeTab=1;
+
+/* ─── Utilities ─────────────────────────────────────────────── */
+function ap(price,m){return Math.ceil(price*(1+m/100)/100)*100;}
+function fmt(n){return Number(n).toLocaleString('ru-RU');}
+function ruDate(){
+  var d=new Date();
+  var mo=['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+  return d.getDate()+' '+mo[d.getMonth()]+' '+d.getFullYear()+' г.';
+}
+function altNums(entry){
+  var id=Math.abs(entry.id||Date.now())%100000;
+  var n1=(id%4999)+5000;
+  var n2a=String(((Math.floor(id/7))%9000)+1000);
+  var n2b=String(((Math.floor(id/13))%9000)+1000);
+  return{kp1:String(n1),kp2:n2a+'-'+n2b};
+}
+function notInclList(entry){
+  var c=entry.client||{},list=[];
+  if(!c.inclDelivery)list.push('доставка');
+  if(!c.inclMontage)list.push('монтаж и пуско-наладка');
+  if(!c.inclObvyazka)list.push('монтаж трубопроводной обвязки');
+  return list;
+}
+function svcItems(entry,m){
+  var c=entry.client||{},r=[];
+  var bmz=(entry.items||[]).some(function(i){return i.category==='Блочно-модульные здания';});
+  var s=bmz?' (внутри БМЗ)':'';
+  if(c.inclDelivery&&c.priceDelivery>0)r.push({n:c.svcNameDelivery||'Транспортные услуги',p:ap(c.priceDelivery,m)});
+  if(c.inclMontage&&c.priceMontage>0)r.push({n:(c.svcNameMontage||('Монтаж и пуско-наладка оборудования'+s)),p:ap(c.priceMontage,m)});
+  if(c.inclObvyazka&&c.priceObvyazka>0)r.push({n:(c.svcNameObvyazka||('Монтаж трубопроводной обвязки'+s)),p:ap(c.priceObvyazka,m)});
+  if(c.inclVyezd&&c.priceVyezd>0)r.push({n:c.svcNameVyezd||'Выезд технического специалиста',p:ap(c.priceVyezd,m)});
+  if(c.inclKomandirovka&&c.priceKomandirovka>0)r.push({n:c.svcNameKomandirovka||'Командировочные расходы',p:ap(c.priceKomandirovka,m)});
+  return r;
+}
+function calcTotal(entry,m){
+  var items=entry.items||[];
+  var svcs=svcItems(entry,m);
+  var eq=items.reduce(function(a,it){return a+ap(it.customPrice,m)*it.quantity;},0);
+  var sv=svcs.reduce(function(a,s){return a+s.p;},0);
+  return Math.round((eq+sv)*(1-(entry.discount||0)/100));
+}
+
+/* ─── SVG Assets ─────────────────────────────────────────────── */
+var BULB='<svg width="68" height="80" viewBox="0 0 68 80" xmlns="http://www.w3.org/2000/svg"><defs><clipPath id="bc"><path d="M34,3 C19,3 7,15 7,31 C7,43 14,52 23,57 L23,63 L45,63 L45,57 C54,52 61,43 61,31 C61,15 49,3 34,3 Z"/></clipPath><linearGradient id="sg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#b3e5fc"/><stop offset="55%" stop-color="#a5d6a7"/><stop offset="100%" stop-color="#388e3c"/></linearGradient></defs><path d="M34,3 C19,3 7,15 7,31 C7,43 14,52 23,57 L23,63 L45,63 L45,57 C54,52 61,43 61,31 C61,15 49,3 34,3 Z" fill="#e8f5e9" stroke="#2e7d32" stroke-width="1.5"/><rect x="8" y="8" width="52" height="55" fill="url(#sg)" clip-path="url(#bc)"/><circle cx="50" cy="14" r="6" fill="#fff176" opacity=".9" clip-path="url(#bc)"/><polygon points="27,62 34,38 41,62" fill="#1b5e20" clip-path="url(#bc)"/><polygon points="13,62 19,47 25,62" fill="#2e7d32" clip-path="url(#bc)"/><line x1="49" y1="62" x2="49" y2="46" stroke="#90a4ae" stroke-width="1.5" clip-path="url(#bc)"/><line x1="44" y1="50" x2="54" y2="42" stroke="#90a4ae" stroke-width="1.2" clip-path="url(#bc)"/><line x1="44" y1="42" x2="54" y2="50" stroke="#90a4ae" stroke-width="1.2" clip-path="url(#bc)"/><rect x="23" y="63" width="22" height="5" rx="1" fill="#90a4ae"/><rect x="24" y="69" width="20" height="5" rx="1" fill="#78909c"/><rect x="26" y="75" width="16" height="5" rx="1" fill="#607d8b"/></svg>';
+
+/* Реальные изображения: подпись Антюфеева и печать Потапенко */
+var SIG_A='<img src="images/unior.png" style="height:60px;display:block;margin-top:6px">';
+var STAMP_P='<img src="images/potapenko.png" style="height:120px;display:block">';
+
+/* Печать ЮНИОРСПЕЦСНАБ: SVG (реального образца нет) */
+var STAMP_Y='<svg width="116" height="116" viewBox="0 0 116 116" xmlns="http://www.w3.org/2000/svg"><circle cx="58" cy="58" r="55" stroke="#0D47A1" stroke-width="2.5" fill="rgba(220,232,255,0.06)"/><circle cx="58" cy="58" r="48" stroke="#0D47A1" stroke-width="1" fill="none"/><defs><path id="yt2" d="M 6,58 A 52,52 0 0,0 110,58"/><path id="yb2" d="M 6,58 A 52,52 0 0,1 110,58"/></defs><text fill="#0D47A1" font-size="9.5" font-family="Arial" font-weight="bold" letter-spacing="2"><textPath href="#yt2" startOffset="4%">ЮниорСпецснаб</textPath></text><text fill="#0D47A1" font-size="8.5" font-family="Arial" font-weight="bold"><textPath href="#yb2" startOffset="26%">★  г. МОСКВА  ★</textPath></text><line x1="18" y1="58" x2="98" y2="58" stroke="#0D47A1" stroke-width="0.8" opacity="0.5"/><text x="58" y="46" text-anchor="middle" fill="#0D47A1" font-size="7.5" font-family="Arial">ООО</text><text x="58" y="73" text-anchor="middle" fill="#0D47A1" font-size="7" font-family="Arial">ДИРЕКТОР</text><text x="58" y="83" text-anchor="middle" fill="#0D47A1" font-size="7" font-family="Arial">Антюфеев В.А.</text></svg>';
+
+/* ─── Template 1: ЮНИОРСПЕЦСНАБ ─────────────────────────────── */
+function renderKP1(entry,m,dd){dd=dd||'15';
+  var nums=altNums(entry);
+  var items=entry.items||[];
+  var svcs=svcItems(entry,m);
+  var discount=entry.discount||0;
+  var rows='';
+  items.forEach(function(it,i){
+    var price=ap(it.customPrice,m);
+    rows+='<tr><td style="text-align:center">'+(i+1)+'</td><td>'+it.name+'</td><td style="text-align:center">'+it.quantity+'</td><td style="text-align:right">'+fmt(price)+'</td><td style="text-align:right;font-weight:600">'+fmt(price*it.quantity)+'</td><td style="text-align:center">'+dd+'</td></tr>';
+  });
+  svcs.forEach(function(s,si){
+    rows+='<tr><td style="text-align:center">'+(items.length+si+1)+'</td><td>'+s.n+'</td><td style="text-align:center">1</td><td style="text-align:right">'+fmt(s.p)+'</td><td style="text-align:right;font-weight:600">'+fmt(s.p)+'</td><td style="text-align:center">—</td></tr>';
+  });
+  var total=calcTotal(entry,m);
+  var totalBase=Math.round(total*100/122);
+  var totalNds=total-totalBase;
+  var c1=entry.client||{};
+  var deliveryRow=c1.inclDelivery
+    ?(c1.priceDelivery>0
+      ?'автомобильным транспортом. Транспортные расходы выделены отдельной строкой в спецификации.'
+      :'автомобильным транспортом. Транспортные расходы включены в стоимость продукции.')
+    :'автомобильным транспортом. Транспортные расходы в стоимость не включены.';
+  var notInclOther=notInclList(entry);
+  return '<div class="t1-head-top">'
+    +'<div><div class="t1-type">Общество с ограниченной ответственностью</div><div class="t1-name">«ЮНИОРСПЕЦСНАБ»</div></div>'
+    +'<div class="t1-addr">Головной офис:<br>Москва, ул.Дубинская д.83<br>тел.: +7 (499) 968-59-95<br>info@kb-spectech.ru</div>'
+    +'</div>'
+    +'<div class="t1-banner">'+BULB+'</div>'
+    +'<div class="t1-title"><em>Коммерческое предложение №'+nums.kp1+' от '+ruDate()+'</em></div>'
+    +'<div class="t1-section">Технологическое оборудование</div>'
+    +'<table class="t1-tbl"><thead><tr>'
+    +'<th style="width:34px">№&nbsp;п/п</th>'
+    +'<th>Наименование заявленного оборудования</th>'
+    +'<th style="width:56px">Кол-во шт.</th>'
+    +'<th style="width:82px">Цена</th>'
+    +'<th style="width:88px">Сумма</th>'
+    +'<th style="width:76px">Срок поставки в календарных днях</th>'
+    +'</tr></thead>'
+    +'<tbody>'+rows+'</tbody>'
+    +'<tfoot>'
+    +'<tr class="t1-total" style="background:#5c6bc0"><td colspan="4">Итого без НДС</td><td colspan="2">'+fmt(totalBase)+' рублей.</td></tr>'
+    +'<tr class="t1-total" style="background:#5c6bc0"><td colspan="4">НДС 22%</td><td colspan="2">'+fmt(totalNds)+' рублей.</td></tr>'
+    +'<tr class="t1-total"><td colspan="4">Итого с НДС 22%</td><td colspan="2">'+fmt(total)+' рублей.</td></tr>'
+    +'<tr class="t1-footer"><td colspan="2"><u>Пункт отправления</u></td><td colspan="4"><u>Москва</u></td></tr>'
+    +'<tr class="t1-footer"><td colspan="2"><u>Условия поставки</u></td><td colspan="4">'+deliveryRow+'</td></tr>'
+    +'<tr class="t1-footer"><td colspan="2"><u>Форма и порядок расчетов</u></td><td colspan="4"><u>Предоплата 100 %</u></td></tr>'
+    +'<tr class="t1-footer"><td colspan="2"><u>Срок поставки оборудования</u></td><td colspan="4">'+(/^\d+$/.test((''+dd).trim())?'в течение '+dd+' календарных дней с момента заключения договора':dd)+'</td></tr>'
+    +'<tr class="t1-footer"><td colspan="6" style="font-style:italic;font-size:10.5px">Подтверждаем наличие:<br>Паспорта, Руководства по эксплуатации на русском языке, Сертификата соответствия<br>Схемы подключения оборудования. Соответствие СНиП 2.04.02-84</td></tr>'
+    +'</tfoot></table>'
+    +(notInclOther.length?'<div style="margin-top:8px;font-size:10.5px;color:#555;font-style:italic">В стоимость не входит: '+notInclOther.join(', ')+'.</div>':'')
+    +'<div class="t1-sign">'
+    +'<div><div style="font-size:13px"><strong>Генеральный Директор</strong> <u>Антюфеев В.А.</u></div>'
+    +'<img src="images/unior.png" style="height:130px;display:block;margin-top:10px">'
+    +'</div>'
+    +'</div>';
+}
+
+/* ─── Template 2: ИП Потапенко ──────────────────────────────── */
+function renderKP2(entry,m,dd){dd=dd||'15';
+  var nums=altNums(entry);
+  var items=entry.items||[];
+  var svcs=svcItems(entry,m);
+  var total=calcTotal(entry,m);
+  var total2Base=Math.round(total*100/122);
+  var total2Nds=total-total2Base;
+  var tableRows='';
+  var rowNum=0;
+  items.forEach(function(it){
+    rowNum++;
+    var price=ap(it.customPrice,m);
+    tableRows+='<tr>'
+      +'<td class="t2-num">'+rowNum+'</td>'
+      +'<td>'+it.name+'</td>'
+      +'<td class="t2-qty">'+it.quantity+'</td>'
+      +'<td class="t2-price">'+fmt(price)+'</td>'
+      +'<td class="t2-sum">'+fmt(price*it.quantity)+'</td>'
+      +'</tr>';
+  });
+  svcs.forEach(function(s){
+    rowNum++;
+    tableRows+='<tr>'
+      +'<td class="t2-num">'+rowNum+'</td>'
+      +'<td>'+s.n+'</td>'
+      +'<td class="t2-qty">1</td>'
+      +'<td class="t2-price">'+fmt(s.p)+'</td>'
+      +'<td class="t2-sum">'+fmt(s.p)+'</td>'
+      +'</tr>';
+  });
+  tableRows+='<tr class="t2-sub"><td colspan="4" style="text-align:right">Итого без НДС:</td><td class="t2-price">'+fmt(total2Base)+'</td></tr>';
+  tableRows+='<tr class="t2-sub"><td colspan="4" style="text-align:right">НДС 22%:</td><td class="t2-price">'+fmt(total2Nds)+'</td></tr>';
+  tableRows+='<tr class="t2-bold"><td colspan="4" style="text-align:right">Итого с НДС 22%:</td><td class="t2-price t2-sum">'+fmt(total)+'</td></tr>';
+  return '<div class="t2-req">'
+    +'Название организации ИНДИВИДУАЛЬНЫЙ ПРЕДПРИНИМАТЕЛЬ ПОТАПЕНКО ИГОРЬ АЛЕКСАНДРОВИЧ '
+    +'Юридический адрес организации 127204, РОССИЯ, Г МОСКВА, АЛЛЕЯ ДОЛГОПРУДНАЯ, Д 14, КОРП 3, КВ 175 '
+    +'ИНН 561903771181 ОГРН 319502700054103 '
+    +'Расчетный счет 40802810500000127346 '
+    +'Банк АО "ТИНЬКОФФ БАНК" ИНН банка 7710140679 БИК банка 044525974'
+    +'</div>'
+    +'<div class="t2-title">Коммерческое предложение '+nums.kp2+'<br>От '+ruDate()+'</div>'
+    +'<div class="t2-from">От: директора ИП Потапенко Игоря Александровича.</div>'
+    +'<div class="t2-intro">Изучив направленный Вами запрос исх., о предоставлении ценовой информации, мы, нижеподписавшиеся, предлагаем осуществить поставку товара: технологическое оборудование для водоподготовки.<br>На условиях, указанных в запросе, на общую сумму '+fmt(total)+' рублей, подтвержденную прилагаемой таблицей, в которой указана цена единицы товара и расчетом:</div>'
+    +'<table class="t2-tbl"><thead><tr><th class="t2-num">№</th><th>Наименование оборудования</th><th class="t2-qty">Кол-во, шт.</th><th class="t2-price">Цена, руб.</th><th class="t2-price">Сумма, руб.</th></tr></thead>'
+    +'<tbody>'+tableRows+'</tbody>'
+    +'</table>'
+    +'<div style="font-size:12px;margin:6px 0"><strong>Срок поставки оборудования</strong><br>'+dd+' дней</div>'
+    +'<div style="font-size:12px;margin:4px 0"><strong>Срок гарантии на товар:</strong><br>12 месяцев</div>'
+    +((entry.client||{}).inclDelivery&&!((entry.client||{}).priceDelivery>0)?'<div class="t2-note">Стоимость услуг по доставке товара до фактического адреса «Заказчика» включена в указанную выше общую стоимость данного коммерческого предложения.</div>':'')
+    +(notInclList(entry).length?'<div class="t2-note" style="color:#555">В стоимость не входит: '+notInclList(entry).join(', ')+'.</div>':'')
+    +'<div class="t2-note">Мы признаём, что направление заказчиком запроса на предоставление ценовой информации и представление участником коммерческого предложения не накладывает на стороны никаких обязательств до момента заключения контракта.</div>'
+    +'<div class="t2-sign">'
+    +'<div style="margin-bottom:8px;font-size:13px">С уважением директор Потапенко И.А.</div>'
+    +'<img src="images/potapenko.png" style="height:130px;display:block">'
+    +'</div>';
+}
+
+/* ─── Render & Controls ──────────────────────────────────────── */
+function renderAll(){
+  var m1=+(document.getElementById('altM1').value||20);
+  var m2=+(document.getElementById('altM2').value||35);
+  var dd=document.getElementById('deliveryDays').value||'15';
+  if(!kpData){
+    document.getElementById('kp1').innerHTML='<p style="padding:40px;text-align:center;color:#c62828;font-size:14px">Данные КП не найдены.<br>Откройте эту страницу из конструктора КП.</p>';
+    document.getElementById('kp2').innerHTML='';
+    return;
+  }
+  document.getElementById('kp1').innerHTML=renderKP1(kpData,m1,dd);
+  document.getElementById('kp2').innerHTML=renderKP2(kpData,m2,dd);
+}
+function rerender(){renderAll();}
+
+function switchTab(n){
+  activeTab=n;
+  document.getElementById('kp1').classList.toggle('hidden',n===2);
+  document.getElementById('kp2').classList.toggle('hidden',n===1);
+  document.getElementById('tab1').classList.toggle('active',n===1);
+  document.getElementById('tab2').classList.toggle('active',n===2);
+  document.getElementById('tab0').classList.toggle('active',n===0);
+}
+
+function printKP(n){
+  document.getElementById('kp1').classList.remove('hidden');
+  document.getElementById('kp2').classList.remove('hidden');
+  document.body.classList.remove('print-kp1','print-kp2','print-both');
+  if(n===1)document.body.classList.add('print-kp1');
+  else if(n===2)document.body.classList.add('print-kp2');
+  else document.body.classList.add('print-both');
+  var old=document.title;
+  document.title=n===1?'КП (Юниорспецснаб)':n===2?'КП (Потапенко)':'КП (Юниорспецснаб + Потапенко)';
+  window.print();
+  window.onafterprint=function(){
+    document.title=old;
+    document.body.classList.remove('print-kp1','print-kp2','print-both');
+    switchTab(activeTab);
+  };
+}
+
+/* ─── Load ───────────────────────────────────────────────────── */
+var kpId=params.get('kpId');
+var shareToken=params.get('t');
+document.getElementById('altM1').value=+(params.get('m1')||20);
+document.getElementById('altM2').value=+(params.get('m2')||35);
+
+if(kpId){
+  try{var h=JSON.parse(localStorage.getItem('kp_history')||'[]');kpData=h.find(function(e){return String(e.id)===String(kpId);})||null;}catch(e){kpData=null;}
+  renderAll();
+}else if(shareToken){
+  document.getElementById('kp1').innerHTML='<p style="padding:40px;text-align:center;color:#666">Загрузка из облака…</p>';
+  fetch(SUPA_URL+'/rest/v1/kps?share_token=eq.'+encodeURIComponent(shareToken)+'&select=data',{
+    headers:{'apikey':ANON,'Authorization':'Bearer '+ANON}
+  }).then(function(r){return r.json();}).then(function(rows){
+    if(rows&&rows[0]&&rows[0].data)kpData=rows[0].data;
+    renderAll();
+  }).catch(function(){renderAll();});
+}else{
+  renderAll();
+}
+</script>
+</body>
+</html>

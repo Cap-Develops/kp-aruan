@@ -1,0 +1,553 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Рабочее пространство</title>
+<style>
+@font-face{font-family:'Muller';src:url('../fonts/Fontfabric - MullerRegular.otf') format('opentype');font-weight:400;font-style:normal}
+@font-face{font-family:'Muller';src:url('../fonts/Fontfabric - MullerMedium.otf') format('opentype');font-weight:500;font-style:normal}
+@font-face{font-family:'Muller';src:url('../fonts/Fontfabric - MullerBold.otf') format('opentype');font-weight:700;font-style:normal}
+@font-face{font-family:'Muller';src:url('../fonts/Fontfabric - MullerExtraBold.otf') format('opentype');font-weight:800;font-style:normal}
+@font-face{font-family:'Muller';src:url('../fonts/Fontfabric - MullerBlack.otf') format('opentype');font-weight:900;font-style:normal}
+@font-face{font-family:'Muller';src:url('../fonts/Fontfabric - MullerLight.otf') format('opentype');font-weight:300;font-style:normal}
+
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Muller',Arial,sans-serif;background:linear-gradient(180deg,#EEF2F7 0%,#E1E8F0 100%);color:#1a2332;min-height:100vh;overflow-x:hidden}
+:root{--blue:#1565C0;--blue-dark:#0D47A1;--blue-light:#E3F2FD;--accent:#FF6F00;--muted:#64748b;--border:#e2e8f0;--shadow:0 2px 8px rgba(0,0,0,.06),0 8px 24px rgba(0,0,0,.06);--glass:rgba(255,255,255,.72);--radius:16px}
+
+/* ===== HEADER ===== */
+.header{background:linear-gradient(135deg,#0a3d8f 0%,#1565C0 50%,#2979d6 100%);padding:0;position:relative;overflow:hidden}
+.header::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(ellipse at 30% 50%,rgba(255,255,255,.06) 0%,transparent 60%);animation:headerShimmer 8s ease-in-out infinite alternate;pointer-events:none}
+@keyframes headerShimmer{0%{transform:translate(0,0)}100%{transform:translate(5%,3%)}}
+
+/* Wave animation in header */
+.header-waves{position:absolute;bottom:0;left:0;width:100%;height:60px;overflow:hidden}
+.header-waves svg{position:absolute;bottom:0;width:200%;height:60px;animation:waveMove 12s linear infinite}
+.header-waves svg:nth-child(2){opacity:.4;animation:waveMove 8s linear infinite reverse;bottom:-5px}
+@keyframes waveMove{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+
+.header-inner{max-width:1240px;margin:0 auto;padding:32px 28px 72px;position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px}
+.header-left{display:flex;align-items:center;gap:18px}
+.header-logos{display:flex;gap:10px}
+.header-logo{width:52px;height:52px;border-radius:14px;background:rgba(255,255,255,.12);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;overflow:hidden;border:1px solid rgba(255,255,255,.15);transition:transform .3s ease}
+.header-logo:hover{transform:scale(1.08)}
+.header-logo img{width:42px;height:42px;object-fit:contain}
+.header-text h1{color:#fff;font-weight:900;font-size:28px;letter-spacing:1.5px;line-height:1.1}
+.header-text p{color:rgba(255,255,255,.6);font-size:14px;font-weight:400;margin-top:4px;letter-spacing:.3px}
+.header-right{display:flex;align-items:center;gap:20px}
+.header-clock{color:rgba(255,255,255,.85);font-size:15px;font-weight:500;background:rgba(255,255,255,.08);backdrop-filter:blur(10px);padding:10px 20px;border-radius:12px;border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;gap:10px}
+.clock-dot{width:8px;height:8px;border-radius:50%;background:#4CAF50;animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+
+/* ===== CONTAINER ===== */
+.container{max-width:1240px;margin:0 auto;padding:0 20px}
+
+/* ===== WELCOME ===== */
+.welcome{margin-top:-36px;position:relative;z-index:3;padding:0 20px}
+.welcome-inner{max-width:1240px;margin:0 auto;background:var(--glass);backdrop-filter:blur(16px);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid rgba(255,255,255,.6);padding:28px 32px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px}
+.welcome-greeting h2{font-size:22px;font-weight:800;color:#1a2332}
+.welcome-greeting p{font-size:14px;color:var(--muted);margin-top:4px}
+.welcome-stats{display:flex;gap:24px;flex-wrap:wrap}
+.stat-item{text-align:center;padding:8px 20px;background:linear-gradient(135deg,rgba(21,101,192,.06),rgba(21,101,192,.02));border-radius:12px;border:1px solid rgba(21,101,192,.08)}
+.stat-number{font-size:28px;font-weight:900;color:var(--blue);display:block;line-height:1.1}
+.stat-label{font-size:11px;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+
+/* ===== MODULE GRID ===== */
+.section-title{font-size:18px;font-weight:800;color:#1a2332;margin:36px 0 20px;padding-left:4px}
+.modules-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+
+/* ===== MODULE CARD ===== */
+.module-card{background:var(--glass);backdrop-filter:blur(16px);border-radius:var(--radius);box-shadow:0 2px 8px rgba(0,0,0,.04),0 8px 32px rgba(0,0,0,.06);border:1px solid rgba(255,255,255,.6);padding:28px 28px 24px;position:relative;overflow:hidden;transition:all .35s cubic-bezier(.4,0,.2,1);cursor:pointer;text-decoration:none;color:inherit;display:flex;flex-direction:column;opacity:0;transform:translateY(30px)}
+
+.module-card.active{border-left:4px solid var(--blue)}
+.module-card.active:hover{transform:translateY(-6px);box-shadow:0 8px 24px rgba(21,101,192,.12),0 20px 48px rgba(0,0,0,.08)}
+.module-card.active::after{content:'';position:absolute;top:0;left:0;right:0;bottom:0;border-radius:var(--radius);opacity:0;transition:opacity .35s ease;background:linear-gradient(135deg,rgba(21,101,192,.03),transparent);pointer-events:none}
+.module-card.active:hover::after{opacity:1}
+
+/* Animated gradient border on hover */
+.module-card.active::before{content:'';position:absolute;top:-2px;left:-2px;right:-2px;bottom:-2px;border-radius:calc(var(--radius) + 2px);background:linear-gradient(135deg,#1565C0,#42A5F5,#1E88E5,#0D47A1);background-size:300% 300%;z-index:-1;opacity:0;transition:opacity .4s ease;animation:gradientBorder 4s ease infinite}
+.module-card.active:hover::before{opacity:1}
+@keyframes gradientBorder{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+
+.module-card.disabled{border-left:4px solid #cfd8dc;opacity:.65;cursor:default}
+.module-card.disabled:hover{transform:none;box-shadow:0 2px 8px rgba(0,0,0,.04),0 8px 32px rgba(0,0,0,.06)}
+
+.card-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px}
+.card-icon{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0}
+.module-card.active .card-icon{background:linear-gradient(135deg,rgba(21,101,192,.1),rgba(21,101,192,.04))}
+.module-card.disabled .card-icon{background:rgba(0,0,0,.04)}
+
+.card-badge{padding:5px 12px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:.3px;display:flex;align-items:center;gap:5px}
+.badge-active{background:#E8F5E9;color:#2E7D32}
+.badge-active::before{content:'';width:6px;height:6px;border-radius:50%;background:#4CAF50;animation:pulse 2s ease-in-out infinite}
+.badge-dev{background:#FFF3E0;color:#E65100}
+.badge-dev::before{content:'';width:6px;height:6px;border-radius:50%;background:#FF9800}
+
+.card-title{font-size:18px;font-weight:800;color:#1a2332;margin-bottom:8px}
+.card-desc{font-size:13px;color:var(--muted);line-height:1.6;flex:1}
+
+.card-footer{display:flex;align-items:center;justify-content:space-between;margin-top:18px;padding-top:16px;border-top:1px solid rgba(0,0,0,.04)}
+.card-link{font-size:13px;font-weight:700;color:var(--blue);display:flex;align-items:center;gap:6px;transition:gap .2s ease}
+.module-card.active:hover .card-link{gap:10px}
+.card-link-arrow{transition:transform .2s ease}
+.module-card.active:hover .card-link-arrow{transform:translateX(3px)}
+.module-card.disabled .card-link{color:#90A4AE}
+
+.card-coming{display:flex;align-items:center;gap:6px;font-size:12px;color:#B0BEC5;font-weight:500}
+
+/* ===== QUICK ACTIONS ===== */
+.quick-actions{margin:36px 0;display:flex;gap:16px;flex-wrap:wrap}
+.btn-action{padding:16px 36px;border-radius:14px;border:none;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;transition:all .25s cubic-bezier(.4,0,.2,1);display:flex;align-items:center;gap:10px;text-decoration:none}
+.btn-primary{background:linear-gradient(135deg,#1565C0,#1E88E5);color:#fff;box-shadow:0 4px 16px rgba(21,101,192,.3)}
+.btn-primary:hover{box-shadow:0 8px 28px rgba(21,101,192,.4);transform:translateY(-2px)}
+.btn-primary:active{transform:translateY(0) scale(.98)}
+.btn-secondary{background:#fff;color:var(--blue);border:1.5px solid rgba(21,101,192,.15);box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.btn-secondary:hover{border-color:var(--blue);box-shadow:0 4px 16px rgba(21,101,192,.1);transform:translateY(-2px)}
+.btn-secondary:active{transform:translateY(0) scale(.98)}
+
+/* ===== FOOTER ===== */
+.footer{margin-top:48px;padding:28px 20px;text-align:center;border-top:1px solid rgba(0,0,0,.06)}
+.footer-main{font-size:13px;color:var(--muted);font-weight:500}
+.footer-sub{font-size:11px;color:#b0bec5;margin-top:6px;display:flex;align-items:center;justify-content:center;gap:16px}
+.footer-dot{width:3px;height:3px;border-radius:50%;background:#cbd5e1}
+
+/* ===== TEAM ===== */
+.team-grid{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:12px}
+.team-card{background:var(--glass);backdrop-filter:blur(16px);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid rgba(255,255,255,.6);padding:20px 14px 16px;display:flex;flex-direction:column;align-items:center;text-align:center;flex:1;min-width:170px;max-width:220px;transition:opacity .4s ease}
+.team-card.loading{opacity:.5}
+.team-photo-wrap{position:relative;margin-bottom:10px}
+.team-photo-wrap img{width:64px;height:64px;border-radius:50%;object-fit:cover;border:3px solid #fff;box-shadow:0 2px 10px rgba(0,0,0,.12);display:block}
+.team-online-ring img{border-color:#4CAF50;box-shadow:0 2px 10px rgba(0,0,0,.12),0 0 0 3px rgba(76,175,80,.2)}
+.team-dot{position:absolute;bottom:1px;right:1px;width:14px;height:14px;border-radius:50%;border:2.5px solid #EEF2F7}
+.team-dot-on{background:#4CAF50;animation:pulse 2s ease-in-out infinite}
+.team-dot-off{background:#CFD8DC}
+.team-name{font-size:13px;font-weight:700;color:#1a2332;line-height:1.35;margin-bottom:3px;word-break:break-word}
+.team-seen{font-size:11px;font-weight:600;margin-bottom:12px}
+.team-seen-on{color:#2E7D32}
+.team-seen-off{color:#90A4AE}
+.team-stats{display:flex;gap:8px;width:100%}
+.team-stat{flex:1;background:linear-gradient(135deg,rgba(21,101,192,.06),rgba(21,101,192,.02));border-radius:8px;border:1px solid rgba(21,101,192,.08);padding:7px 4px}
+.team-stat b{display:block;font-size:17px;font-weight:900;color:var(--blue);line-height:1.2}
+.team-stat small{font-size:10px;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:.3px}
+.team-section-header{display:flex;align-items:baseline;gap:12px;margin:36px 0 20px}
+.team-online-badge{font-size:12px;font-weight:700;padding:3px 10px;border-radius:20px;background:#E8F5E9;color:#2E7D32;display:flex;align-items:center;gap:5px}
+.team-online-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:#4CAF50;animation:pulse 2s ease-in-out infinite}
+.team-stat-all{font-size:10px;color:#90A4AE;margin-top:6px;text-align:center;width:100%}
+
+/* ===== ANIMATIONS ===== */
+@keyframes fadeInUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+.animate-in{animation:fadeInUp .6s cubic-bezier(.4,0,.2,1) forwards}
+
+/* ===== COUNTER ANIMATION ===== */
+.counter-animate{display:inline-block}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:900px){
+  .modules-grid{grid-template-columns:1fr}
+  .header-inner{padding:24px 20px 60px;flex-direction:column;align-items:flex-start}
+  .header-right{width:100%}
+  .header-text h1{font-size:22px}
+  .welcome-inner{flex-direction:column;align-items:flex-start}
+}
+@media(max-width:600px){
+  .header-text h1{font-size:18px}
+  .welcome-greeting h2{font-size:18px}
+  .module-card{padding:20px}
+  .card-title{font-size:16px}
+  .quick-actions{flex-direction:column}
+  .btn-action{justify-content:center}
+  .stat-number{font-size:22px}
+  .team-card{min-width:calc(50% - 7px);max-width:100%}
+}
+</style>
+</head>
+<body>
+<nav style="background:#1a2332;display:flex;gap:20px;padding:6px 24px;font-size:13px;align-items:center;position:sticky;top:0;z-index:1000;box-shadow:0 2px 8px rgba(0,0,0,0.2)">
+<a href="hub.html" style="color:#fff;text-decoration:none;font-weight:600">🏠 Главная</a>
+<a href="index.html" style="color:rgba(255,255,255,.6);text-decoration:none">📋 Конструктор КП</a>
+<a href="catalog.html" style="color:rgba(255,255,255,.6);text-decoration:none">📦 Каталог</a>
+<a href="calculator.html" style="color:rgba(255,255,255,.6);text-decoration:none">🔧 Калькулятор</a>
+</nav>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-inner">
+    <div class="header-left">
+      <div class="header-logos">
+        <div class="header-logo" style="background:rgba(255,255,255,.1);border:2px dashed rgba(255,255,255,.3);font-size:10px;font-weight:700;color:rgba(255,255,255,.6);padding:4px 8px">ЛОГО</div>
+      </div>
+      <div class="header-text">
+        <h1>ВАША КОМПАНИЯ</h1>
+        <p>Рабочее пространство</p>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="header-clock">
+        <span class="clock-dot"></span>
+        <span id="headerDate">—</span>
+        <span style="opacity:.3">|</span>
+        <span id="headerTime" style="font-weight:700;font-variant-numeric:tabular-nums">—</span>
+      </div>
+    </div>
+  </div>
+  <div class="header-waves">
+    <svg viewBox="0 0 1200 60" preserveAspectRatio="none">
+      <path d="M0,40 C150,55 350,15 600,35 C850,55 1050,20 1200,40 L1200,60 L0,60 Z" fill="#EEF2F7"/>
+    </svg>
+    <svg viewBox="0 0 1200 60" preserveAspectRatio="none">
+      <path d="M0,45 C200,20 400,55 600,30 C800,5 1000,50 1200,35 L1200,60 L0,60 Z" fill="#EEF2F7"/>
+    </svg>
+  </div>
+</header>
+
+<!-- WELCOME -->
+<section class="welcome">
+  <div class="welcome-inner animate-in" style="animation-delay:.1s">
+    <div class="welcome-greeting">
+      <h2 id="greeting">Добрый день!</h2>
+      <p>Выберите модуль для работы</p>
+    </div>
+    <div class="welcome-stats">
+      <div class="stat-item">
+        <span class="stat-number" data-target="0" id="statItems">0</span>
+        <span class="stat-label">Позиций в каталоге</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number" data-target="0" id="statCategories">0</span>
+        <span class="stat-label">Категорий</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number" data-target="3" id="statModules">0</span>
+        <span class="stat-label">Активных модулей</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MODULES -->
+<div class="container">
+  <div class="section-title">Модули системы</div>
+  <div class="modules-grid">
+
+    <!-- Card 1 — Конструктор КП -->
+    <a href="index.html" class="module-card active" style="animation-delay:.2s">
+      <div class="card-header">
+        <div class="card-icon">📋</div>
+        <div class="card-badge badge-active">Активен</div>
+      </div>
+      <div class="card-title">Конструктор КП</div>
+      <div class="card-desc">Быстрая сборка коммерческих предложений с автоматической генерацией PDF</div>
+      <div class="card-footer">
+        <span class="card-link">Открыть <span class="card-link-arrow">→</span></span>
+      </div>
+    </a>
+
+    <!-- Card 2 — Каталог оборудования -->
+    <a href="catalog.html" class="module-card active" style="animation-delay:.3s">
+      <div class="card-header">
+        <div class="card-icon">📦</div>
+        <div class="card-badge badge-active">Активен</div>
+      </div>
+      <div class="card-title">Каталог оборудования</div>
+      <div class="card-desc">Интерактивный прайс-лист с фильтрами, поиском и карточками товаров</div>
+      <div class="card-footer">
+        <span class="card-link">Открыть <span class="card-link-arrow">→</span></span>
+      </div>
+    </a>
+
+    <!-- Card 3 — Подбор оборудования -->
+    <div class="module-card disabled" style="animation-delay:.4s">
+      <div class="card-header">
+        <div class="card-icon">🧪</div>
+        <div class="card-badge badge-dev">В разработке</div>
+      </div>
+      <div class="card-title">Подбор оборудования</div>
+      <div class="card-desc">Автоматический подбор комплекта по анализу воды клиента</div>
+      <div class="card-footer">
+        <span class="card-coming">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B0BEC5" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+          Скоро
+        </span>
+      </div>
+    </div>
+
+    <!-- Card 4 — Калькулятор загрузок -->
+    <a href="calculator.html" class="module-card" style="animation-delay:.5s;text-decoration:none;color:inherit">
+      <div class="card-header">
+        <div class="card-icon">🔧</div>
+        <div class="card-badge badge-active">Активен</div>
+      </div>
+      <div class="card-title">Калькулятор загрузок</div>
+      <div class="card-desc">Расчёт стоимости загрузок, расхода соли и периодичности регенерации</div>
+      <div class="card-footer">
+        <span class="card-link">Открыть →</span>
+      </div>
+    </a>
+
+  </div>
+
+  <!-- TEAM -->
+  <div class="team-section-header">
+    <div class="section-title" style="margin:0">Команда</div>
+    <div class="team-online-badge" id="onlineBadge" style="display:none"></div>
+  </div>
+  <div class="team-grid" id="teamGrid">
+    <!-- JS rendered -->
+  </div>
+
+  <!-- QUICK ACTIONS -->
+  <div class="section-title">Быстрые действия</div>
+  <div class="quick-actions">
+    <a href="index.html" class="btn-action btn-primary">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Создать новое КП
+    </a>
+    <a href="catalog.html" class="btn-action btn-secondary">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Открыть каталог
+    </a>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-main">ООО &laquo;Ваша компания&raquo; &copy; 2026</div>
+  <div class="footer-sub">
+    <span>Разработано с помощью AI</span>
+    <span class="footer-dot"></span>
+    <span>v1.0</span>
+  </div>
+</footer>
+
+<!-- DATABASE -->
+<script src="../database-equipment-a.js"></script>
+<script src="../database-equipment-b.js"></script>
+<script src="../database.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+
+<script>
+(function(){
+  // === Clock ===
+  function updateClock(){
+    const now = new Date();
+    const months = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+    const days = ['воскресенье','понедельник','вторник','среда','четверг','пятница','суббота'];
+    document.getElementById('headerDate').textContent = now.getDate() + ' ' + months[now.getMonth()] + ', ' + days[now.getDay()];
+    document.getElementById('headerTime').textContent = now.toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  }
+  updateClock();
+  setInterval(updateClock, 1000);
+
+  // === Greeting ===
+  const h = new Date().getHours();
+  let greet = 'Доброй ночи!';
+  if(h >= 5 && h < 12) greet = 'Доброе утро!';
+  else if(h >= 12 && h < 18) greet = 'Добрый день!';
+  else if(h >= 18 && h < 23) greet = 'Добрый вечер!';
+  document.getElementById('greeting').textContent = greet;
+
+  // === Stats from database ===
+  let itemCount = 0;
+  let categoryCount = 0;
+  if(typeof EQUIPMENT_DB !== 'undefined' && Array.isArray(EQUIPMENT_DB)){
+    itemCount = EQUIPMENT_DB.length;
+    const cats = new Set();
+    EQUIPMENT_DB.forEach(function(item){ if(item.category) cats.add(item.category); });
+    categoryCount = cats.size;
+  }
+
+  // === Counter animation ===
+  function animateCounter(el, target, duration){
+    if(target === 0){el.textContent = '0'; return;}
+    let start = 0;
+    const step = Math.max(1, Math.floor(target / (duration / 16)));
+    const timer = setInterval(function(){
+      start += step;
+      if(start >= target){
+        start = target;
+        clearInterval(timer);
+      }
+      el.textContent = start;
+    }, 16);
+  }
+
+  // === Team / presence ===
+  var SB_URL='https://uclzyzztoripulpcpshp.supabase.co';
+  var SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVjbHp5enp0b3JpcHVscGNwc2hwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3ODIyNzMsImV4cCI6MjA5MjM1ODI3M30.rX-WT1WdZiwRakVcUEkcg-_dnWzfU49LvgTNHYgBYQ0';
+  var SB_HDR={'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY};
+
+  var TEAM=[
+    {id:1,name:'Менеджер 1',photo:'../assets/demo-avatar.svg'},
+    {id:2,name:'Менеджер 2',photo:'../assets/demo-avatar.svg'},
+    {id:3,name:'Менеджер 3',photo:'../assets/demo-avatar.svg'},
+    {id:4,name:'Менеджер 4',photo:'../assets/demo-avatar.svg'},
+    {id:5,name:'Менеджер 5',photo:'../assets/demo-avatar.svg'}
+  ];
+
+  function fmtSeen(iso){
+    if(!iso)return{text:'Не активен',cls:'team-seen-off',online:false};
+    var diff=Math.floor((Date.now()-new Date(iso))/1000);
+    if(diff<600)return{text:'Онлайн',cls:'team-seen-on',online:true};
+    if(diff<3600)return{text:Math.floor(diff/60)+' мин назад',cls:'team-seen-off',online:false};
+    if(diff<86400)return{text:Math.floor(diff/3600)+' ч назад',cls:'team-seen-off',online:false};
+    return{text:'Не активен',cls:'team-seen-off',online:false};
+  }
+
+  function fmtSum(v){
+    if(!v||v===0)return '—';
+    if(v>=1000000)return (v/1000000).toFixed(2).replace(/\.?0+$/,'')+'&nbsp;млн';
+    if(v>=1000)return Math.round(v/1000)+'&nbsp;тыс';
+    return v+'';
+  }
+
+  function shortName(full){
+    var p=full.trim().split(/\s+/);
+    if(p.length>=2)return p[0]+'<br>'+p[1];
+    return full;
+  }
+
+  function renderSkeletons(){
+    var html=TEAM.map(function(m){
+      return '<div class="team-card loading">'+
+        '<div class="team-photo-wrap"><img src="'+m.photo+'" alt="'+m.name+'">'+
+        '<span class="team-dot team-dot-off"></span></div>'+
+        '<div class="team-name">'+shortName(m.name)+'</div>'+
+        '<div class="team-seen team-seen-off">…</div>'+
+        '<div class="team-stats">'+
+          '<div class="team-stat"><b style="font-size:13px;color:#ccc">—</b><small>КП сегодня</small></div>'+
+          '<div class="team-stat"><b style="font-size:13px;color:#ccc">—</b><small>руб сегодня</small></div>'+
+        '</div>'+
+        '<div class="team-stat-all" style="color:#ddd">Всего: — · —</div>'+
+      '</div>';
+    }).join('');
+    document.getElementById('teamGrid').innerHTML=html;
+  }
+
+  function renderTeam(presence,stats,statsToday){
+    var onlineCount=0;
+    var html=TEAM.map(function(m){
+      var seen=fmtSeen(presence[m.id]);
+      if(seen.online)onlineCount++;
+      var st=stats[m.id]||{count:0,sum:0};
+      var stT=(statsToday||{})[m.id]||{count:0,sum:0};
+      var ringCls=seen.online?' team-online-ring':'';
+      return '<div class="team-card">'+
+        '<div class="team-photo-wrap'+ringCls+'"><img src="'+m.photo+'" alt="'+m.name+'">'+
+        '<span class="team-dot '+(seen.online?'team-dot-on':'team-dot-off')+'"></span></div>'+
+        '<div class="team-name">'+shortName(m.name)+'</div>'+
+        '<div class="team-seen '+seen.cls+'">'+seen.text+'</div>'+
+        '<div class="team-stats">'+
+          '<div class="team-stat"><b>'+stT.count+'</b><small>КП сегодня</small></div>'+
+          '<div class="team-stat"><b>'+fmtSum(stT.sum)+'</b><small>руб сегодня</small></div>'+
+        '</div>'+
+        '<div class="team-stat-all">Всего: '+st.count+' КП · '+fmtSum(st.sum)+' ₽</div>'+
+      '</div>';
+    }).join('');
+    document.getElementById('teamGrid').innerHTML=html;
+    var badge=document.getElementById('onlineBadge');
+    if(onlineCount>0){badge.textContent=onlineCount+' онлайн';badge.style.display='flex';}
+    else{badge.style.display='none';}
+  }
+
+  async function loadTeam(){
+    try{
+      var today=new Date().toISOString().slice(0,10);
+      var results=await Promise.all([
+        fetch(SB_URL+'/rest/v1/managers_presence?select=manager_id,last_seen',{headers:SB_HDR}).then(function(r){return r.json();}),
+        fetch(SB_URL+'/rest/v1/kps?select=manager_id,total,kp_date&manager_id=gt.0',{headers:SB_HDR}).then(function(r){return r.json();})
+      ]);
+      var presence={};
+      (results[0]||[]).forEach(function(r){presence[r.manager_id]=r.last_seen;});
+      var stats={};var statsToday={};
+      (results[1]||[]).forEach(function(r){
+        var mid=r.manager_id;if(!mid)return;
+        if(!stats[mid])stats[mid]={count:0,sum:0};
+        stats[mid].count++;stats[mid].sum+=r.total||0;
+        if(r.kp_date===today){
+          if(!statsToday[mid])statsToday[mid]={count:0,sum:0};
+          statsToday[mid].count++;statsToday[mid].sum+=r.total||0;
+        }
+      });
+      _presence=presence;_stats=stats;_statsToday=statsToday;
+      try{localStorage.setItem('hub_team_cache',JSON.stringify({date:today,presence:presence,stats:stats,statsToday:statsToday}));}catch(e){}
+      renderTeam(presence,stats,statsToday);
+    }catch(e){console.warn('Team load:',e);}
+  }
+
+  function pingMyPresence(){
+    var myId=+(localStorage.getItem('my_manager_id')||0);
+    if(!myId)return;
+    var me=TEAM.find(function(m){return m.id===myId;});
+    if(!me)return;
+    var now=new Date().toISOString();
+    // Сразу обновляем локальный стейт — лампочка горит без ожидания Realtime/сети
+    _presence[myId]=now;
+    renderTeam(_presence,_stats,_statsToday);
+    fetch(SB_URL+'/rest/v1/managers_presence',{
+      method:'POST',
+      headers:Object.assign({'Content-Type':'application/json','Prefer':'resolution=merge-duplicates'},SB_HDR),
+      body:JSON.stringify({manager_id:myId,manager_name:me.name,last_seen:now})
+    });
+  }
+
+  // Состояние — доступно из Realtime-обработчика
+  var _presence={};var _stats={};var _statsToday={};
+
+  // Мгновенный рендер из кеша
+  try{
+    var _c=localStorage.getItem('hub_team_cache');
+    if(_c){
+      var _cd=JSON.parse(_c);
+      var _today=new Date().toISOString().slice(0,10);
+      _presence=_cd.presence||{};_stats=_cd.stats||{};
+      _statsToday=(_cd.date===_today)?(_cd.statsToday||{}):{};
+      renderTeam(_presence,_stats,_statsToday);
+    }else{renderSkeletons();}
+  }catch(e){renderSkeletons();}
+
+  // Первоначальная загрузка свежих данных
+  pingMyPresence();
+  loadTeam();
+
+  // Realtime: мгновенное обновление статусов присутствия
+  var _sbRT=supabase.createClient(SB_URL,SB_KEY);
+  _sbRT.channel('presence-watch')
+    .on('postgres_changes',{event:'*',schema:'public',table:'managers_presence'},function(payload){
+      var row=payload.new||{};
+      if(row.manager_id){
+        _presence[row.manager_id]=row.last_seen;
+        try{localStorage.setItem('hub_team_cache',JSON.stringify({date:new Date().toISOString().slice(0,10),presence:_presence,stats:_stats,statsToday:_statsToday}));}catch(e){}
+        renderTeam(_presence,_stats,_statsToday);
+      }
+    })
+    .subscribe();
+
+  // Stats обновляем раз в минуту (не нужен realtime)
+  setInterval(function(){pingMyPresence();loadTeam();},60000);
+
+
+  // === Entrance animations ===
+  const cards = document.querySelectorAll('.module-card');
+  const observer = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if(entry.isIntersecting){
+        entry.target.classList.add('animate-in');
+        observer.unobserve(entry.target);
+      }
+    });
+  },{threshold:.1});
+  cards.forEach(function(card){ observer.observe(card); });
+
+  // Fire counters after a short delay for visual effect
+  setTimeout(function(){
+    animateCounter(document.getElementById('statItems'), itemCount, 1200);
+    animateCounter(document.getElementById('statCategories'), categoryCount, 800);
+    animateCounter(document.getElementById('statModules'), 2, 600);
+  }, 400);
+
+})();
+</script>
+
+</body>
+</html>

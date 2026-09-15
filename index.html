@@ -1,0 +1,867 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Конструктор КП — Аруан & Аурус</title>
+<style>
+@font-face{font-family:'Muller';src:url('fonts/muller-regular.woff2') format('woff2');font-display:swap;font-weight:400;font-style:normal}
+@font-face{font-family:'Muller';src:url('fonts/muller-medium.woff2') format('woff2');font-display:swap;font-weight:500;font-style:normal}
+@font-face{font-family:'Muller';src:url('fonts/muller-bold.woff2') format('woff2');font-display:swap;font-weight:700;font-style:normal}
+@font-face{font-family:'Muller';src:url('fonts/muller-extrabold.woff2') format('woff2');font-display:swap;font-weight:800;font-style:normal}
+@font-face{font-family:'Muller';src:url('fonts/muller-black.woff2') format('woff2');font-display:swap;font-weight:900;font-style:normal}
+@font-face{font-family:'Muller';src:url('fonts/muller-light.woff2') format('woff2');font-display:swap;font-weight:300;font-style:normal}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Muller',Arial,sans-serif;background:linear-gradient(180deg,#EEF2F7 0%,#E1E8F0 100%);color:#1a2332;min-height:100vh}
+:root{--blue:#1565C0;--blue-dark:#0D47A1;--blue-light:#E3F2FD;--accent:#FF6F00;--muted:#64748b;--border:#e2e8f0;--shadow:0 2px 8px rgba(0,0,0,.06),0 8px 24px rgba(0,0,0,.06);--glass:rgba(255,255,255,.75);--radius:14px}
+input,select,button{font-family:inherit;transition:all .2s ease}
+input:focus,select:focus{outline:none;border-color:var(--blue)!important;box-shadow:0 0 0 3px rgba(21,101,192,.12)}
+button:active{transform:scale(.97)}
+.header{background:linear-gradient(135deg,#0a3d8f,#1565C0,#2979d6);padding:16px 28px;display:flex;align-items:center;gap:16px;box-shadow:0 4px 20px rgba(13,71,161,.25);flex-wrap:wrap}
+.header-logo{width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,.12);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.header-logo img{width:34px;height:34px;object-fit:contain}
+.header-title{color:#fff;font-weight:800;font-size:18px;letter-spacing:.3px}
+.header-sub{color:rgba(255,255,255,.55);font-size:11px;font-weight:400}
+.steps{display:flex;gap:5px;margin-left:auto;flex-wrap:wrap}
+.step-btn{padding:8px 20px;border-radius:24px;border:1.5px solid transparent;cursor:pointer;font-size:13px;font-weight:500;transition:all .25s ease;backdrop-filter:blur(4px)}
+.step-btn.active{background:#fff;color:#0D47A1;font-weight:700;box-shadow:0 2px 12px rgba(0,0,0,.1);border-color:rgba(255,255,255,.3)}
+.step-btn:not(.active){background:rgba(255,255,255,.1);color:rgba(255,255,255,.75);border-color:rgba(255,255,255,.08)}
+.step-btn:not(.active):hover{background:rgba(255,255,255,.18);color:#fff}
+.step-badge{margin-left:5px;background:linear-gradient(135deg,#FF6F00,#FF8F00);color:#fff;border-radius:10px;padding:2px 7px;font-size:10px;font-weight:700}
+.container{max-width:1240px;margin:0 auto;padding:24px 20px}
+.card{background:var(--glass);border-radius:var(--radius);box-shadow:var(--shadow);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.6)}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.form-label{font-size:12px;font-weight:600;color:var(--blue);margin-bottom:4px;display:block;text-transform:uppercase;letter-spacing:.5px}
+.form-input{padding:12px 16px;border-radius:10px;border:1.5px solid var(--border);font-size:14px;width:100%;background:#fff;transition:all .2s}
+.form-input:hover{border-color:#90CAF9}
+.btn-primary{padding:13px 34px;border-radius:10px;border:none;background:linear-gradient(135deg,#1565C0,#1E88E5);color:#fff;font-size:15px;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(21,101,192,.3);transition:all .2s}
+.btn-primary:hover{box-shadow:0 6px 20px rgba(21,101,192,.4);transform:translateY(-1px)}
+.btn-accent{padding:13px 38px;border-radius:10px;border:none;background:linear-gradient(135deg,#FF6F00,#FFA000);color:#fff;font-size:15px;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(255,111,0,.3);transition:all .2s}
+.btn-accent:hover{box-shadow:0 6px 20px rgba(255,111,0,.4);transform:translateY(-1px)}
+.btn-outline{padding:13px 30px;border-radius:10px;border:1.5px solid var(--border);background:#fff;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s}
+.btn-outline:hover{border-color:var(--blue);color:var(--blue);box-shadow:0 2px 8px rgba(21,101,192,.08)}
+.btn-danger{padding:6px 14px;border-radius:8px;border:none;background:#FFF0F0;color:#C62828;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s}
+.btn-danger:hover{background:#FFCDD2}
+.catalog-grid{display:grid;grid-template-columns:1fr 480px;gap:20px;align-items:start}
+.search-bar{display:flex;gap:12px;flex-wrap:wrap;align-items:center;padding:18px}
+.seg-switch{display:inline-flex;background:#EEF2F7;border-radius:10px;padding:3px;gap:2px;flex-shrink:0}
+.seg-btn{border:none;background:transparent;padding:7px 14px;border-radius:8px;font-family:inherit;font-size:12.5px;font-weight:700;color:var(--muted);cursor:pointer;white-space:nowrap;transition:all .15s}
+.seg-btn.on{background:linear-gradient(135deg,#1565C0,#1E88E5);color:#fff;box-shadow:0 2px 8px rgba(21,101,192,.3)}
+.search-input{flex:1;min-width:200px;padding:12px 16px;border-radius:10px;border:1.5px solid var(--border);font-size:14px;background:#fff}
+.search-select{padding:12px 16px;border-radius:10px;border:1.5px solid var(--border);font-size:13px;background:#fff;cursor:pointer}
+.eq-list{display:flex;flex-direction:column;gap:8px;max-height:calc(100vh - 220px);overflow-y:auto;padding:0 18px 18px;scroll-behavior:smooth}
+.eq-item{background:#fff;border-radius:12px;padding:14px 18px;border:1.5px solid var(--border);display:flex;align-items:center;gap:16px;transition:all .2s ease}
+.eq-item:hover{border-color:#64B5F6;box-shadow:0 4px 16px rgba(21,101,192,.08);transform:translateY(-1px)}
+.eq-item.added{border:2px solid var(--blue);background:#FAFCFF;opacity:.7}
+.eq-name{font-size:14px;font-weight:700}
+.eq-tags{display:flex;gap:6px;margin-top:4px;flex-wrap:wrap}
+.tag{font-size:10px;padding:3px 10px;border-radius:6px;font-weight:600;letter-spacing:.2px}
+.tag-cat{background:var(--blue-light);color:var(--blue)}
+.tag-prod{background:#E8F5E9;color:#2E7D32}
+.tag-brand{background:#FFF3E0;color:#E65100}
+.eq-specs{font-size:11px;color:var(--muted);margin-top:5px;line-height:1.5}
+.eq-price{font-size:16px;font-weight:800;color:#1a2332}
+.add-btn{width:40px;height:40px;border-radius:10px;border:none;cursor:pointer;font-size:20px;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.add-btn.add{background:linear-gradient(135deg,#1565C0,#1E88E5);color:#fff;box-shadow:0 3px 10px rgba(21,101,192,.25)}
+.add-btn.add:hover{box-shadow:0 5px 16px rgba(21,101,192,.35);transform:scale(1.05)}
+.add-btn.remove{background:#FFF0F0;color:#C62828}
+.add-btn.remove:hover{background:#FFCDD2;transform:scale(1.05)}
+.sidebar{position:sticky;top:40px}
+.sidebar-header{padding:18px 20px;background:linear-gradient(135deg,#0a3d8f,#1565C0);color:#fff;border-radius:var(--radius) var(--radius) 0 0}
+.sidebar-list{}
+.sidebar-item{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;gap:10px;align-items:center;transition:background .15s}
+.sidebar-item:hover{background:#FAFCFF}
+.sidebar-item.drag-over{border-top:2px solid var(--blue);background:#EEF4FF}
+.drag-handle{cursor:grab;color:#bbb;font-size:20px;flex-shrink:0;padding:0 2px;user-select:none;line-height:1}
+.drag-handle:hover{color:var(--blue)}
+.drag-handle:active{cursor:grabbing}
+.qty-input{width:58px;padding:8px 10px;border-radius:8px;border:1.5px solid var(--border);font-size:15px;text-align:center}
+.price-input{width:95px;padding:8px 10px;border-radius:8px;border:1.5px solid var(--border);font-size:15px;text-align:right}
+.sidebar-total{padding:16px 20px;border-top:2px solid var(--border);background:rgba(250,250,250,.8);border-radius:0 0 var(--radius) var(--radius)}
+.discount-input{width:52px;padding:3px 6px;border-radius:6px;border:1px solid var(--border);font-size:12px;text-align:center}
+.preview-header{background:linear-gradient(135deg,#0a3d8f,#1565C0,#42A5F5);padding:36px 40px;color:#fff;border-radius:var(--radius) var(--radius) 0 0}
+.preview-table{width:100%;border-collapse:collapse;margin-top:18px}
+.preview-table th{padding:12px 10px;color:#fff;font-size:12px;font-weight:700;text-align:left;background:linear-gradient(135deg,#0D47A1,#1565C0)}
+.preview-table td{padding:12px 10px;font-size:13px;border-bottom:1px solid #E8EDF2}
+.preview-table tr:nth-child(even){background:#F8FAFC}
+.preview-table tr:hover{background:#EFF6FF}
+.history-item{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:18px;cursor:pointer;transition:all .2s ease}
+.history-item:hover{background:#EFF6FF;transform:translateX(4px)}
+.eq-thumb{width:56px;height:56px;object-fit:contain;border-radius:10px;flex-shrink:0;background:#fff;padding:2px}
+@media(max-width:900px){.catalog-grid{grid-template-columns:1fr}.sidebar{position:static}.form-grid{grid-template-columns:1fr}}
+
+/* ═══ PRINT PDF STYLES ═══ */
+/* Table styles outside @media print for height measurement */
+.pdf-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:2mm}
+.pdf-table th{background:#0D47A1;color:#fff;padding:6px 5px;font-size:12px;text-align:left;border:0.5px solid #1565C0}
+.pdf-table td{padding:5px 5px;border:0.5px solid #ccc;vertical-align:top}
+.pdf-specs{font-size:11px;color:#555;white-space:pre-line;line-height:1.4}
+.pdf-photo{width:22mm;height:22mm;object-fit:contain}
+#printArea{display:none}
+@media print{
+  *{font-family:'Muller',Arial,sans-serif!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  .ecosystem-nav{display:none!important}
+  body>*:not(#printArea){display:none!important}
+  #printArea{display:block!important;margin:0;padding:0}
+  /* Fixed pages (title, certs, examples, requisites) */
+  .pdf-page{page-break-after:always;width:210mm;height:297mm;padding:0;margin:0;position:relative;overflow:hidden;background:#fff!important}
+  body,html,#printArea{background:#fff!important}
+  .pdf-page:last-child{page-break-after:auto}
+  /* Flowing table section — browser handles page breaks */
+  .pdf-flow{width:210mm;padding:0 8mm 15mm;page-break-after:always}
+  .pdf-flow .pdf-sign-block{break-inside:avoid!important;page-break-inside:avoid!important;break-before:auto}
+  @page{size:A4;margin:0}
+  .pdf-header-bar{background:linear-gradient(90deg,#3a6a9e 0%,#5a8bb8 50%,#3a6a9e 100%)!important;color:#fff!important;padding:4mm 8mm;font-size:11px;display:flex;justify-content:space-between;align-items:center}
+  .pdf-header-bar span{color:#fff!important}
+  .pdf-header-bar .logo-bg{background:#fff;border-radius:6px;padding:2mm 3mm;display:inline-flex;align-items:center;gap:3mm}
+  .pdf-footer-bar{position:absolute;bottom:0;left:0;right:0;background:url('assets/header_bg.png') center/cover no-repeat;color:#fff;padding:3mm 10mm;font-size:13px;font-weight:700;display:flex;justify-content:space-between;align-items:center}
+  .pdf-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:2mm}
+  .pdf-table thead{display:table-header-group}
+  .pdf-table th{background:#0D47A1;color:#fff;padding:6px 5px;font-size:12px;text-align:left;border:0.5px solid #1565C0}
+  .pdf-table td{padding:5px 5px;border:0.5px solid #ccc;vertical-align:top}
+  .pdf-table tbody tr{break-inside:avoid!important;page-break-inside:avoid!important}
+  .pdf-table tr:nth-child(even){background:#F8FAFC}
+  .pdf-specs{font-size:11px;color:#555;white-space:pre-line;line-height:1.4}
+  .pdf-total-box{background:#EBF5FB;border:1px solid #1565C0;border-radius:3px;padding:8px 14px;display:inline-block}
+  .pdf-req-table{width:85%;margin:0 auto;border-collapse:collapse}
+  .pdf-req-table td{padding:6px 10px;border:0.5px solid #ccc;font-size:11px}
+  .pdf-req-table tr:nth-child(even){background:#EBF5FB}
+  .pdf-photo{width:22mm;height:22mm;object-fit:contain}
+}
+</style>
+<script src="supabase.min.js"></script>
+</head>
+<body>
+
+<nav id="ecoNav" class="ecosystem-nav" style="background:#1a2332;display:flex;gap:20px;padding:6px 24px;font-size:13px;align-items:center;position:sticky;top:0;z-index:1000;box-shadow:0 2px 8px rgba(0,0,0,0.2)">
+<a href="hub.html" style="color:rgba(255,255,255,.6);text-decoration:none;transition:color .2s">🏠 Главная</a>
+<a href="index.html" style="color:#fff;text-decoration:none;font-weight:600">📋 Конструктор КП</a>
+<a href="catalog.html" style="color:rgba(255,255,255,.6);text-decoration:none;transition:color .2s">📦 Каталог</a>
+<a href="calculator.html" style="color:rgba(255,255,255,.6);text-decoration:none;transition:color .2s">🔧 Калькулятор</a>
+<a href="ro-design.html" style="color:rgba(255,255,255,.6);text-decoration:none;transition:color .2s">💧 RO-проект</a>
+</nav>
+<script>
+// Demo mode: hide ecosystem nav when ?demo=1
+(function(){var p=new URLSearchParams(location.search);if(p.get('demo')==='1'){var n=document.getElementById('ecoNav');if(n)n.style.display='none';}})();
+</script>
+<div id="app"></div>
+<div id="printArea"></div>
+
+<!-- Внешняя база данных -->
+<script src="database-equipment-a.js"></script>
+<script src="database-equipment-b.js"></script>
+<script src="database.js"></script>
+<script src="search.js"></script>
+
+<script>
+// ═══ MANAGERS ═══
+var MANAGERS=[
+  {id:0,name:'',phone:'',ext:'',email:'',photo:''},
+  {id:1,name:'Кривошеев Сергей Сергеевич',phone:'8-800-100-39-54',ext:'10',email:'prom10@aruan.ru',photo:'assets/manager_1.png'},
+  {id:2,name:'Маякова Лилия Анатольевна',phone:'8-800-100-39-54',ext:'13',email:'prom13@aruan.ru',photo:'assets/manager_2.png'},
+  {id:3,name:'Мещерякова Анжелика Владимировна',phone:'8-800-100-39-54',ext:'105',email:'',photo:'assets/manager_3.png'},
+  {id:4,name:'Щукин Игорь Александрович',phone:'8-800-100-39-54',ext:'100',email:'sale100@aruan.ru',photo:'assets/manager_4.png'},
+  {id:5,name:'Войтович Станислав Владимирович',phone:'8-800-100-39-54',ext:'20',email:'prom20@aruan.ru',photo:'assets/manager_5.png'},
+  {id:6,name:'Маяков Дмитрий Анатольевич',phone:'8-800-100-39-54',ext:'14',email:'prom14@aruan.ru',photo:'assets/manager_6.png'}
+];
+function getManager(id){return MANAGERS.find(function(m){return m.id===id;})||MANAGERS[0];}
+
+// ═══ IMAGE HELPER ═══
+function _resolveImg(item){
+  // Always prefer current DB entry to handle renames; fall back to stored value
+  if(typeof EQUIPMENT_DB!=='undefined'){
+    var db=EQUIPMENT_DB.find(function(x){return x.id==item.id;});
+    if(db&&db.img)return db.img;
+  }
+  return item.img||'';
+}
+function _imgurl(v){return v?(String(v).slice(0,5)==='data:'?v:'images/'+v):'';}
+function imgSrc(item){return _imgurl(_resolveImg(item));}
+function imgTag(item,w,h,cls){
+  var img=_resolveImg(item);
+  if(!img)return '';
+  return '<img src="'+_imgurl(img)+'" style="width:'+w+'px;height:'+h+'px;object-fit:contain'+(cls?';'+cls:'')+'">';
+}
+// ═══ ФОТО СВОЕЙ ПОЗИЦИИ: убрать однотонный фон + 200×200 прозрачный PNG (в браузере) ═══
+function _onCustomPhoto(ev,itemId){
+  var f=ev.target.files&&ev.target.files[0];if(!f)return;
+  if(!/^image\//.test(f.type)){showToast('Нужен файл изображения');return;}
+  showToast('Обработка фото…');
+  _processPhoto(f,function(dataUrl){
+    var it=state.items.find(function(i){return i.id===itemId;});
+    if(it){it.img=dataUrl;render();showToast('✅ Фото добавлено');}
+  },function(){showToast('Не удалось обработать фото');});
+}
+// ── ИИ-удаление фона (ISNet + onnxruntime, самохост в ort/). Фолбэк - простой алгоритм ниже. ──
+var _aiSession=null,_aiLoading=null;
+function _aiToast(msg){var t=document.getElementById('ai-toast');if(!t){t=document.createElement('div');t.id='ai-toast';t.style.cssText='position:fixed;bottom:32px;left:50%;transform:translateX(-50%);background:#1a2332;color:#fff;padding:14px 24px;border-radius:10px;font-size:14px;font-weight:600;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,.25)';document.body.appendChild(t);}t.textContent=msg;}
+function _aiToastHide(){var t=document.getElementById('ai-toast');if(t)t.remove();}
+function _aiLoadScript(){return new Promise(function(res,rej){if(window.ort)return res();var s=document.createElement('script');s.src='ort/ort.all.min.js';s.onload=res;s.onerror=rej;document.head.appendChild(s);});}
+function _aiFetchPart(url,onBytes){return fetch(url).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);var reader=r.body.getReader(),chunks=[],got=0;function pump(){return reader.read().then(function(x){if(x.done){var buf=new Uint8Array(got),off=0;chunks.forEach(function(c){buf.set(c,off);off+=c.length;});return buf;}chunks.push(x.value);got+=x.value.length;onBytes(x.value.length);return pump();});}return pump();});}
+function _aiGetSession(){
+  if(_aiSession)return Promise.resolve(_aiSession);
+  if(_aiLoading)return _aiLoading;
+  _aiLoading=_aiLoadScript().then(function(){
+    ort.env.wasm.wasmPaths=new URL('ort/',location.href).toString();
+    if(!self.crossOriginIsolated)ort.env.wasm.numThreads=1;
+    var total=178648008,done=0;
+    function prog(n){done+=n;_aiToast('Загрузка ИИ-обработчика: '+Math.min(99,Math.round(done/total*100))+'% (только в первый раз)');}
+    return Promise.all([_aiFetchPart('ort/isnet.part1',prog),_aiFetchPart('ort/isnet.part2',prog)]);
+  }).then(function(parts){
+    var model=new Uint8Array(parts[0].length+parts[1].length);
+    model.set(parts[0],0);model.set(parts[1],parts[0].length);
+    _aiToast('Запуск ИИ-обработчика…');
+    var tryGpu=(navigator.gpu?navigator.gpu.requestAdapter().catch(function(){return null;}):Promise.resolve(null));
+    return tryGpu.then(function(ad){
+      var ep=ad?['webgpu','wasm']:['wasm'];
+      return ort.InferenceSession.create(model,{executionProviders:ep});
+    });
+  }).then(function(s){_aiSession=s;_aiLoading=null;return s;}).catch(function(e){_aiLoading=null;throw e;});
+  return _aiLoading;
+}
+function _aiRemoveBg(img,onDone,onErr){
+  _aiGetSession().then(function(session){
+    _aiToast('Обработка фото…');
+    var S=1024,c=document.createElement('canvas');c.width=S;c.height=S;
+    var ctx=c.getContext('2d');ctx.drawImage(img,0,0,S,S);
+    var d=ctx.getImageData(0,0,S,S).data;
+    var arr=new Float32Array(3*S*S);
+    for(var i=0;i<S*S;i++){arr[i]=d[i*4]/255-0.5;arr[S*S+i]=d[i*4+1]/255-0.5;arr[2*S*S+i]=d[i*4+2]/255-0.5;}
+    var feeds={};feeds[session.inputNames[0]]=new ort.Tensor('float32',arr,[1,3,S,S]);
+    return session.run(feeds).then(function(res){
+      var mask=res[session.outputNames[0]].data;
+      var mn=Infinity,mx=-Infinity;
+      for(var j=0;j<mask.length;j++){if(mask[j]<mn)mn=mask[j];if(mask[j]>mx)mx=mask[j];}
+      var rng=(mx-mn)||1;
+      var W=img.naturalWidth,H=img.naturalHeight,sc=Math.min(1,480/Math.max(W,H));
+      var w=Math.max(1,Math.round(W*sc)),h=Math.max(1,Math.round(H*sc));
+      var pc=document.createElement('canvas');pc.width=w;pc.height=h;
+      var pctx=pc.getContext('2d');pctx.drawImage(img,0,0,w,h);
+      var pd=pctx.getImageData(0,0,w,h),pp=pd.data;
+      for(var y=0;y<h;y++)for(var x=0;x<w;x++){
+        var mxi=Math.min(S-1,Math.round(x/w*S)),myi=Math.min(S-1,Math.round(y/h*S));
+        pp[(y*w+x)*4+3]=Math.round((mask[myi*S+mxi]-mn)/rng*255);
+      }
+      pctx.putImageData(pd,0,0);
+      var minX=w,minY=h,maxX=0,maxY=0,any=false;
+      for(var y2=0;y2<h;y2++)for(var x2=0;x2<w;x2++){if(pp[(y2*w+x2)*4+3]>30){any=true;if(x2<minX)minX=x2;if(x2>maxX)maxX=x2;if(y2<minY)minY=y2;if(y2>maxY)maxY=y2;}}
+      if(!any){minX=0;minY=0;maxX=w-1;maxY=h-1;}
+      var cw=maxX-minX+1,ch=maxY-minY+1;
+      var out=document.createElement('canvas');out.width=200;out.height=200;
+      var octx=out.getContext('2d');
+      var s2=Math.min(184/cw,184/ch),dw=Math.round(cw*s2),dh=Math.round(ch*s2);
+      octx.drawImage(pc,minX,minY,cw,ch,(200-dw)/2,(200-dh)/2,dw,dh);
+      _aiToastHide();
+      onDone(out.toDataURL('image/png'));
+    });
+  }).catch(function(e){_aiToastHide();onErr(e);});
+}
+function _processPhoto(file,onDone,onErr){
+  var img=new Image();
+  img.onload=function(){
+    _aiRemoveBg(img,onDone,function(){
+      // ИИ не завёлся (старый браузер/нет памяти) - простой алгоритм как запасной
+      _processPhotoSimple(file,onDone,onErr);
+    });
+  };
+  img.onerror=function(){if(onErr)onErr();};
+  img.src=URL.createObjectURL(file);
+}
+function _processPhotoSimple(file,onDone,onErr){
+  var img=new Image();
+  img.onload=function(){
+    try{
+      var W=img.naturalWidth,H=img.naturalHeight,sc=Math.min(1,480/Math.max(W,H));
+      var w=Math.max(1,Math.round(W*sc)),h=Math.max(1,Math.round(H*sc));
+      var c=document.createElement('canvas');c.width=w;c.height=h;
+      var ctx=c.getContext('2d');ctx.drawImage(img,0,0,w,h);
+      var d=ctx.getImageData(0,0,w,h),px=d.data;
+      var br=0,bgc=0,bb=0,n=0;
+      function edge(x,y){var i=(y*w+x)*4;br+=px[i];bgc+=px[i+1];bb+=px[i+2];n++;}
+      for(var x=0;x<w;x++){edge(x,0);edge(x,h-1);}
+      for(var y=0;y<h;y++){edge(0,y);edge(w-1,y);}
+      br/=n;bgc/=n;bb/=n;
+      var TH=42;
+      function isBg(i){var dr=px[i]-br,dg=px[i+1]-bgc,db=px[i+2]-bb;return (dr*dr+dg*dg+db*db)<TH*TH;}
+      var seen=new Uint8Array(w*h),stack=[];
+      function push(x,y){if(x<0||y<0||x>=w||y>=h)return;var p=y*w+x;if(seen[p])return;seen[p]=1;if(isBg(p*4)){px[p*4+3]=0;stack.push(p);}}
+      for(var x2=0;x2<w;x2++){push(x2,0);push(x2,h-1);}
+      for(var y2=0;y2<h;y2++){push(0,y2);push(w-1,y2);}
+      while(stack.length){var p=stack.pop(),cx=p%w,cy=(p-cx)/w;push(cx+1,cy);push(cx-1,cy);push(cx,cy+1);push(cx,cy-1);}
+      ctx.putImageData(d,0,0);
+      var minX=w,minY=h,maxX=0,maxY=0,any=false;
+      for(var yy=0;yy<h;yy++)for(var xx=0;xx<w;xx++){if(px[(yy*w+xx)*4+3]>10){any=true;if(xx<minX)minX=xx;if(xx>maxX)maxX=xx;if(yy<minY)minY=yy;if(yy>maxY)maxY=yy;}}
+      if(!any){minX=0;minY=0;maxX=w-1;maxY=h-1;}
+      var cw=maxX-minX+1,ch=maxY-minY+1;
+      var out=document.createElement('canvas');out.width=200;out.height=200;
+      var octx=out.getContext('2d');
+      var s2=Math.min(184/cw,184/ch),dw=Math.round(cw*s2),dh=Math.round(ch*s2);
+      octx.drawImage(c,minX,minY,cw,ch,(200-dw)/2,(200-dh)/2,dw,dh);
+      onDone(out.toDataURL('image/png'));
+    }catch(e){if(onErr)onErr(e);}
+  };
+  img.onerror=function(){if(onErr)onErr();};
+  img.src=URL.createObjectURL(file);
+}
+
+var KP_SEG=localStorage.getItem('kp_segment')||'prom';
+function _inSeg(e){if(KP_SEG==='all')return true;var s=e.segment||'prom';return s==='both'||s===KP_SEG;}
+var EQUIPMENT_VIEW=[];var CATEGORIES=[];
+function _rebuildSegView(){EQUIPMENT_VIEW=EQUIPMENT_DB.filter(_inSeg);CATEGORIES=[];var _cs={};EQUIPMENT_VIEW.forEach(function(e){if(!_cs[e.category]){_cs[e.category]=1;CATEGORIES.push(e.category);}});}
+_rebuildSegView();
+function setSegment(s){KP_SEG=s;localStorage.setItem('kp_segment',s);_rebuildSegView();setState({search:'',catFilter:'Все'});}
+var fmt=function(n){return n.toLocaleString('ru-RU');};
+function _pluralMeshok(n){if(n%1!==0)return'мешка';var a=Math.abs(n)%100,l=a%10;if(a>=11&&a<=19)return'мешков';if(l===1)return'мешок';if(l>=2&&l<=4)return'мешка';return'мешков';}
+function plRu(n,one,few,many){var a=Math.abs(n)%100,b=a%10;if(a>=11&&a<=19)return many;if(b===1)return one;if(b>=2&&b<=4)return few;return many;}
+function _normalizeSpecs(s){if(!s)return s;s=s.replace(/мешк\./g,'мешков').replace(/мешк\b/g,'мешков');s=s.replace(/(\d+\s+мешков)\s*\+\s*/g,'$1, ');s=s.replace(/([a-zA-Zа-яёА-ЯЁ0-9x\/]+)\s+(\d+(?:\.\d+)?)\s+мешков/g,'$1, $2 мешков');s=s.replace(/(\d+(?:\.\d+)?)\s+мешков/g,function(m,n){return n+' '+_pluralMeshok(parseFloat(n));});return s;}
+function fmtSpecs(s){s=_normalizeSpecs(s);if(!s)return '';var p=s.split(/\. (?=[А-ЯЁA-Z])/).filter(function(x){return x.trim();});if(p.length<=1)return s;return p.map(function(x){return '• '+x.replace(/\.$/,'');}).join('<br>');}
+function fmtSpecsTxt(s){s=_normalizeSpecs(s);if(!s)return '';var p=s.split(/\. (?=[А-ЯЁA-Z])/).filter(function(x){return x.trim();});if(p.length<=1)return s;return p.map(function(x){return '• '+x.replace(/\.$/,'');}).join('\n');}
+
+// ═══ SERVICES ═══
+function getServiceItems(){var c=state.client,r=[];var hasBMZ=state.items&&state.items.some(function(i){return i.category==='Блочно-модульные здания';});var bmzSuffix=hasBMZ?' (внутри БМЗ)':'';if(c.inclDelivery&&c.priceDelivery>0)r.push({name:c.svcNameDelivery||'Транспортные услуги (без разгрузки)',price:c.priceDelivery});if(c.inclMontage&&c.priceMontage>0)r.push({name:c.svcNameMontage||(hasBMZ?'Монтаж оборудования (внутри БМЗ)':'Монтаж и пуско-наладка оборудования'),price:c.priceMontage});if(c.inclObvyazka&&c.priceObvyazka>0)r.push({name:c.svcNameObvyazka||('Трубная обвязка'+bmzSuffix),price:c.priceObvyazka});if(c.inclVyezd&&c.priceVyezd>0)r.push({name:c.svcNameVyezd||'Выезд технического специалиста',price:c.priceVyezd});if(c.inclKomandirovka&&c.priceKomandirovka>0)r.push({name:c.svcNameKomandirovka||'Командировочные расходы',price:c.priceKomandirovka});return r;}
+function renameSvc(key,val){state.client['svcName'+key]=val;}
+function calcServicesTotal(){return getServiceItems().reduce(function(s,i){return s+i.price;},0);}
+
+// ═══ SUPABASE ═══
+var _sb=(typeof supabase!=='undefined')?supabase.createClient('https://uclzyzztoripulpcpshp.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVjbHp5enp0b3JpcHVscGNwc2hwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3ODIyNzMsImV4cCI6MjA5MjM1ODI3M30.rX-WT1WdZiwRakVcUEkcg-_dnWzfU49LvgTNHYgBYQ0'):null;
+var _cloudSynced=false;
+function _cloudSave(entry){if(!_sb)return;_sb.from('kps').upsert({local_id:String(entry.id),kp_number:entry.client&&entry.client.kpNum||'',client_name:entry.client&&entry.client.name||'',total:entry.total||0,manager_id:entry.client&&entry.client.managerId||1,kp_date:(entry.createdAt||entry.savedAt||new Date().toISOString()).slice(0,10),updated_at:new Date().toISOString(),data:entry},{onConflict:'local_id'}).then(function(r){if(r.error)console.warn('Cloud save:',r.error);});}
+function _cloudDelete(id){if(!_sb)return;_sb.from('kps').delete().eq('local_id',String(id)).then(function(){});}
+var _myMgrId=+(localStorage.getItem('my_manager_id')||0);
+function _pingPresence(mid){try{if(!mid||!_sb)return;var mgr=getManager(mid);if(!mgr||!mgr.name)return;localStorage.setItem('my_manager_id',String(mid));_myMgrId=mid;_sb.from('managers_presence').upsert({manager_id:mid,manager_name:mgr.name,last_seen:new Date().toISOString()},{onConflict:'manager_id'}).then(function(){});}catch(e){}}
+function _bulkSync(){if(!_sb)return;if(localStorage.getItem('kp_bulk_synced')==='3')return;var h=loadHistory();if(!h.length)return;var batch=h.map(function(e){return{local_id:String(e.id),kp_number:e.client&&e.client.kpNum||'',client_name:e.client&&e.client.name||'',total:e.total||0,manager_id:e.client&&e.client.managerId||1,kp_date:(e.createdAt||e.savedAt||new Date().toISOString()).slice(0,10),updated_at:e.savedAt||new Date().toISOString(),data:e};});var chunks=[];for(var _i=0;_i<batch.length;_i+=50)chunks.push(batch.slice(_i,_i+50));Promise.all(chunks.map(function(chunk){return _sb.from('kps').upsert(chunk,{onConflict:'local_id'}).then(function(r){if(r.error)console.warn('Bulk sync chunk:',r.error);});})).then(function(){localStorage.setItem('kp_bulk_synced','3');});}
+function showToast(msg,dur){var t=document.createElement('div');t.textContent=msg;t.style.cssText='position:fixed;bottom:32px;left:50%;transform:translateX(-50%);background:#1a2332;color:#fff;padding:14px 24px;border-radius:10px;font-size:14px;font-weight:600;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,.25);transition:opacity .4s';document.body.appendChild(t);setTimeout(function(){t.style.opacity='0';setTimeout(function(){t.remove();},400);},dur||3000);}
+function _showShareModal(url){var d=document.createElement('div');d.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:10000;display:flex;align-items:center;justify-content:center';d.innerHTML='<div style="background:#fff;border-radius:12px;padding:24px;width:460px;max-width:90vw;box-shadow:0 20px 60px rgba(0,0,0,.3)"><div style="font-weight:700;font-size:16px;margin-bottom:4px">Ссылка на КП</div><div style="font-size:12px;color:#666;margin-bottom:12px">Скопируйте и отправьте клиенту</div><input id="_su_inp" value="'+url+'" readonly style="width:100%;box-sizing:border-box;padding:10px;border:1px solid #ddd;border-radius:8px;font-size:12px;margin-bottom:12px;color:#333;background:#f9f9f9" onclick="this.select()"><div style="display:flex;gap:8px;justify-content:flex-end"><button onclick="this.closest(\'div[data-sm]\').remove()" style="padding:8px 16px;border:1px solid #ddd;border-radius:8px;cursor:pointer;font-size:14px;background:#fff">Закрыть</button><button id="_su_btn" onclick="navigator.clipboard.writeText(document.getElementById(\'_su_inp\').value).then(function(){var b=document.getElementById(\'_su_btn\');b.textContent=\'✅ Скопировано\';b.style.background=\'#16a34a\';})" style="padding:8px 16px;border:none;border-radius:8px;background:#2563eb;color:#fff;cursor:pointer;font-size:14px;font-weight:600">Копировать</button></div></div>';d.firstChild.dataset.sm='1';d.addEventListener('click',function(e){if(e.target===d)d.remove();});document.body.appendChild(d);setTimeout(function(){var i=document.getElementById('_su_inp');if(i)i.select();},50);}
+async function shareKP(){var entry=saveCurrentKP();if(!_sb){showToast('❌ Облако недоступно',3000);return;}showToast('Сохраняю в облако…',2000);await new Promise(function(r){setTimeout(r,2500);});var r=await _sb.from('kps').select('share_token').eq('local_id',String(entry.id)).single();var token=r.data&&r.data.share_token;if(!token){token=crypto.randomUUID();var upd=await _sb.from('kps').update({share_token:token}).eq('local_id',String(entry.id));if(upd.error){showToast('❌ Ошибка сохранения. Попробуйте ещё раз.',4000);return;}}var url=location.origin+'/view.html?t='+token;_showShareModal(url);}
+function syncFromCloud(){if(!_sb||_cloudSynced)return;_cloudSynced=true;_sb.from('kps').select('data,updated_at,last_viewed_at').order('updated_at',{ascending:false}).then(function(r){if(r.error||!r.data||!r.data.length)return;var local=loadHistory();var map={};local.forEach(function(e){map[e.id]=e;});r.data.forEach(function(row){var e=row.data;if(e&&e.id){if(row.last_viewed_at)e._viewedAt=row.last_viewed_at;map[e.id]=e;}});var merged=Object.values(map).sort(function(a,b){return (b.savedAt||'').localeCompare(a.savedAt||'');});saveHistory(merged);render();});}
+
+// ═══ STORAGE ═══
+function loadHistory(){try{return JSON.parse(localStorage.getItem('kp_history')||'[]');}catch(e){return[];}}
+function saveHistory(list){localStorage.setItem('kp_history',JSON.stringify(list));}
+function saveCurrentKP(){var h=loadHistory();var idx=h.findIndex(function(x){return x.id===state.currentKPId;});var existing=idx>=0?h[idx]:null;var now=new Date().toISOString();var entry={id:state.currentKPId||Date.now(),createdAt:existing&&existing.createdAt?existing.createdAt:now,client:JSON.parse(JSON.stringify(state.client)),items:JSON.parse(JSON.stringify(state.items)),discount:state.discount,savedAt:now,total:calcTotal()};if(idx>=0)h[idx]=entry;else h.unshift(entry);saveHistory(h);state.currentKPId=entry.id;_cloudSave(entry);return entry;}
+function loadKP(id){var h=loadHistory();var e=h.find(function(x){return x.id===id;});if(!e)return;state.client=e.client;state.items=e.items;state.discount=e.discount||0;state.currentKPId=e.id;if(!state.client.kpDate)state.client.kpDate=new Date().toISOString().split('T')[0];state.step=0;render();}
+function deleteKP(id){if(!confirm('Удалить это КП из истории?'))return;saveHistory(loadHistory().filter(function(x){return x.id!==id;}));render();_cloudDelete(id);}
+function histToggle(id){state._histOpen=state._histOpen||{};state._histOpen[id]=!state._histOpen[id];render();}
+function detectKpSubject(items){
+  if(!items||!items.length)return'оборудование для водоподготовки';
+  var cats=items.map(function(i){return(i.category||'').trim();});
+  var uniq=[...new Set(cats)];
+  var map={
+    'Загрузки для колонн':'фильтрующие загрузки для колонн',
+    'Фильтры грубой очистки':'фильтры грубой очистки воды',
+    'Двойные фильтры механической очистки':'двойные фильтры механической очистки воды',
+    'Фильтры ультратонкой очистки':'фильтры тонкой очистки воды',
+    'Колбы Аурус':'фильтры-колбы',
+    'Картриджи':'картриджи и расходные материалы',
+    'Системы обратного осмоса':'системы обратного осмоса',
+    'Аэрация':'аэрационное оборудование',
+    'Колонны обезжелезивания':'колонны обезжелезивания',
+    'Колонны умягчения':'колонны умягчения воды',
+    'Колонны деминерализации':'колонны деминерализации',
+    'Колонны угольные':'угольные колонны',
+    'Колонны смешивания':'смесительные колонны',
+    'УФ-стерилизаторы':'ультрафиолетовые стерилизаторы',
+    'Озонаторы':'озонаторы',
+    'Насосы':'насосное оборудование',
+    'Насосное оборудование':'насосное оборудование',
+    'Ёмкости':'накопительные ёмкости',
+    'Блочно-модульные здания':'блочно-модульные здания',
+    'Автоматика':'автоматику промыва',
+    'Кавитаторы':'кавитаторы',
+    'Дополнительное оборудование':'дополнительное оборудование',
+    'Комплектующие':'комплектующие для водоподготовки'
+  };
+  if(uniq.length===1)return map[uniq[0]]||'оборудование для водоподготовки';
+  var systemCats=['Колонны обезжелезивания','Колонны умягчения','Колонны деминерализации','Колонны угольные','Колонны смешивания','Системы обратного осмоса','Аэрация','Блочно-модульные здания'];
+  var hasSystem=uniq.some(function(c){return systemCats.indexOf(c)>=0;});
+  if(hasSystem)return'систему водоподготовки';
+  return'оборудование для водоподготовки';
+}
+function calcTotal(){var s=state.items.reduce(function(a,i){return a+i.customPrice*i.quantity;},0)+calcServicesTotal();return Math.round(s*(1-state.discount/100));}
+function autoKPNum(){var d=new Date();var dd=String(d.getDate()).padStart(2,'0');var mm=String(d.getMonth()+1).padStart(2,'0');var yy=String(d.getFullYear()).slice(-2);var prefix='ТИ-'+dd+'-'+mm+'-'+yy+'/';var hist=loadHistory();var cnt=hist.filter(function(h){return h.client&&h.client.kpNum&&h.client.kpNum.indexOf(prefix)===0;}).length;return prefix+String(cnt+1).padStart(2,'0');}
+
+// ═══ STATE ═══
+var state={step:-1,client:{name:'',contact:'',phone:'',email:'',managerId:1,inclDelivery:false,inclMontage:false,inclObvyazka:false,inclVyezd:false,inclKomandirovka:false,priceDelivery:0,priceMontage:0,priceObvyazka:0,priceVyezd:0,priceKomandirovka:0,kpNum:autoKPNum(),kpDate:new Date().toISOString().split('T')[0],deliveryDays:10,warrantyMonths:12,withoutVat:false,comment:''},items:[],search:'',catFilter:'Все',discount:0,currentKPId:null,historySearch:'',historyManagerFilter:'all',historySort:'date_desc'};
+function setState(u){if(u.step===1&&state.step!==1){u.search='';u.catFilter='Все';}Object.assign(state,u);render();restoreFocus();}
+var _fid='',_fp=-1;
+function saveFocus(){var e=document.activeElement;if(e&&e.id){_fid=e.id;try{_fp=e.selectionStart!=null?e.selectionStart:-1;}catch(x){_fp=-1;}}else{_fid='';_fp=-1;}_fval=e?e.value:'';}
+function restoreFocus(){if(_fid){var e=document.getElementById(_fid);if(e){e.focus();if(e.type==='number'){var len=String(e.value).length;try{e.setSelectionRange(len,len);}catch(x){}}else if(_fp>=0&&e.setSelectionRange)try{e.setSelectionRange(_fp,_fp);}catch(x){}}}}
+function setClient(k,v){state.client[k]=v;}
+function newKP(){state.currentKPId=null;state.client={name:'',contact:'',phone:'',email:'',managerId:1,inclDelivery:false,inclMontage:false,inclObvyazka:false,inclVyezd:false,inclKomandirovka:false,priceDelivery:0,priceMontage:0,priceObvyazka:0,priceVyezd:0,priceKomandirovka:0,kpNum:autoKPNum(),kpDate:new Date().toISOString().split('T')[0],deliveryDays:10,warrantyMonths:12,withoutVat:false,comment:''};state.items=[];state.discount=0;state.step=0;render();}
+
+// ═══ PDF GENERATION ═══
+function pdfHeader(){return '<div class="pdf-header-bar"><div style="background:#fff;border-radius:6px;padding:2mm 4mm;display:flex;align-items:center;gap:4mm"><img src="assets/logo_aruan.png" style="height:10mm"><img src="assets/logo_aurus.png" style="height:10mm"></div><div style="display:flex;align-items:center;gap:6mm;font-size:11px"><span>📞 8-800-100-39-54</span><span>✉ prom10@aruan.ru</span><span>🌐 www.filtr-aruan.ru</span></div></div>';}
+function pdfFooter(dateStr,pageNum){return '<div class="pdf-footer-bar"><span>'+dateStr+'</span><span>'+pageNum+'</span></div>';}
+
+function generatePDF(){
+  try{
+  saveCurrentKP();
+  var c=state.client,items=state.items,discount=state.discount;
+  var mgr=getManager(c.managerId);
+  var eqSub=items.reduce(function(a,i){return a+i.customPrice*i.quantity;},0);
+  var svcTotal=calcServicesTotal();var subtotal=eqSub+svcTotal;
+  var discAmt=subtotal*(discount/100);var total=Math.round(subtotal-discAmt);
+  var dateStr=new Date(c.kpDate).toLocaleDateString('ru-RU');
+  var svcItems=getServiceItems();
+  var notIncl=[];
+  if(!c.inclDelivery)notIncl.push('доставка');if(!c.inclMontage)notIncl.push('монтаж');
+  if(!c.inclObvyazka)notIncl.push('обвязка');;
+  var clientContact=c.phone||c.email||'';
+  var h='';
+
+  // PAGE 1: TITLE (точная копия образца)
+  h+='<div class="pdf-page" style="overflow:hidden;padding:0;position:relative;width:210mm;height:297mm">';
+  h+='<img src="assets/bg_title_smooth.jpg" style="position:absolute;top:-2mm;left:-1mm;width:calc(100% + 5mm);height:calc(100% + 4mm);object-fit:fill;z-index:0">';
+  h+='<div style="position:relative;z-index:2;width:100%;height:100%">';
+
+  // 1. TOP BAR: логотипы слева + телефон справа (на одном уровне)
+  h+='<div style="display:flex;justify-content:space-between;align-items:center;padding:7mm 7mm 0">';
+  h+='<div style="display:flex;align-items:center;gap:3mm"><img src="assets/logo_aruan.png" style="height:15mm"><img src="assets/logo_aurus.png" style="height:15mm"></div>';
+  h+='<div style="display:flex;align-items:center;gap:2mm;font-size:17px;font-weight:700;color:#333"><img src="assets/icon_phone.png" style="height:5mm"> 8-800-100-39-54</div>';
+  h+='</div>';
+
+  // 2-3. TITLE BLOCK: КОММЕРЧЕСКОЕ ПРЕДЛОЖЕНИЕ + номер (центр по всей ширине)
+  h+='<div style="text-align:center;margin-top:25mm;width:100%">';
+  h+='<div style="font-size:32px;font-weight:900;color:#1a2332;letter-spacing:2px">КОММЕРЧЕСКОЕ ПРЕДЛОЖЕНИЕ</div>';
+  h+='<div style="margin-top:2mm;font-size:20px;color:#1a2332">№ <span style="font-size:36px;font-weight:900">'+c.kpNum+'</span></div>';
+  h+='</div>';
+
+  // 4-5. COMPANY BLOCK: КОМПАНИЯ ТЕХНОИНТЕЛЛЕКТ (ниже и правее)
+  h+='<div style="text-align:center;margin-top:18mm;width:55%;padding-left:5mm">';
+  h+='<div style="font-size:24px;font-weight:900;color:#1a2332;letter-spacing:1px">КОМПАНИЯ<br>ТЕХНОИНТЕЛЛЕКТ</div>';
+  h+='<div style="font-size:15px;color:#444;margin-top:3mm;letter-spacing:1.5px">ПРОИЗВОДИТЕЛЬ ФИЛЬТРОВ И<br>СИСТЕМ ОЧИСТКИ ВОДЫ</div>';
+  h+='<div style="font-size:24px;font-weight:900;color:#1a2332;margin-top:3mm;letter-spacing:1px">АРУАН И АУРУС</div>';
+  h+='</div>';
+
+  // 6-7. Фото и информация менеджера (только если выбран)
+  if(mgr.id>0){
+    h+='<div style="position:absolute;bottom:105mm;left:12mm;z-index:3">';
+    h+='<img src="'+mgr.photo+'" style="width:38mm;height:38mm;border-radius:50%;object-fit:cover;border:0.6mm solid #A7D6E8;background:#fff">';
+    h+='</div>';
+    h+='<div style="position:absolute;bottom:68mm;left:8mm;font-size:14px;color:#1a2332;line-height:1.5;z-index:3">';
+    h+='<div style="font-style:italic">Ваш менеджер:</div>';
+    h+='<div style="font-weight:700">'+mgr.name+'</div>';
+    h+='<div style="margin-top:2mm;font-style:italic">Тел.: '+mgr.phone+'</div>';
+    h+='<div style="margin-top:2mm;font-style:italic">Добавочный '+mgr.ext+'</div>';
+    h+='<div style="margin-top:2mm;font-style:italic">Почта: '+mgr.email+'</div>';
+    h+='</div>';
+  }
+
+  // 8. БЛОК 2: Информация о клиенте (динамически)
+  var hasClient=c.name||c.contact||c.phone||c.email;
+  if(hasClient){
+    h+='<div style="position:absolute;bottom:28mm;left:8mm;font-size:14px;color:#1a2332;line-height:1.5;z-index:3;border-top:0.5px solid rgba(26,35,50,0.2);padding-top:3mm">';
+    h+='<div style="font-style:italic">Клиент:</div>';
+    if(c.name)h+='<div style="font-weight:700">'+c.name+'</div>';
+    if(c.contact)h+='<div style="margin-top:1mm">'+c.contact+'</div>';
+    if(c.phone)h+='<div style="margin-top:1mm;font-style:italic">Тел.: '+c.phone+'</div>';
+    if(c.email)h+='<div style="margin-top:1mm;font-style:italic">Почта: '+c.email+'</div>';
+    h+='</div>';
+  }
+
+  // 9. Дата (низ слева, крупная жирная)
+  h+='<div style="position:absolute;bottom:5mm;left:8mm;font-size:18px;font-weight:700;color:#1a2332;z-index:3">'+dateStr+'</div>';
+  h+='</div></div>';
+
+  // TABLE SECTION — JS pre-pagination into fixed-height pages (Stripe/QuickBooks approach)
+  var colW='width:6%;width:12%;width:44%;width:6%;width:5%;width:12%;width:15%'.split(';');
+
+  function makeRow(num,numColor,img,name,qty,unit,price,sum,bg){
+    var s='<div class="pdf-row" style="display:flex;border-bottom:0.5px solid #ccc'+(bg?';background:'+bg:'')+'">';
+    s+='<div style="'+colW[0]+';padding:5px;text-align:center;font-weight:700;color:'+numColor+';border-right:0.5px solid #ccc">'+num+'</div>';
+    s+='<div style="'+colW[1]+';padding:5px;text-align:center;border-right:0.5px solid #ccc">'+img+'</div>';
+    s+='<div style="'+colW[2]+';padding:5px;border-right:0.5px solid #ccc">'+name+'</div>';
+    s+='<div style="'+colW[3]+';padding:5px;text-align:center;border-right:0.5px solid #ccc">'+qty+'</div>';
+    s+='<div style="'+colW[4]+';padding:5px;text-align:center;border-right:0.5px solid #ccc">'+unit+'</div>';
+    s+='<div style="'+colW[5]+';padding:5px;text-align:right;border-right:0.5px solid #ccc">'+price+'</div>';
+    s+='<div style="'+colW[6]+';padding:5px;text-align:right;font-weight:700">'+sum+'</div>';
+    s+='</div>';
+    return s;
+  }
+
+  var rowsArr=[];
+  items.forEach(function(it,i){
+    var fillLabel='';if(it.fillType&&typeof COLUMN_FILLS!=='undefined'&&!it.name.includes('с засыпкой')){var ff=COLUMN_FILLS[it.fillType].find(function(f){return f.id===it.fillId;});if(ff)fillLabel=' с засыпкой '+ff.name;}
+    var imgHtml=_resolveImg(it)?'<img src="'+_imgurl(_resolveImg(it))+'" class="pdf-photo">':'';
+    var nameHtml='<b>'+it.name+fillLabel+'</b><br><span class="pdf-specs">'+fmtSpecsTxt(it.specs)+'</span>';
+    rowsArr.push(makeRow(i+1,'#0D47A1',imgHtml,nameHtml,it.quantity,it.unit,fmt(it.customPrice),fmt(it.customPrice*it.quantity),''));
+  });
+  svcItems.forEach(function(svc,si){
+    rowsArr.push(makeRow(items.length+si+1,'#FF6F00','','<b>'+svc.name+'</b>',1,'Усл.',fmt(svc.price),fmt(svc.price),'#FFF8E1'));
+  });
+
+  // Table header row
+  var hc='border-right:0.5px solid rgba(255,255,255,0.3);';
+  var headerRow='<div style="display:flex;background:linear-gradient(90deg,#3a6a9e 0%,#5a8bb8 50%,#3a6a9e 100%);color:#fff;font-size:12px;font-weight:700;border:1px solid #3a6a9e">';
+  headerRow+='<div style="'+colW[0]+';padding:6px 5px;text-align:center;'+hc+'">№</div>';
+  headerRow+='<div style="'+colW[1]+';padding:6px 5px;text-align:center;'+hc+'">Фото</div>';
+  headerRow+='<div style="'+colW[2]+';padding:6px 5px;'+hc+'">Товары (работы, услуги)</div>';
+  headerRow+='<div style="'+colW[3]+';padding:6px 5px;text-align:center;'+hc+'">Кол-во</div>';
+  headerRow+='<div style="'+colW[4]+';padding:6px 5px;text-align:center;'+hc+'">Ед.</div>';
+  headerRow+='<div style="'+colW[5]+';padding:6px 5px;text-align:right;'+hc+'">Цена, руб.</div>';
+  headerRow+='<div style="'+colW[6]+';padding:6px 5px;text-align:right">Сумма, руб.</div>';
+  headerRow+='</div>';
+
+  // Intro text (only on first table page)
+  var kpSubject=detectKpSubject(state.items);
+  var introHtml='<div class="pdf-intro" style="padding:3mm 0;text-align:center;font-size:12px;color:#333;line-height:1.5">С учетом Вашего запроса мы предлагаем Вам <b>'+kpSubject+'</b> Аруан. Общая стоимость составляет <b style="color:#0D47A1;font-size:16px">'+fmt(total)+'</b> рублей'+(c.withoutVat?'':', включая НДС 22%')+'. Прилагаемая таблица содержит детальную информацию о ценах на каждую единицу товара. Мы гарантируем качественную поставку и полную поддержку.</div>';
+
+  // Comment block (before signature)
+  var commentHtml='';if(c.comment&&c.comment.trim()){commentHtml='<div style="margin-top:3mm;padding:3mm 4mm;background:#F8FAFC;border:1px solid #BDBDBD;border-radius:2mm;font-size:11px;color:#333;line-height:1.6"><b style="font-size:12px">Примечания:</b><br>'+c.comment.trim().replace(/\n/g,'<br>')+'</div>';}
+
+  // Signature block (only on last page)
+  var signHtml=commentHtml+'<div class="pdf-sign" style="margin-top:3mm;padding-top:3mm;border-top:1px solid #0D47A1">';
+  signHtml+='<div style="display:flex;justify-content:space-between;align-items:flex-start">';
+  signHtml+='<div style="font-size:12px;line-height:1.7"><b>Срок поставки – '+(/^\d+$/.test((''+c.deliveryDays).trim())?c.deliveryDays+' '+plRu(c.deliveryDays,'рабочий день','рабочих дня','рабочих дней'):c.deliveryDays)+'.</b><br><b>Срок гарантии на товар – '+c.warrantyMonths+' '+plRu(c.warrantyMonths,'месяц','месяца','месяцев')+'.</b><br>';
+  if(notIncl.length)signHtml+='<span style="font-size:11px;color:#666">В стоимость не входит: '+notIncl.join(', ')+'.</span>';
+  signHtml+='</div>';
+  signHtml+='<div style="text-align:right;background:#EBF5FB;padding:6px 14px;border-radius:4px"><div style="font-size:12px;color:#333">Итого:</div><div style="font-size:22px;font-weight:800;color:#0D47A1">'+fmt(total)+' рублей</div>'+(c.withoutVat?'':'<div style="font-size:11px;color:#666">с учетом НДС 22%</div>')+'</div>';
+  signHtml+='</div>';
+  signHtml+='<div style="margin-top:3mm;display:flex;align-items:center;gap:5mm">';
+  signHtml+='<div style="font-size:12px;line-height:1.8"><div>С уважением Коммерческий директор</div><div><b>ООО «ТЕХНОИНТЕЛЛЕКТ»</b></div><div><b>Наумов Иван Павлович</b></div></div>';
+  signHtml+='<img src="assets/stamp.png" style="width:50mm;height:50mm;object-fit:contain;margin-left:10mm">';
+  signHtml+='</div></div>';
+
+  // Placeholder — will be replaced after measurement by paginateTable()
+  h+='<div id="pdfTableMount" data-rows=\''+JSON.stringify(rowsArr).replace(/'/g,'&#39;')+'\' data-header=\''+headerRow.replace(/'/g,'&#39;')+'\' data-intro=\''+introHtml.replace(/'/g,'&#39;')+'\' data-sign=\''+signHtml.replace(/'/g,'&#39;')+'\'></div>';
+  var pgNum=2;
+
+  // PAGE 3: CERTIFICATES (white bg, title-page color palette)
+  h+='<div class="pdf-page" style="background:#fff">';
+  h+=pdfHeader();
+  h+='<div style="text-align:center;padding:6mm 10mm">';
+  h+='<div style="font-size:22px;font-weight:900;color:#1a2332;letter-spacing:1px">ВЫСОКОЕ КАЧЕСТВО<br><span style="background:linear-gradient(135deg,#0a3d8f,#1565C0,#2979d6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">ПОДТВЕРЖДЁННОЕ СЕРТИФИКАТАМИ</span></div>';
+  h+='<p style="font-size:10px;color:#1a2332;margin-top:4mm;line-height:1.6">Производственные процессы прошли сертификацию качества ISO 90001,<br>Данные изменения позволили сократить срок производства и поставки товара,<br>отладить пост-гарантийный контроль оборудования, соблюдать гост и контроль<br>качества производимого продукта.</p>';
+  h+='<p style="font-size:10px;color:#1a2332;margin-top:3mm;line-height:1.6">Продукция прошли все гидро-испытания и соответствуют заявленным<br>характеристикам и Техническим условиям производства.<br>Компания провела экспертизу на продукцию и<br>получила сертификаты соответствия и<br>декларации таможенного союза</p>';
+  h+='<div style="margin-top:5mm;display:grid;grid-template-columns:55mm 55mm;justify-content:center;gap:6mm">';
+  ['cert_1','cert_2','cert_3','cert_4'].forEach(function(cn){
+    h+='<img src="assets/'+cn+'.jpg" style="width:55mm;height:78mm;object-fit:contain;border:0.5px solid #1565C0;border-radius:4px;background:#fff;box-shadow:0 2mm 6mm rgba(10,61,143,0.15)">';
+  });
+  h+='</div>';
+  h+='<div style="margin-top:5mm"><img src="assets/cert_icons.jpg" style="height:10mm"></div>';
+  h+='</div></div>';
+
+  // PAGE 4: EXAMPLES (white bg, title-page color palette)
+  h+='<div class="pdf-page" style="background:#fff">';
+  h+=pdfHeader();
+  h+='<div style="text-align:center;padding:6mm 10mm">';
+  h+='<div style="font-size:22px;font-weight:900;color:#1a2332;letter-spacing:1px">ПРИМЕРЫ <span style="background:linear-gradient(135deg,#0a3d8f,#1565C0,#2979d6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">НАШИХ РАБОТ</span></div>';
+  h+='<div style="margin-top:5mm"><img src="assets/works_collage.jpg" style="width:170mm;object-fit:contain;border-radius:4px;box-shadow:0 2mm 6mm rgba(10,61,143,0.15)"></div>';
+  h+='</div></div>';
+
+  // PAGE 5: REQUISITES (white bg, title-page color palette)
+  h+='<div class="pdf-page" style="background:#fff">';
+  h+=pdfHeader();
+  h+='<div style="padding:8mm 15mm;text-align:center"><div style="font-size:22px;font-weight:900;color:#1a2332;letter-spacing:1px;margin-bottom:6mm">РЕКВИЗИТЫ <span style="background:linear-gradient(135deg,#0a3d8f,#1565C0,#2979d6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">ОРГАНИЗАЦИИ</span></div><table class="pdf-req-table">';
+  [['Название организации','ООО «ТЕХНОИНТЕЛЛЕКТ»'],['ИНН','5047229652'],['КПП','504701001'],['ОКПО','41184058'],['ОГРН','1195081058259'],['ОКТМО','46740000001'],['ОКАТО','46416000000'],['Расчетный счет','40702810040000007112 ПАО Сбербанк'],['Корреспондентский счёт','30101810400000000225'],['БИК','044525225'],['Телефоны','8-800-100-39-54<br>8-929-680-32-13 (бухгалтерия)<br>8-929-576-34-49 (отдел логистики)'],['Email','95909@mail.ru'],['Юр. адрес','141733, Московская область, Г.О. ЛОБНЯ, Г ЛОБНЯ, Ш БУКИНСКОЕ, Д. 39, ЛИТЕРА А-1, ЭТАЖ 1, КОМ. 5'],['Почтовый адрес','141733, Московская область, Г.О. ЛОБНЯ, Г ЛОБНЯ, Ш БУКИНСКОЕ, Д. 39, ЛИТЕРА А-1, ЭТАЖ 1, КОМ. 5'],['Директор','Наумов Иван Павлович'],['На основании','Устава'],['Сайт','www.filtr-aruan.ru']].forEach(function(r){h+='<tr><td style="font-weight:700;color:#0a3d8f;width:45mm;text-align:center">'+r[0]+'</td><td style="text-align:center;color:#1a2332">'+r[1]+'</td></tr>';});
+  h+='</table></div></div>';
+
+  document.getElementById('printArea').innerHTML=h;
+  // Preload critical images (stamp, logos) THEN wait for all printArea images THEN paginate
+  var critical=['assets/stamp.png','assets/logo_aruan.png','assets/logo_aurus.png'];
+  Promise.all(critical.map(function(src){return new Promise(function(res){var im=new Image();im.onload=res;im.onerror=res;im.src=src;});})).then(function(){
+    var imgs=document.getElementById('printArea').querySelectorAll('img');
+    var loaded=0;var total=imgs.length;
+    function afterLoad(){
+      try{paginateTable();}catch(e){alert('Ошибка таблицы: '+e.message);console.error(e);return;}
+      var allImgs=document.getElementById('printArea').querySelectorAll('img');
+      var pending=0;allImgs.forEach(function(img){if(!img.complete)pending++;});
+      function doPrint(){var _t=document.title;document.title='КП';window.print();document.title=_t;}
+      if(pending===0){setTimeout(doPrint,300);}
+      else{var done=0;allImgs.forEach(function(img){if(!img.complete){img.onload=function(){done++;if(done>=pending)setTimeout(doPrint,300);};img.onerror=function(){done++;if(done>=pending)setTimeout(doPrint,300);};}});}
+    }
+    function tryPrint(){loaded++;if(loaded>=total)setTimeout(afterLoad,300);}
+    if(total===0){setTimeout(afterLoad,300);}
+    else{imgs.forEach(function(img){if(img.complete)tryPrint();else{img.onload=tryPrint;img.onerror=tryPrint;}});}
+  });
+  }catch(err){alert('Ошибка: '+err.message);console.error(err);}
+}
+
+// ═══ JS PAGINATION (Stripe/QuickBooks approach) ═══
+function paginateTable(){
+  var mount=document.getElementById('pdfTableMount');
+  if(!mount)return;
+  var rowsArr=JSON.parse(mount.getAttribute('data-rows'));
+  var headerRow=mount.getAttribute('data-header').replace(/&#39;/g,"'");
+  var introHtml=mount.getAttribute('data-intro').replace(/&#39;/g,"'");
+  var signHtml=mount.getAttribute('data-sign').replace(/&#39;/g,"'");
+
+  // Page geometry in CSS pixels (96dpi: 1mm ≈ 3.7795px)
+  var mm=3.7795;
+  var PAGE_H=297*mm;          // A4 height
+  var PAGE_W=210*mm;          // A4 width
+  var HEADER_BAR_H=16*mm;     // pdf-header-bar (logos in white box)
+  var SIDE_PAD=8*mm;          // left/right padding for content
+  var TOP_PAD=3*mm;
+  var BOT_PAD=12*mm;          // safety bottom margin (extra for print metrics drift)
+  var SAFETY=6*mm;
+
+  // Measure each row in a hidden container at exact print width
+  var measurer=document.createElement('div');
+  measurer.style.cssText='position:absolute;left:-99999px;top:0;width:'+(PAGE_W-2*SIDE_PAD)+'px;font-family:Muller,Arial,sans-serif;visibility:hidden;font-size:13px';
+  document.body.appendChild(measurer);
+
+  // Measure header
+  measurer.innerHTML='<div style="border:0.5px solid #ccc">'+headerRow+'</div>';
+  var headerH=measurer.firstChild.getBoundingClientRect().height;
+
+  // Measure intro
+  measurer.innerHTML=introHtml;
+  var introH=measurer.firstChild.getBoundingClientRect().height;
+
+  // Measure signature — stamp is 50mm + text + total box + margins ≈ 75-85mm guaranteed
+  measurer.innerHTML=signHtml;
+  var signH=Math.max(measurer.firstChild.getBoundingClientRect().height,75*mm);
+
+  // Measure each row
+  var rowHeights=[];
+  for(var i=0;i<rowsArr.length;i++){
+    measurer.innerHTML='<div style="border:0.5px solid #ccc">'+rowsArr[i]+'</div>';
+    rowHeights.push(measurer.firstChild.getBoundingClientRect().height);
+  }
+  document.body.removeChild(measurer);
+
+  // Available content height per page (after header bar + paddings)
+  var avail=PAGE_H-HEADER_BAR_H-TOP_PAD-BOT_PAD-SAFETY;
+  // First page has intro + table header
+  var firstAvail=avail-introH-headerH;
+  // Other pages have only table header
+  var restAvail=avail-headerH;
+
+  // PASS 1: Pack rows greedily (max per page, ignore signature for now)
+  var pages=[];var cur=[];var used=0;var isFirst=true;
+  for(var ri=0;ri<rowsArr.length;ri++){
+    var rh=rowHeights[ri];
+    var cap=isFirst?firstAvail:restAvail;
+    if(used+rh<=cap){
+      cur.push(ri);used+=rh;
+    }else{
+      pages.push(cur);
+      cur=[ri];used=rh;isFirst=false;
+    }
+  }
+  if(cur.length>0)pages.push(cur);
+
+  // PASS 2: Check if signature fits on the LAST page after the last row
+  var lastPage=pages[pages.length-1];
+  var lastUsed=0;
+  for(var li=0;li<lastPage.length;li++)lastUsed+=rowHeights[lastPage[li]];
+  var lastCap=(pages.length===1?firstAvail:restAvail);
+  var sigGap=4*mm;
+  var sigOnLastPage=(lastUsed+sigGap+signH<=lastCap);
+
+  // PASS 3: If signature doesn't fit, try to pull rows from last page back to make room
+  // Only if it's a single page or if pulling gives us more space
+  if(!sigOnLastPage&&pages.length>1){
+    // Move rows from end of last page to a new "signature page" until last page has just 1-2 rows + signature
+    // Better approach: leave last page as-is, signature goes on its own page (acceptable last resort)
+  }
+
+  // Build the new HTML: one .pdf-page per page, with header bar, intro (only first), table, signature (only last)
+  var newHtml='';
+  pages.forEach(function(pg,pi){
+    var isFirstPg=(pi===0);
+    var isLastPg=(pi===pages.length-1);
+    newHtml+='<div class="pdf-page pdf-table-page" style="position:relative;padding:0;overflow:visible;background:#fff">';
+    newHtml+='<div class="pdf-header-bar"><div style="background:#fff;border-radius:6px;padding:2mm 4mm;display:flex;align-items:center;gap:4mm"><img src="assets/logo_aruan.png" style="height:10mm"><img src="assets/logo_aurus.png" style="height:10mm"></div><div style="display:flex;align-items:center;gap:6mm;font-size:11px"><span>📞 8-800-100-39-54</span><span>✉ prom10@aruan.ru</span><span>🌐 www.filtr-aruan.ru</span></div></div>';
+    newHtml+='<div style="padding:'+(TOP_PAD/mm)+'mm '+(SIDE_PAD/mm)+'mm 0">';
+    if(isFirstPg)newHtml+=introHtml;
+    newHtml+='<div style="border:0.5px solid #ccc;font-size:13px;margin-top:2mm">'+headerRow;
+    pg.forEach(function(ri){newHtml+=rowsArr[ri];});
+    newHtml+='</div>';
+    if(isLastPg&&sigOnLastPage)newHtml+=signHtml;
+    newHtml+='</div></div>';
+  });
+  // If signature didn't fit on last page, add a separate page for it
+  if(!sigOnLastPage){
+    newHtml+='<div class="pdf-page pdf-table-page" style="position:relative;padding:0;overflow:visible;background:#fff">';
+    newHtml+='<div class="pdf-header-bar"><div style="background:#fff;border-radius:6px;padding:2mm 4mm;display:flex;align-items:center;gap:4mm"><img src="assets/logo_aruan.png" style="height:10mm"><img src="assets/logo_aurus.png" style="height:10mm"></div><div style="display:flex;align-items:center;gap:6mm;font-size:11px"><span>📞 8-800-100-39-54</span><span>✉ prom10@aruan.ru</span><span>🌐 www.filtr-aruan.ru</span></div></div>';
+    newHtml+='<div style="padding:'+(TOP_PAD/mm)+'mm '+(SIDE_PAD/mm)+'mm 0">'+signHtml+'</div></div>';
+  }
+
+  // Replace mount with the paginated content
+  mount.outerHTML=newHtml;
+}
+
+// ═══ RENDER ═══
+function render(){
+  var step=state.step,client=state.client,items=state.items,search=state.search,catFilter=state.catFilter,discount=state.discount;
+  var categories=['Все'].concat(CATEGORIES);
+  var filtered=EQUIPMENT_VIEW;
+  if(catFilter!=='Все')filtered=filtered.filter(function(e){return e.category===catFilter;});
+  if(search){filtered=SearchEngine.search(search,filtered);}
+  var eqSub=items.reduce(function(a,i){return a+i.customPrice*i.quantity;},0);var svcTotal=calcServicesTotal();var subtotal=eqSub+svcTotal;
+  var discAmt=subtotal*(discount/100);var total=Math.round(subtotal-discAmt);
+  var html='';
+  // Header
+  html+='<div class="header"><div class="header-logo"><img src="assets/logo_aruan.png" style="width:32px;height:32px;object-fit:contain"></div><div><div class="header-title">Конструктор КП</div><div class="header-sub">Аруан & Аурус • '+EQUIPMENT_VIEW.length+' позиций</div></div><div class="steps">';
+  html+='<button onclick="newKP()" style="padding:6px 14px;border:none;border-radius:8px;background:#fff;color:var(--blue);font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap">+ Новое КП</button>';
+  html+='<button class="step-btn '+(step===-1?'active':'')+'" onclick="setState({step:-1})">📋 История</button>';
+  html+='<button class="step-btn '+(step===0?'active':'')+'" onclick="setState({step:0})">1. Клиент</button>';
+  html+='<button class="step-btn '+(step===1?'active':'')+'" onclick="setState({step:1})">2. Оборудование'+(items.length?'<span class="step-badge">'+items.length+'</span>':'')+'</button>';
+  html+='<button class="step-btn '+(step===2?'active':'')+'" onclick="'+(items.length?'setState({step:2})':'')+'"">3. Предпросмотр</button></div></div><div class="container">';
+  // HISTORY
+  if(step===-1){var hist=loadHistory();var hs=state.historySearch?state.historySearch.toLowerCase():'';var hmf=state.historyManagerFilter;var hsort=state.historySort;
+  // Фильтр по поиску
+  if(hs)hist=hist.filter(function(h){var c=h.client||{};var mgr=getManager(c.managerId||1);var hsDigits=hs.replace(/\D/g,'');var totalStr=String(h.total||0);var matchSum=hsDigits.length>=3&&totalStr.indexOf(hsDigits)>=0;return (c.kpNum||'').toLowerCase().indexOf(hs)>=0||(c.name||'').toLowerCase().indexOf(hs)>=0||(c.contact||'').toLowerCase().indexOf(hs)>=0||(c.phone||'').toLowerCase().indexOf(hs)>=0||(c.email||'').toLowerCase().indexOf(hs)>=0||(mgr.name||'').toLowerCase().indexOf(hs)>=0||matchSum;});
+  // Фильтр по менеджеру
+  if(hmf!=='all')hist=hist.filter(function(h){return h.client&&h.client.managerId===+hmf;});
+  // Сортировка
+  hist.sort(function(a,b){if(hsort==='date_asc')return new Date(a.savedAt)-new Date(b.savedAt);if(hsort==='sum_desc')return (b.total||0)-(a.total||0);if(hsort==='sum_asc')return (a.total||0)-(b.total||0);return new Date(b.savedAt)-new Date(a.savedAt);});
+  // Хедер
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:12px"><h2 style="font-size:20px;font-weight:800">История коммерческих предложений</h2><button class="btn-primary" onclick="newKP()">+ Новое КП</button></div>';
+  // Панель фильтров
+  html+='<div class="card" style="padding:14px 18px;margin-bottom:12px;display:flex;gap:12px;flex-wrap:wrap;align-items:center">';
+  html+='<input class="search-input" id="field_historySearch" style="min-width:240px;flex:1" placeholder="Поиск по клиенту, номеру КП, сумме, телефону, менеджеру..." value="'+state.historySearch+'" oninput="saveFocus();setState({historySearch:this.value})">';
+  html+='<select class="search-select" onchange="setState({historyManagerFilter:this.value})"><option value="all"'+(hmf==='all'?' selected':'')+'>Все менеджеры</option>';MANAGERS.filter(function(m){return m.id>0;}).forEach(function(m){html+='<option value="'+m.id+'"'+(hmf==String(m.id)?' selected':'')+'>'+m.name.split(' ').slice(0,2).join(' ')+'</option>';});html+='</select>';
+  html+='<div style="display:flex;gap:4px">';
+  html+='<button class="btn-outline" style="padding:8px 14px;font-size:12px;'+(hsort.indexOf('date')>=0?'border-color:var(--blue);color:var(--blue)':'')+'" onclick="setState({historySort:state.historySort===\'date_desc\'?\'date_asc\':\'date_desc\'})">По дате '+(hsort==='date_asc'?'↑':'↓')+'</button>';
+  html+='<button class="btn-outline" style="padding:8px 14px;font-size:12px;'+(hsort.indexOf('sum')>=0?'border-color:var(--blue);color:var(--blue)':'')+'" onclick="setState({historySort:state.historySort===\'sum_desc\'?\'sum_asc\':\'sum_desc\'})">По сумме '+(hsort==='sum_desc'?'↓':hsort==='sum_asc'?'↑':'')+'</button>';
+  html+='</div></div>';
+  // Карточки КП с группировкой по датам
+  html+='<div class="card">';
+  if(!hist.length){html+='<div style="padding:48px;text-align:center;color:var(--muted)"><div style="font-size:48px;margin-bottom:12px">📋</div><div style="font-size:16px;font-weight:600">'+(hs||hmf!=='all'?'Ничего не найдено':'Нет сохранённых КП')+'</div><div style="font-size:13px;margin-top:4px">'+(hs||hmf!=='all'?'Попробуйте другой фильтр':'Нажмите «+ Новое КП» чтобы создать первое')+'</div></div>';}else{
+  var lastGroup='';var today=new Date();today.setHours(0,0,0,0);var yesterday=new Date(today);yesterday.setDate(yesterday.getDate()-1);var weekAgo=new Date(today);weekAgo.setDate(weekAgo.getDate()-7);
+  hist.forEach(function(h){
+    var d=new Date(h.savedAt);var dDay=new Date(d);dDay.setHours(0,0,0,0);
+    var group=dDay>=today?'Сегодня':dDay>=yesterday?'Вчера':dDay>=weekAgo?'На этой неделе':'Ранее';
+    if(group!==lastGroup&&hsort.indexOf('date')>=0){lastGroup=group;html+='<div style="padding:10px 20px 6px;font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid var(--border)">'+group+'</div>';}
+    var ds=d.toLocaleDateString('ru-RU')+' '+d.toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});
+    var ic=h.items?h.items.length:0;
+    var mgr=getManager((h.client&&h.client.managerId)||1);
+    var eqNames=(h.items||[]).slice(0,3).map(function(i){return i.name;}).join(', ');
+    var viewedBadge=h._viewedAt?'<div style="font-size:10px;color:#90A4AE;margin-top:3px">👁 '+new Date(h._viewedAt).toLocaleDateString('ru-RU')+'</div>':'';
+    html+='<div class="history-item" onclick="loadKP('+h.id+')">';
+    html+='<div style="width:42px;height:42px;border-radius:10px;background:var(--blue-light);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">📄</div>';
+    html+='<div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:700">'+((h.client&&h.client.kpNum)||'—')+'</div>';
+    html+='<div style="font-size:12px;color:var(--muted);margin-top:2px">'+((h.client&&h.client.name)||'Без клиента')+' • '+ic+' поз.</div>';
+    if(mgr.id>0)html+='<div style="font-size:11px;color:var(--blue);margin-top:1px">'+mgr.name.split(' ').slice(0,2).join(' ')+'</div>';
+    if(eqNames)html+='<div style="font-size:10px;color:#999;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+eqNames+'</div>';
+    html+='</div>';
+    var hOpen=state._histOpen&&state._histOpen[h.id];
+    html+='<div style="text-align:right;flex-shrink:0"><div style="font-size:15px;font-weight:800;color:var(--blue)">'+fmt(h.total||0)+' ₽</div><div style="font-size:11px;color:var(--muted);margin-top:2px">'+ds+'</div>'+viewedBadge+'<div style="font-size:11px;color:var(--blue);font-weight:700;margin-top:4px;cursor:pointer;user-select:none" onclick="event.stopPropagation();histToggle('+h.id+')">'+(hOpen?'Скрыть ▴':'Состав ▾')+'</div>'+'</div>';
+    html+='<button class="btn-danger" onclick="event.stopPropagation();deleteKP('+h.id+')">✕</button></div>';
+    if(hOpen){
+      var _hcell='padding:5px 8px;font-size:12px;border-bottom:1px solid #eef2f7;vertical-align:top';
+      html+='<div style="margin:-4px 16px 12px;padding:10px 14px;background:#F8FAFC;border:1px solid var(--border);border-radius:10px;overflow-x:auto">';
+      html+='<table style="width:100%;border-collapse:collapse"><thead><tr>';
+      ['Наименование','Кол-во','Цена за ед.','Сумма'].forEach(function(th,ti){html+='<th style="padding:4px 8px;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;text-align:'+(ti===0?'left':(ti===1?'center':'right'))+';border-bottom:1px solid var(--border)">'+th+'</th>';});
+      html+='</tr></thead><tbody>';
+      (h.items||[]).forEach(function(it,idx){
+        var hfl='';if(it.fillType&&typeof COLUMN_FILLS!=='undefined'&&!it.name.includes('с засыпкой')){var hff=COLUMN_FILLS[it.fillType].find(function(f){return f.id===it.fillId;});if(hff)hfl=' с засыпкой '+hff.name;}
+        html+='<tr><td style="'+_hcell+'">'+(idx+1)+'. '+String(it.name+hfl).replace(/</g,'&lt;')+'</td><td style="'+_hcell+';text-align:center;white-space:nowrap">'+it.quantity+'</td><td style="'+_hcell+';text-align:right;white-space:nowrap">'+fmt(it.customPrice)+' ₽</td><td style="'+_hcell+';text-align:right;white-space:nowrap;font-weight:700">'+fmt(it.quantity*it.customPrice)+' ₽</td></tr>';
+      });
+      var hc=h.client||{};
+      [['inclDelivery','priceDelivery','svcNameDelivery','Транспортные услуги'],['inclMontage','priceMontage','svcNameMontage','Монтаж и пуско-наладка'],['inclObvyazka','priceObvyazka','svcNameObvyazka','Монтаж трубопроводной обвязки'],['inclVyezd','priceVyezd','svcNameVyezd','Выезд технического специалиста'],['inclKomandirovka','priceKomandirovka','svcNameKomandirovka','Командировочные расходы']].forEach(function(sv){
+        if(hc[sv[0]]&&hc[sv[1]]>0)html+='<tr style="color:#8a6d1a"><td style="'+_hcell+'">'+String(hc[sv[2]]||sv[3]).replace(/</g,'&lt;')+'</td><td style="'+_hcell+';text-align:center">1</td><td style="'+_hcell+';text-align:right;white-space:nowrap">'+fmt(hc[sv[1]])+' ₽</td><td style="'+_hcell+';text-align:right;white-space:nowrap;font-weight:700">'+fmt(hc[sv[1]])+' ₽</td></tr>';
+      });
+      html+='</tbody></table>';
+      html+='<div style="display:flex;justify-content:space-between;padding:8px 8px 0;font-size:13px"><span style="font-weight:700">'+((h.discount||0)>0?'Итого (скидка '+h.discount+'%):':'Итого:')+'</span><span style="font-weight:800;color:var(--blue)">'+fmt(h.total||0)+' ₽</span></div>';
+      html+='</div>';
+    }
+  });}html+='</div>';}
+  // STEP 0
+  if(step===0){html+='<div class="card" style="padding:28px"><h2 style="font-size:20px;font-weight:800;margin-bottom:20px">Данные клиента и КП</h2><div class="form-grid">';[['Наименование клиента','name','text','Необязательно'],['Контактное лицо','contact','text','ФИО'],['Телефон заказчика','phone','tel','Необязательно'],['Почта заказчика','email','email','Необязательно'],['Номер КП','kpNum','text',''],['Дата КП','kpDate','date',''],['Срок поставки','deliveryDays','text','напр. 10 или «по согласованию»'],['Гарантия (месяцев)','warrantyMonths','number','']].forEach(function(a){html+='<div><label class="form-label">'+a[0]+'</label><input class="form-input" id="field_'+a[1]+'" type="'+a[2]+'" value="'+client[a[1]]+'" placeholder="'+a[3]+'" oninput="setClient(\''+a[1]+'\',this.value)"></div>';});
+  html+='<div><label class="form-label">Менеджер</label><select class="form-input" onchange="setClient(\'managerId\',+this.value);_pingPresence(+this.value);render()">';MANAGERS.forEach(function(m){html+='<option value="'+m.id+'"'+(client.managerId===m.id?' selected':'')+'>'+(m.name||'— Без менеджера —')+'</option>';});html+='</select></div>';
+  html+='</div>';
+  html+='<div style="margin-top:20px;padding:16px 18px;background:#F8FAFC;border-radius:8px"><div style="font-size:13px;font-weight:700;margin-bottom:10px">Включено в стоимость:</div><div style="display:flex;flex-wrap:wrap;gap:12px">';
+  [['inclDelivery','priceDelivery','Транспортные услуги'],['inclMontage','priceMontage','Монтаж и пуско-наладка'],['inclObvyazka','priceObvyazka','Трубопроводная обвязка']].forEach(function(a){var k=a[0],pk=a[1],l=a[2];html+='<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:8px;border:1.5px solid '+(client[k]?'var(--blue)':'var(--border)')+';background:'+(client[k]?'var(--blue-light)':'#fff')+'"><label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;white-space:nowrap"><input type="checkbox" '+(client[k]?'checked':'')+' onchange="setClient(\''+k+'\',this.checked);render()" style="accent-color:var(--blue)"> '+l+'</label>';if(client[k])html+='<input type="number" id="field_'+pk+'" value="'+client[pk]+'" oninput="setClient(\''+pk+'\',+this.value)" style="width:100px;padding:4px 8px;border-radius:4px;border:1px solid var(--border);font-size:12px;text-align:right" placeholder="Цена"> <span style="font-size:11px;color:var(--muted)">₽</span>';html+='</div>';});
+  html+='</div></div>';
+  html+='<div style="margin-top:10px;padding:8px 18px;background:#F8FAFC;border-radius:8px;display:flex;flex-wrap:wrap;align-items:center;gap:12px">';
+  html+='<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:8px;border:1.5px solid '+(client.withoutVat?'var(--blue)':'var(--border)')+';background:'+(client.withoutVat?'var(--blue-light)':'#fff')+'"><label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;white-space:nowrap"><input type="checkbox" '+(client.withoutVat?'checked':'')+' onchange="setClient(\'withoutVat\',this.checked);render()" style="accent-color:var(--blue)"> Без НДС</label></div>';
+  if(client.withoutVat)html+='<span style="font-size:12px;color:var(--blue)">Упоминания НДС скрыты в КП и PDF — сумма не меняется</span>';
+  else html+='<span style="font-size:12px;color:var(--muted)">Для клиентов на УСН / ИП</span>';
+  html+='</div>';
+  html+='<div style="margin-top:12px;padding:16px 18px;background:#FFF8E1;border-radius:8px"><div style="font-size:13px;font-weight:700;margin-bottom:10px;color:#8B6914">Дополнительные услуги (добавляются в спецификацию отдельно):</div><div style="display:flex;flex-wrap:wrap;gap:12px">';
+  [['inclVyezd','priceVyezd','Выезд специалиста'],['inclKomandirovka','priceKomandirovka','Командировочные расходы']].forEach(function(a){var k=a[0],pk=a[1],l=a[2];html+='<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:8px;border:1.5px solid '+(client[k]?'var(--accent)':'var(--border)')+';background:'+(client[k]?'#FFF3CD':'#fff')+'"><label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;white-space:nowrap"><input type="checkbox" '+(client[k]?'checked':'')+' onchange="setClient(\''+k+'\',this.checked);render()" style="accent-color:var(--accent)"> '+l+'</label>';if(client[k])html+='<input type="number" id="field_'+pk+'" value="'+client[pk]+'" oninput="setClient(\''+pk+'\',+this.value)" style="width:100px;padding:4px 8px;border-radius:4px;border:1px solid var(--border);font-size:12px;text-align:right" placeholder="Цена"> <span style="font-size:11px;color:var(--muted)">₽</span>';html+='</div>';});
+  html+='</div></div>';
+  html+='<div style="margin-top:24px;display:flex;gap:12px;justify-content:flex-end"><button class="btn-outline" onclick="saveCurrentKP();alert(\'КП сохранено!\')">💾 Сохранить</button><button class="btn-primary" onclick="setState({step:1})">Далее → Выбор оборудования</button></div></div>';}
+  // STEP 1
+  if(step===1){html+='<div class="catalog-grid"><div><div class="card search-bar" style="margin-bottom:12px"><div class="seg-switch"><button class="seg-btn'+(KP_SEG==='prom'?' on':'')+'" onclick="setSegment(\'prom\')">🏭 Пром</button><button class="seg-btn'+(KP_SEG==='byt'?' on':'')+'" onclick="setSegment(\'byt\')">🏠 Быт</button><button class="seg-btn'+(KP_SEG==='all'?' on':'')+'" onclick="setSegment(\'all\')">📦 Все</button></div><input class="search-input" id="field_search" placeholder="🔍 Поиск по названию, характеристикам..." value="'+search+'" oninput="saveFocus();setState({search:this.value})"><select class="search-select" id="field_catFilter" onchange="saveFocus();setState({catFilter:this.value})">'+categories.map(function(c){return '<option'+(c===catFilter?' selected':'')+'>'+c+'</option>';}).join('')+'</select><span style="font-size:12px;color:var(--muted)">Найдено: '+filtered.length+'</span><button class="btn-outline" style="padding:6px 12px;font-size:12px;margin-left:auto;white-space:nowrap" onclick="addCustomItem()">+ Своя позиция</button></div><div class="eq-list">';
+  filtered.forEach(function(eq){var ad=items.some(function(i){return i.id===eq.id;});html+='<div class="eq-item'+(ad?' added':'')+'">'+(eq.img?'<img src="images/'+eq.img+'" class="eq-thumb">':'')+'<div style="flex:1;min-width:0"><div class="eq-name">'+eq.name+'</div><div class="eq-tags"><span class="tag tag-cat">'+eq.category+'</span>'+(eq.productivity?'<span class="tag tag-prod">'+eq.productivity+'</span>':'')+'<span class="tag tag-brand">'+(eq.brand&&eq.brand!=="Другой"?eq.brand:'Другое')+'</span></div>'+(eq.specs?'<div class="eq-specs">'+fmtSpecs(eq.specs)+'</div>':'')+'</div><div style="text-align:right;flex-shrink:0"><div class="eq-price">'+fmt(eq.price)+' ₽</div></div><button class="add-btn add" onclick="addItem('+eq.id+')">+</button></div>';});
+  html+='</div></div>';
+  // Sidebar
+  html+='<div class="sidebar"><div class="card"><div class="sidebar-header"><div style="font-weight:800;font-size:15px">Выбранное оборудование</div><div style="font-size:12px;opacity:.7;margin-top:2px">'+items.length+' позиций</div></div><div class="sidebar-list">';
+  if(!items.length)html+='<div style="padding:32px;text-align:center;color:var(--muted);font-size:13px">Нажмите «+» чтобы добавить<br>оборудование в КП</div>';
+  items.forEach(function(it,i){
+    html+='<div class="sidebar-item" draggable="true" data-idx="'+i+'" ondragstart="_dStart(event,'+i+')" ondragover="_dOver(event,'+i+')" ondrop="_dDrop(event,'+i+')" ondragleave="_dLeave(event)" ondragend="_dEnd()"><div class="drag-handle" title="Перетащить">⠿</div>';
+    if(it.id<0){html+='<label style="width:34px;height:34px;flex-shrink:0;border:1px dashed var(--blue);border-radius:6px;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;background:#f0f6ff" title="Добавить или заменить фото">'+(it.img?'<img src="'+_imgurl(it.img)+'" style="width:100%;height:100%;object-fit:contain">':'<span style="font-size:15px">📷</span>')+'<input type="file" accept="image/*" onchange="_onCustomPhoto(event,'+it.id+')" style="display:none"></label>';}
+    else{html+=(_resolveImg(it)?'<img src="'+_imgurl(_resolveImg(it))+'" style="width:32px;height:32px;object-fit:contain;flex-shrink:0">':'');}
+    var sideFL='';if(it.fillType&&typeof COLUMN_FILLS!=='undefined'&&!it.name.includes('с засыпкой')){var sff=COLUMN_FILLS[it.fillType].find(function(f){return f.id===it.fillId;});if(sff)sideFL=' с засыпкой '+sff.name;}
+    html+='<div style="flex:1;min-width:0"><textarea oninput="renameItem('+it.id+',this.value.replace(/^\\d+\\.\\s*/,\'\'));this.style.height=\'auto\';this.style.height=this.scrollHeight+\'px\'" style="font-size:11px;font-weight:600;line-height:1.3;width:100%;border:1px solid transparent;border-radius:4px;padding:2px 4px;background:transparent;color:inherit;cursor:text;resize:none;min-height:18px;overflow:hidden;font-family:inherit" onfocus="this.style.borderColor=\'var(--blue)\';this.style.background=\'#fff\';this.style.height=\'auto\';this.style.height=this.scrollHeight+\'px\'" onblur="this.style.borderColor=\'transparent\';this.style.background=\'transparent\'">'+(i+1)+'. '+(it.name+sideFL).replace(/</g,'&lt;')+'</textarea>';
+    var specsForEdit=(it.specs||'').split(/\.\s+/).filter(function(x){return x.trim();}).map(function(x){return x.replace(/\.$/,'');}).join('\n');
+    html+='<textarea oninput="editSpecs('+it.id+',this.value)" style="font-size:11px;color:#555;width:100%;border:1px dashed #ccc;border-radius:6px;padding:6px 8px;background:#fafafa;resize:vertical;min-height:60px;max-height:160px;line-height:1.5;font-family:inherit;margin-top:4px" onfocus="this.style.borderColor=\'var(--blue)\';this.style.background=\'#fff\'" onblur="this.style.borderColor=\'#ccc\';this.style.background=\'#fafafa\'">'+specsForEdit.replace(/</g,'&lt;')+'</textarea>';
+    html+='<div style="display:flex;align-items:center;gap:6px;margin-top:4px"><input class="qty-input" id="field_qty_'+it.id+'" type="number" min="1" value="'+it.quantity+'" oninput="updateQty('+it.id+',+this.value)" onblur="commitChange()"><span style="font-size:10px;color:var(--muted)">×</span><input class="price-input" id="field_price_'+it.id+'" type="number" value="'+it.customPrice+'" oninput="updatePrice('+it.id+',+this.value)" onblur="commitChange()"><span style="font-size:10px;color:var(--muted)">₽</span><input id="mkp_'+it.id+'" type="number" min="0" placeholder="%" style="width:38px;padding:2px 4px;border:1px solid #ddd;border-radius:4px;font-size:10px;text-align:center" title="Наценка %"><button onclick="applyMarkupItem('+it.id+',+(document.getElementById(\'mkp_'+it.id+'\').value))" style="font-size:10px;padding:2px 5px;border:none;border-radius:4px;background:var(--blue);color:#fff;cursor:pointer;white-space:nowrap">+%</button></div>';
+    if(it.fillType&&typeof COLUMN_FILLS!=='undefined'){var fills=COLUMN_FILLS[it.fillType];html+='<select style="margin-top:4px;width:100%;padding:4px 6px;border-radius:6px;border:1px solid var(--border);font-size:10px;color:var(--blue);background:#fff" onchange="changeFill('+it.id+',this.value)">';fills.forEach(function(f){html+='<option value="'+f.id+'"'+(it.fillId===f.id?' selected':'')+'>'+f.name+(f.default?' (по умолч.)':'')+'</option>';});html+='</select>';}
+    html+='</div><div style="text-align:right;flex-shrink:0"><div style="font-size:12px;font-weight:700">'+fmt(it.customPrice*it.quantity)+' ₽</div><button style="font-size:10px;color:#C62828;background:none;border:none;cursor:pointer;margin-top:2px" onclick="removeItem('+it.id+')">Удалить</button></div></div>';
+  });
+  html+='</div>';
+  if(items.length){html+='<div style="padding:8px 12px;border-top:1px solid var(--border)"><div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Наценка на все позиции</div><div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px">';[5,10,15,20,30].forEach(function(p){html+='<button onclick="applyMarkupAll('+p+')" style="padding:3px 8px;border:1px solid var(--blue);border-radius:6px;background:#fff;color:var(--blue);font-size:11px;font-weight:600;cursor:pointer">+'+p+'%</button>';});html+='</div><div style="display:flex;gap:6px;align-items:center"><input id="mkp_all" type="number" min="0" placeholder="Свой %" style="width:70px;padding:4px 6px;border:1px solid #ddd;border-radius:6px;font-size:11px"><button onclick="applyMarkupAll(+(document.getElementById(\'mkp_all\').value))" style="padding:4px 10px;border:none;border-radius:6px;background:var(--blue);color:#fff;font-size:11px;font-weight:600;cursor:pointer">Применить ко всем</button></div></div>';}
+  html+='<div style="padding:8px 12px;border-top:1px solid var(--border)"><button onclick="addCustomItem()" style="width:100%;padding:7px;border:1.5px dashed var(--blue);border-radius:8px;background:#f0f6ff;color:var(--blue);font-size:12px;font-weight:600;cursor:pointer;letter-spacing:.3px">+ Своя позиция / услуга</button></div>';
+  // Services in sidebar
+  var svcItems2=getServiceItems();
+  if(svcItems2.length){
+    html+='<div style="padding:8px 12px;border-top:1px solid var(--border)">';
+    html+='<div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">Услуги</div>';
+    svcItems2.forEach(function(svc,si){
+      var svcKey='Delivery';var nameRaw=(svc.name||'').toLowerCase();if(nameRaw.indexOf('монтаж')===0||nameRaw.indexOf('монтаж ')===0)svcKey='Montage';else if(nameRaw.indexOf('обвязк')===0)svcKey='Obvyazka';else if(nameRaw.indexOf('выезд')===0)svcKey='Vyezd';else if(nameRaw.indexOf('командиров')===0)svcKey='Komandirovka';
+      html+='<div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid #f0f0f0">';
+      html+='<input type="text" value="'+svc.name.replace(/"/g,'&quot;')+'" oninput="renameSvc(\''+svcKey+'\',this.value)" style="font-size:11px;font-weight:600;flex:1;min-width:0;border:1px solid transparent;border-radius:4px;padding:2px 4px;background:transparent" onfocus="this.style.borderColor=\'var(--blue)\';this.style.background=\'#fff\'" onblur="this.style.borderColor=\'transparent\';this.style.background=\'transparent\'">';
+      html+='<span style="font-size:12px;font-weight:700;white-space:nowrap">'+fmt(svc.price)+' ₽</span>';
+      html+='</div>';
+    });
+    html+='</div>';
+  }
+  if(items.length){html+='<div class="sidebar-total"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:12px;color:var(--muted)">Оборудование:</span><span style="font-size:13px;font-weight:600">'+fmt(eqSub)+' ₽</span></div>';if(svcTotal>0)html+='<div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:12px;color:var(--muted)">Услуги:</span><span style="font-size:13px;font-weight:600">'+fmt(svcTotal)+' ₽</span></div>';html+='<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px"><span style="font-size:12px;color:var(--muted)">Скидка:</span><input class="discount-input" id="field_discount" type="number" min="0" max="100" value="'+discount+'" oninput="saveFocus();setState({discount:Math.min(100,Math.max(0,+this.value))})"><span style="font-size:11px;color:var(--muted)">%</span>';if(discount>0)html+='<span style="font-size:11px;color:#C62828;font-weight:600">−'+fmt(Math.round(discAmt))+' ₽</span>';html+='</div><div style="display:flex;justify-content:space-between;padding:8px 0;border-top:1px solid var(--border)"><span style="font-size:14px;font-weight:700">'+(client.withoutVat?'Итого:':'Итого (вкл. НДС 22%):')+'</span><span style="font-size:16px;font-weight:800;color:var(--blue)">'+fmt(total)+' ₽</span></div><button class="btn-accent" style="width:100%;margin-top:8px" onclick="setState({step:2})">Предпросмотр КП →</button></div>';}
+  html+='</div></div></div>';}
+  // STEP 2
+  if(step===2){var dateFmt=new Date(client.kpDate).toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'});html+='<div class="card" style="overflow:hidden"><div class="preview-header"><div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px"><div><div style="font-size:11px;font-weight:600;opacity:.7;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">Коммерческое предложение</div><div style="font-size:28px;font-weight:800">№ '+client.kpNum+'</div><div style="margin-top:8px;font-size:13px;opacity:.8">от '+dateFmt+'</div></div><div style="text-align:right"><div style="font-size:20px;font-weight:800">АРУАН & АУРУС</div><div style="font-size:11px;opacity:.7;margin-top:4px">ООО «Техноинтеллект»</div><div style="font-size:12px;margin-top:2px">8-800-100-39-54</div></div></div>';
+  var cp=[];if(client.name)cp.push(client.name);if(client.contact)cp.push(client.contact);if(client.phone)cp.push(client.phone);if(client.email)cp.push(client.email);
+  if(cp.length)html+='<div style="margin-top:16px;padding:10px 16px;background:rgba(255,255,255,.1);border-radius:8px;font-size:13px"><strong>Клиент:</strong> '+cp.join(' • ')+'</div>';html+='</div>';
+  html+='<div style="display:flex;background:#F5F5F5;padding:12px 36px;gap:24px;flex-wrap:wrap"><div><span style="font-size:11px;color:var(--muted)">Позиций:</span> <strong>'+items.length+'</strong></div><div style="margin-left:auto"><span style="font-size:11px;color:var(--muted)">'+(client.withoutVat?'Итого:':'Итого (вкл. НДС 22%):')+' </span> <strong style="font-size:18px;color:var(--blue)">'+fmt(total)+' ₽</strong></div></div>';
+  html+='<div style="padding:0 36px 24px"><table class="preview-table"><thead><tr><th style="width:36px">№</th><th style="width:70px">Фото</th><th>Наименование</th><th>Характеристики</th><th style="width:60px">Кол</th><th style="width:50px">Ед.</th><th style="width:100px;text-align:right">Цена, ₽</th><th style="width:110px;text-align:right">Сумма, ₽</th></tr></thead><tbody>';
+  items.forEach(function(it,i){var fl='';if(it.fillType&&typeof COLUMN_FILLS!=='undefined'&&!it.name.includes('с засыпкой')){var ff=COLUMN_FILLS[it.fillType].find(function(f){return f.id===it.fillId;});if(ff)fl=' с засыпкой '+ff.name;}html+='<tr><td style="text-align:center;font-weight:700;color:var(--blue)">'+(i+1)+'</td><td style="text-align:center">'+((_resolveImg(it))?'<img src="'+_imgurl(_resolveImg(it))+'" style="width:60px;height:60px;object-fit:contain">':'')+'</td><td style="font-weight:600">'+it.name+fl+'</td><td style="font-size:11px;color:var(--muted)">'+fmtSpecs(it.specs)+'</td><td style="text-align:center;font-weight:600">'+it.quantity+'</td><td style="text-align:center">'+it.unit+'</td><td style="text-align:right">'+fmt(it.customPrice)+'</td><td style="text-align:right;font-weight:700">'+fmt(it.customPrice*it.quantity)+'</td></tr>';});
+  var svcI=getServiceItems();svcI.forEach(function(svc,si){html+='<tr style="background:#FFF8E1"><td style="text-align:center;font-weight:700;color:var(--accent)">'+(items.length+si+1)+'</td><td></td><td style="font-weight:600">'+svc.name+'</td><td style="font-size:11px;color:var(--muted)">Услуга</td><td style="text-align:center;font-weight:600">1</td><td style="text-align:center">Усл.</td><td style="text-align:right">'+fmt(svc.price)+'</td><td style="text-align:right;font-weight:700">'+fmt(svc.price)+'</td></tr>';});
+  html+='</tbody></table>';
+  html+='<div style="display:flex;justify-content:flex-end;margin-top:16px"><div style="background:#F5F5F5;border-radius:8px;padding:16px 24px;min-width:280px">';
+  if(discount>0)html+='<div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:12px;color:var(--muted)">Сумма:</span><span style="font-size:13px;font-weight:600">'+fmt(subtotal)+' ₽</span></div><div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="font-size:12px;color:#C62828">Скидка '+discount+'%:</span><span style="font-size:13px;font-weight:600;color:#C62828">−'+fmt(Math.round(discAmt))+' ₽</span></div>';
+  html+='<div style="display:flex;justify-content:space-between;align-items:baseline;'+(discount>0?'padding-top:8px;border-top:1px solid var(--border)':'')+'"><span style="font-size:15px;font-weight:700">'+(client.withoutVat?'Итого:':'Итого (вкл. НДС 22%):')+'</span><span style="font-size:18px;font-weight:800;color:var(--blue)">'+fmt(total)+' ₽</span></div></div></div>';
+  var ni=[];if(!client.inclDelivery)ni.push('доставка');if(!client.inclMontage)ni.push('монтаж');if(!client.inclObvyazka)ni.push('обвязка');;
+  html+='<div style="margin-top:20px;padding:14px 18px;background:#E8F5E9;border-radius:8px;font-size:13px;color:#1B5E20;line-height:1.5"><strong>Срок поставки:</strong> '+(/^\d+$/.test((''+client.deliveryDays).trim())?client.deliveryDays+' '+plRu(client.deliveryDays,'рабочий день','рабочих дня','рабочих дней'):client.deliveryDays)+' • <strong>Гарантия:</strong> '+client.warrantyMonths+' '+plRu(client.warrantyMonths,'месяц','месяца','месяцев')+'';if(ni.length)html+='<br><span style="font-size:11px;color:#388E3C">В стоимость не входит: '+ni.join(', ')+'.</span>';html+='</div></div></div>';
+  html+='<div style="margin-top:20px;padding:16px 20px;background:#F8FAFC;border:1px solid var(--border);border-radius:8px"><label style="display:block;font-size:13px;font-weight:600;color:var(--text);margin-bottom:8px">📝 Примечания <span style="font-weight:400;color:var(--muted)">(адрес доставки, габариты, особые условия — появятся в PDF)</span></label><textarea id="kp-comment" rows="3" placeholder="Например: доставка по адресу ул. Ленина, 10; высота помещения 3м; подъезд с торца здания" style="width:100%;box-sizing:border-box;padding:10px 12px;font-size:13px;font-family:inherit;border:1.5px solid var(--border);border-radius:6px;resize:vertical;color:var(--text);background:#fff" oninput="setClient(\'comment\',this.value)">'+(client.comment||'').replace(/</g,'&lt;')+'</textarea></div>';
+  html+='<div style="display:flex;gap:12px;margin-top:16px;justify-content:center;flex-wrap:wrap"><button class="btn-outline" onclick="setState({step:1})">← Редактировать</button><button class="btn-outline" onclick="saveCurrentKP();showToast(\'✅ КП сохранено\')">💾 Сохранить</button><button class="btn-outline" style="border-color:#1565C0;color:#1565C0;font-weight:700" onclick="shareKP()">🔗 Поделиться ссылкой</button><button class="btn-outline" style="border-color:#5C6BC0;color:#5C6BC0;font-weight:700" onclick="openAltKP()">📄 Альт. КП</button><button class="btn-accent" style="font-size:16px;padding:14px 40px" onclick="generatePDF()">📥 Сформировать КП (PDF)</button></div>';}
+  html+='</div>';var _eqScroll=0;var _eqEl=document.querySelector('.eq-list');if(_eqEl)_eqScroll=_eqEl.scrollTop;document.getElementById('app').innerHTML=html;var _eqEl2=document.querySelector('.eq-list');if(_eqEl2)_eqEl2.scrollTop=_eqScroll;
+}
+
+// ═══ ACTIONS ═══
+function addItem(id){var eq=EQUIPMENT_DB.find(function(e){return e.id===id;});if(!eq)return;var isDup=state.items.some(function(i){return i.id===id;});var itemId=isDup?-Date.now():eq.id;var item={id:itemId,name:eq.name,specs:eq.specs,unit:eq.unit,price:eq.price,productivity:eq.productivity,category:eq.category,brand:eq.brand,img:eq.img,quantity:1,customPrice:eq.price};if(eq.fillType){item.fillType=eq.fillType;item.fillVolume=eq.fillVolume;item.basePrice=eq.basePrice;item.fillId=eq.fillId;}
+// Auto-link automatic backwash to first mechanical filter
+if(eq.name&&eq.name.toLowerCase().indexOf('автоматика промыва')>=0){
+  var firstFilter=state.items.find(function(i){return i.category==='Фильтры грубой очистки';});
+  if(firstFilter){var fname=firstFilter.name.replace(/^Фильтр\s/,'фильтра ');item.specs='Для '+fname+'.';}
+}
+state.items.push(item);render();}
+function changeFill(itemId,fillId){var it=state.items.find(function(i){return i.id===itemId;});if(!it||!it.fillType)return;var fills=COLUMN_FILLS[it.fillType];var fill=fills.find(function(f){return f.id===fillId;});if(!fill)return;it.fillId=fillId;it.customPrice=Math.round(it.basePrice+it.fillVolume*fill.ppl);render();}
+function addCustomItem(){var id=-(Date.now());state.items.push({id:id,name:'Новая позиция',specs:'',unit:'шт.',price:0,customPrice:0,quantity:1,img:null,category:'',brand:''});render();var sl=document.querySelector('.sidebar-list');if(sl)sl.scrollTop=sl.scrollHeight;}
+var _dragIdx=null;
+function _dStart(e,idx){_dragIdx=idx;e.dataTransfer.effectAllowed='move';}
+function _dOver(e,idx){e.preventDefault();e.dataTransfer.dropEffect='move';e.currentTarget.classList.add('drag-over');}
+function _dLeave(e){e.currentTarget.classList.remove('drag-over');}
+function _dDrop(e,idx){e.preventDefault();e.currentTarget.classList.remove('drag-over');if(_dragIdx===null||_dragIdx===idx)return;var a=state.items;var item=a.splice(_dragIdx,1)[0];a.splice(idx,0,item);_dragIdx=null;render();}
+function _dEnd(){_dragIdx=null;document.querySelectorAll('.drag-over').forEach(function(el){el.classList.remove('drag-over');});}
+function applyMarkupAll(pct){if(!pct||pct<=0)return;state.items.forEach(function(it){it.customPrice=Math.round(it.customPrice*(1+pct/100)/100)*100;});render();showToast('Наценка +'+pct+'% применена ко всем позициям',3000);}
+function applyMarkupItem(id,pct){if(!pct||pct<=0)return;var it=state.items.find(function(i){return i.id===id;});if(!it)return;it.customPrice=Math.round(it.customPrice*(1+pct/100)/100)*100;render();}
+function renameItem(id,newName){var it=state.items.find(function(i){return i.id===id;});if(it)it.name=newName;}
+function editSpecs(id,val){var it=state.items.find(function(i){return i.id===id;});if(it)it.specs=val.split('\n').filter(function(x){return x.trim();}).map(function(x){return x.replace(/\.$/,'');}).join('. ')+'.';}
+function removeItem(id){state.items=state.items.filter(function(i){return i.id!==id;});render();}
+function updateQty(id,v){var it=state.items.find(function(i){return i.id===id;});if(it)it.quantity=Math.max(1,v);}
+function updatePrice(id,v){var it=state.items.find(function(i){return i.id===id;});if(it)it.customPrice=v;}
+function commitChange(){render();}
+function moveItem(idx,dir){var a=state.items;var n=idx+dir;if(n<0||n>=a.length)return;var t=a[idx];a[idx]=a[n];a[n]=t;render();}
+function openAltKP(){var entry=saveCurrentKP();window.open('alt-kp.html?kpId='+entry.id+'&m1=20&m2=35','_blank');}
+async function shareAltKP(){var entry=saveCurrentKP();if(!_sb){alert('Облако недоступно');return;}showToast('Сохраняю в облако…',1500);await new Promise(function(r){setTimeout(r,1200);});var r=await _sb.from('kps').select('share_token').eq('local_id',String(entry.id)).single();if(r.error||!r.data){alert('Ошибка получения ссылки');return;}var token=r.data.share_token;var url=location.origin+'/alt-kp.html?t='+token+'&m1=20&m2=35';try{await navigator.clipboard.writeText(url);}catch(e){prompt('Скопируйте ссылку:',url);return;}showToast('✅ Ссылка на альт. КП скопирована',4000);}
+render();syncFromCloud();setTimeout(_bulkSync,2000);if(_myMgrId)_pingPresence(_myMgrId);setInterval(function(){if(_myMgrId)_pingPresence(_myMgrId);},5*60*1000);
+</script>
+</body>
+</html>

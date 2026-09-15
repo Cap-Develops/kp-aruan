@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Калькулятор загрузок — Аруан & Аурус</title>
+<script src="database-equipment-a.js"></script>
+<script src="database-equipment-b.js"></script>
+<script src="database.js"></script>
+<style>
+@font-face{font-family:'Muller';src:url('fonts/muller-regular.woff2') format('woff2');font-display:swap;font-weight:400;font-style:normal}
+@font-face{font-family:'Muller';src:url('fonts/muller-medium.woff2') format('woff2');font-display:swap;font-weight:500;font-style:normal}
+@font-face{font-family:'Muller';src:url('fonts/muller-bold.woff2') format('woff2');font-display:swap;font-weight:700;font-style:normal}
+@font-face{font-family:'Muller';src:url('fonts/muller-extrabold.woff2') format('woff2');font-display:swap;font-weight:800;font-style:normal}
+@font-face{font-family:'Muller';src:url('fonts/muller-black.woff2') format('woff2');font-display:swap;font-weight:900;font-style:normal}
+@font-face{font-family:'Muller';src:url('fonts/muller-light.woff2') format('woff2');font-display:swap;font-weight:300;font-style:normal}
+
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --blue:#1565C0;--blue-dark:#0D47A1;--blue-deeper:#0a3d8f;
+  --blue-light:#E3F2FD;--blue-pale:#f0f7ff;
+  --green:#2E7D32;--green-light:#E8F5E9;--green-dark:#1B5E20;
+  --orange:#E65100;--orange-light:#FFF3E0;--orange-dark:#BF360C;
+  --accent:#FF6F00;--accent-light:#FFF3E0;
+  --text:#1a2332;--text-muted:#64748b;--text-light:#94a3b8;
+  --border:#e2e8f0;--border-light:#f1f5f9;
+  --bg:#f0f4f8;--bg-card:rgba(255,255,255,.82);
+  --shadow-sm:0 1px 3px rgba(0,0,0,.04),0 1px 2px rgba(0,0,0,.06);
+  --shadow:0 4px 12px rgba(0,0,0,.06),0 1px 4px rgba(0,0,0,.04);
+  --shadow-lg:0 10px 40px rgba(0,0,0,.08),0 2px 8px rgba(0,0,0,.04);
+  --shadow-xl:0 20px 60px rgba(0,0,0,.1),0 4px 12px rgba(0,0,0,.06);
+  --radius:14px;--radius-sm:10px;--radius-xs:8px;
+  --transition:all .25s cubic-bezier(.4,0,.2,1);
+}
+html{scroll-behavior:smooth}
+body{font-family:'Muller',Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+input,select,button,textarea{font-family:inherit}
+::selection{background:var(--blue);color:#fff}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#c4cdd5;border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:#94a3b8}
+
+/* ===== TOP NAV ===== */
+.top-nav{
+  background:#1a2332;padding:8px 20px;display:flex;align-items:center;
+  gap:24px;flex-wrap:wrap;position:sticky;top:0;z-index:200;
+  border-bottom:1px solid rgba(255,255,255,.06);
+}
+.top-nav a{
+  color:rgba(255,255,255,.7);text-decoration:none;font-size:13px;font-weight:500;
+  display:flex;align-items:center;gap:6px;transition:var(--transition);
+  padding:4px 0;position:relative;white-space:nowrap;
+}
+.top-nav a:hover{color:#fff}
+.top-nav a.active{color:#fff;font-weight:700}
+.top-nav a.active::after{
+  content:'';position:absolute;bottom:-8px;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--blue),#42A5F5);border-radius:1px;
+}
+
+/* ===== HEADER ===== */
+.header{
+  background:linear-gradient(135deg,#061e3c 0%,var(--blue-dark) 30%,var(--blue) 70%,#2196F3 100%);
+  padding:0;position:sticky;top:37px;z-index:100;
+  box-shadow:0 4px 30px rgba(13,71,161,.3);
+}
+.header::before{
+  content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;
+  background:radial-gradient(ellipse at 30% 50%,rgba(255,255,255,.04) 0%,transparent 60%);
+  animation:headerShimmer 8s ease-in-out infinite alternate;pointer-events:none;
+}
+@keyframes headerShimmer{0%{transform:translate(0,0)}100%{transform:translate(5%,3%)}}
+.header-inner{
+  max-width:1440px;margin:0 auto;padding:24px 32px;
+  display:flex;align-items:center;gap:20px;flex-wrap:wrap;position:relative;z-index:2;
+}
+.header-icon{
+  width:52px;height:52px;border-radius:14px;
+  background:rgba(255,255,255,.12);backdrop-filter:blur(12px);
+  display:flex;align-items:center;justify-content:center;
+  font-size:28px;flex-shrink:0;
+  border:1px solid rgba(255,255,255,.15);
+}
+.header-text{flex:1}
+.header-title{
+  color:#fff;font-weight:800;font-size:22px;letter-spacing:.3px;
+  text-shadow:0 2px 8px rgba(0,0,0,.2);
+}
+.header-sub{color:rgba(255,255,255,.5);font-size:13px;font-weight:400;margin-top:3px}
+.header-badge{
+  padding:8px 18px;border-radius:12px;
+  background:rgba(255,255,255,.1);backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,.12);
+  color:rgba(255,255,255,.8);font-size:13px;font-weight:500;
+  display:flex;align-items:center;gap:8px;
+}
+.header-badge .dot{
+  width:8px;height:8px;border-radius:50%;background:#4CAF50;
+  animation:pulse 2s ease-in-out infinite;
+}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:.8}}
+
+/* ===== LAYOUT ===== */
+.main-layout{
+  max-width:1440px;margin:0 auto;padding:28px 32px;
+  display:grid;grid-template-columns:1fr 380px;gap:28px;
+  align-items:start;
+}
+@media(max-width:1100px){
+  .main-layout{grid-template-columns:1fr;gap:20px}
+  .result-panel{position:relative !important;top:auto !important}
+}
+@media(max-width:600px){
+  .main-layout{padding:16px}
+  .header-inner{padding:18px 16px}
+  .top-nav{padding:8px 12px;gap:16px}
+  .type-cards{grid-template-columns:1fr !important}
+  .model-grid{grid-template-columns:1fr !important}
+}
+
+/* ===== STEP SECTIONS ===== */
+.step-section{
+  background:var(--bg-card);backdrop-filter:blur(16px);
+  border-radius:var(--radius);border:1px solid rgba(255,255,255,.6);
+  box-shadow:var(--shadow);padding:24px;margin-bottom:24px;
+  opacity:0;transform:translateY(20px);
+  animation:fadeUp .5s ease forwards;
+}
+.step-section:nth-child(2){animation-delay:.1s}
+.step-section:nth-child(3){animation-delay:.2s}
+.step-section:nth-child(4){animation-delay:.3s}
+@keyframes fadeUp{to{opacity:1;transform:translateY(0)}}
+
+.step-header{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.step-number{
+  width:36px;height:36px;border-radius:10px;
+  background:linear-gradient(135deg,var(--blue),#42A5F5);
+  color:#fff;font-weight:800;font-size:15px;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;box-shadow:0 4px 12px rgba(21,101,192,.3);
+}
+.step-number.done{background:linear-gradient(135deg,#2E7D32,#4CAF50)}
+.step-title{font-size:17px;font-weight:800;color:var(--text)}
+.step-subtitle{font-size:12px;color:var(--text-muted);font-weight:400;margin-top:2px}
+
+/* ===== TYPE CARDS ===== */
+.type-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.type-card{
+  padding:24px 20px;border-radius:var(--radius-sm);
+  border:2px solid var(--border);cursor:pointer;
+  transition:var(--transition);text-align:center;
+  position:relative;overflow:hidden;
+}
+.type-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;bottom:0;opacity:0;
+  transition:opacity .3s ease;border-radius:inherit;
+}
+.type-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg)}
+.type-card:hover::before{opacity:1}
+.type-card.blue-theme{border-color:rgba(21,101,192,.15)}
+.type-card.blue-theme::before{background:linear-gradient(135deg,rgba(21,101,192,.04),rgba(21,101,192,.01))}
+.type-card.blue-theme .type-icon{background:var(--blue-light);color:var(--blue)}
+.type-card.blue-theme.selected{border-color:var(--blue);background:linear-gradient(135deg,rgba(21,101,192,.06),rgba(21,101,192,.02));box-shadow:0 4px 20px rgba(21,101,192,.15)}
+.type-card.green-theme{border-color:rgba(46,125,50,.15)}
+.type-card.green-theme::before{background:linear-gradient(135deg,rgba(46,125,50,.04),rgba(46,125,50,.01))}
+.type-card.green-theme .type-icon{background:var(--green-light);color:var(--green)}
+.type-card.green-theme.selected{border-color:var(--green);background:linear-gradient(135deg,rgba(46,125,50,.06),rgba(46,125,50,.02));box-shadow:0 4px 20px rgba(46,125,50,.15)}
+.type-card.orange-theme{border-color:rgba(230,81,0,.15)}
+.type-card.orange-theme::before{background:linear-gradient(135deg,rgba(230,81,0,.04),rgba(230,81,0,.01))}
+.type-card.orange-theme .type-icon{background:var(--orange-light);color:var(--orange)}
+.type-card.orange-theme.selected{border-color:var(--orange);background:linear-gradient(135deg,rgba(230,81,0,.06),rgba(230,81,0,.02));box-shadow:0 4px 20px rgba(230,81,0,.15)}
+
+.type-icon{
+  width:56px;height:56px;border-radius:14px;margin:0 auto 14px;
+  display:flex;align-items:center;justify-content:center;font-size:28px;
+  transition:var(--transition);
+}
+.type-card:hover .type-icon{transform:scale(1.1)}
+.type-card.selected .type-icon{transform:scale(1.1)}
+.type-name{font-size:15px;font-weight:700;margin-bottom:4px}
+.type-count{font-size:12px;color:var(--text-muted);font-weight:400}
+.type-check{
+  position:absolute;top:10px;right:10px;width:24px;height:24px;
+  border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:13px;color:#fff;opacity:0;transform:scale(.5);transition:var(--transition);
+}
+.type-card.selected .type-check{opacity:1;transform:scale(1)}
+.blue-theme .type-check{background:var(--blue)}
+.green-theme .type-check{background:var(--green)}
+.orange-theme .type-check{background:var(--orange)}
+
+/* ===== MODEL GRID ===== */
+.model-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.model-card{
+  padding:18px 16px;border-radius:var(--radius-sm);
+  border:2px solid var(--border);cursor:pointer;
+  transition:var(--transition);position:relative;
+}
+.model-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg);border-color:rgba(21,101,192,.2)}
+.model-card.selected{border-color:var(--blue);background:linear-gradient(135deg,rgba(21,101,192,.05),rgba(21,101,192,.01));box-shadow:0 4px 20px rgba(21,101,192,.12)}
+.model-card.selected .model-name{color:var(--blue)}
+.model-name{font-size:15px;font-weight:800;margin-bottom:8px;transition:var(--transition)}
+.model-specs{display:flex;flex-direction:column;gap:5px}
+.model-spec{
+  font-size:12px;color:var(--text-muted);display:flex;
+  align-items:center;gap:6px;
+}
+.model-spec-icon{font-size:13px;width:18px;text-align:center;flex-shrink:0}
+.model-price{
+  margin-top:10px;padding-top:10px;border-top:1px solid var(--border-light);
+  font-size:14px;font-weight:800;color:var(--text);
+}
+.model-price small{font-weight:400;color:var(--text-muted);font-size:11px}
+.model-check{
+  position:absolute;top:8px;right:8px;width:22px;height:22px;
+  border-radius:50%;background:var(--blue);color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;opacity:0;transform:scale(.5);transition:var(--transition);
+}
+.model-card.selected .model-check{opacity:1;transform:scale(1)}
+
+/* ===== FILL LIST ===== */
+.fill-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px}
+.fill-card{
+  padding:14px 16px;border-radius:var(--radius-xs);
+  border:2px solid var(--border);cursor:pointer;
+  transition:var(--transition);display:flex;align-items:center;gap:12px;
+}
+.fill-card:hover{border-color:rgba(21,101,192,.2);box-shadow:var(--shadow-sm)}
+.fill-card.selected{border-color:var(--blue);background:linear-gradient(135deg,rgba(21,101,192,.05),rgba(21,101,192,.01))}
+.fill-radio{
+  width:20px;height:20px;border-radius:50%;
+  border:2px solid var(--border);flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  transition:var(--transition);
+}
+.fill-card.selected .fill-radio{border-color:var(--blue);background:var(--blue)}
+.fill-card.selected .fill-radio::after{content:'';width:8px;height:8px;border-radius:50%;background:#fff}
+.fill-info{flex:1;min-width:0}
+.fill-name{font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.fill-badge{
+  display:inline-flex;padding:2px 8px;border-radius:6px;
+  font-size:10px;font-weight:700;background:var(--blue-light);color:var(--blue);
+  white-space:nowrap;
+}
+.fill-price{font-size:12px;color:var(--text-muted);margin-top:2px}
+
+/* ===== RESULT PANEL ===== */
+.result-panel{
+  position:sticky;top:100px;
+  background:var(--bg-card);backdrop-filter:blur(16px);
+  border-radius:var(--radius);border:1px solid rgba(255,255,255,.6);
+  box-shadow:var(--shadow-lg);overflow:hidden;
+  opacity:0;transform:translateY(20px);
+  animation:fadeUp .5s ease .2s forwards;
+}
+.result-header{
+  padding:20px 24px;
+  background:linear-gradient(135deg,var(--blue-deeper),var(--blue));
+  color:#fff;
+}
+.result-header h3{font-size:17px;font-weight:800;margin-bottom:4px}
+.result-header p{font-size:12px;opacity:.6;font-weight:400}
+.result-body{padding:20px 24px}
+.result-empty{
+  text-align:center;padding:30px 20px;color:var(--text-muted);font-size:13px;
+}
+.result-empty-icon{font-size:40px;margin-bottom:12px;opacity:.4}
+
+.result-row{
+  display:flex;justify-content:space-between;align-items:flex-start;
+  padding:10px 0;border-bottom:1px solid var(--border-light);
+  font-size:13px;
+}
+.result-row:last-child{border-bottom:none}
+.result-label{color:var(--text-muted);font-weight:400;flex:1}
+.result-value{font-weight:700;text-align:right;margin-left:12px}
+.result-detail{font-size:11px;color:var(--text-light);margin-top:2px;font-weight:400}
+.result-total{
+  margin-top:16px;padding:16px;border-radius:var(--radius-sm);
+  background:linear-gradient(135deg,rgba(21,101,192,.06),rgba(21,101,192,.02));
+  border:1px solid rgba(21,101,192,.1);
+  display:flex;justify-content:space-between;align-items:center;
+}
+.result-total-label{font-size:15px;font-weight:700;color:var(--text)}
+.result-total-value{font-size:22px;font-weight:900;color:var(--blue)}
+
+.result-actions{padding:0 24px 20px;display:flex;flex-direction:column;gap:10px}
+.btn-primary{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  padding:14px 24px;border-radius:var(--radius-sm);border:none;
+  background:linear-gradient(135deg,var(--blue),#42A5F5);
+  color:#fff;font-size:14px;font-weight:700;cursor:pointer;
+  transition:var(--transition);box-shadow:0 4px 16px rgba(21,101,192,.3);
+  text-decoration:none;
+}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(21,101,192,.4)}
+.btn-secondary{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  padding:12px 24px;border-radius:var(--radius-sm);
+  border:1px solid var(--border);background:transparent;
+  color:var(--text-muted);font-size:13px;font-weight:600;cursor:pointer;
+  transition:var(--transition);text-decoration:none;
+}
+.btn-secondary:hover{border-color:var(--blue);color:var(--blue);background:rgba(21,101,192,.03)}
+
+/* ===== COMPARISON TABLE ===== */
+.comparison-section{
+  background:var(--bg-card);backdrop-filter:blur(16px);
+  border-radius:var(--radius);border:1px solid rgba(255,255,255,.6);
+  box-shadow:var(--shadow);padding:24px;margin-top:24px;
+  opacity:0;transform:translateY(20px);
+  animation:fadeUp .5s ease .3s forwards;
+}
+.comparison-table{width:100%;border-collapse:collapse;margin-top:16px}
+.comparison-table th{
+  text-align:left;font-size:11px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.5px;
+  color:var(--text-muted);padding:10px 14px;
+  border-bottom:2px solid var(--border);
+  background:rgba(0,0,0,.01);
+}
+.comparison-table td{
+  padding:12px 14px;font-size:13px;border-bottom:1px solid var(--border-light);
+  transition:background .2s ease;
+}
+.comparison-table tr:hover td{background:rgba(21,101,192,.02)}
+.comparison-table tr.highlight td{
+  background:linear-gradient(135deg,rgba(21,101,192,.05),rgba(21,101,192,.02));
+  font-weight:600;
+}
+.comparison-table tr.highlight-default td{
+  background:linear-gradient(135deg,rgba(46,125,50,.05),rgba(46,125,50,.02));
+}
+.comparison-table .price-cell{font-weight:700;white-space:nowrap}
+.comparison-table .total-cell{font-weight:800;color:var(--blue)}
+.table-badge{
+  display:inline-flex;padding:2px 8px;border-radius:6px;
+  font-size:10px;font-weight:700;margin-left:6px;vertical-align:middle;
+}
+.badge-default{background:var(--green-light);color:var(--green)}
+.badge-selected{background:var(--blue-light);color:var(--blue)}
+
+/* ===== SOFTENING EXTRA ===== */
+.softening-info{
+  margin-top:16px;padding:16px;border-radius:var(--radius-sm);
+  background:linear-gradient(135deg,rgba(46,125,50,.05),rgba(46,125,50,.02));
+  border:1px solid rgba(46,125,50,.1);
+}
+.softening-info h4{font-size:13px;font-weight:700;color:var(--green);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.softening-info .info-row{
+  display:flex;justify-content:space-between;align-items:center;
+  font-size:12px;padding:4px 0;
+}
+.softening-info .info-label{color:var(--text-muted)}
+.softening-info .info-value{font-weight:700;color:var(--text)}
+
+/* ===== DISABLED STATE ===== */
+.step-disabled{opacity:.4;pointer-events:none;filter:grayscale(.3)}
+
+/* ===== EMPTY STATE ===== */
+.empty-state{
+  text-align:center;padding:40px 20px;color:var(--text-muted);
+}
+.empty-state-icon{font-size:48px;margin-bottom:12px;opacity:.3}
+.empty-state-text{font-size:14px;font-weight:500}
+.empty-state-hint{font-size:12px;color:var(--text-light);margin-top:4px}
+
+/* ===== MISC ANIMATIONS ===== */
+@keyframes scaleIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
+.scale-in{animation:scaleIn .3s ease forwards}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:768px){
+  .fill-grid{grid-template-columns:1fr}
+  .comparison-table{font-size:12px}
+  .comparison-table th,.comparison-table td{padding:8px 10px}
+  .result-total-value{font-size:18px}
+}
+</style>
+</head>
+<body>
+
+<!-- Top Navigation -->
+<nav class="top-nav">
+  <a href="hub.html"><span>&#127968;</span> &#1043;&#1083;&#1072;&#1074;&#1085;&#1072;&#1103;</a>
+  <a href="index.html"><span>&#128203;</span> &#1050;&#1086;&#1085;&#1089;&#1090;&#1088;&#1091;&#1082;&#1090;&#1086;&#1088; &#1050;&#1055;</a>
+  <a href="catalog.html"><span>&#128230;</span> &#1050;&#1072;&#1090;&#1072;&#1083;&#1086;&#1075;</a>
+  <a href="calculator.html" class="active"><span>&#128295;</span> &#1050;&#1072;&#1083;&#1100;&#1082;&#1091;&#1083;&#1103;&#1090;&#1086;&#1088; &#1079;&#1072;&#1075;&#1088;&#1091;&#1079;&#1086;&#1082;</a>
+  <a href="ro-design.html"><span>&#128167;</span> RO-&#1087;&#1088;&#1086;&#1077;&#1082;&#1090;</a>
+</nav>
+
+<!-- Header -->
+<header class="header">
+  <div class="header-inner">
+    <div class="header-icon">&#9879;&#65039;</div>
+    <div class="header-text">
+      <div class="header-title">&#1050;&#1072;&#1083;&#1100;&#1082;&#1091;&#1083;&#1103;&#1090;&#1086;&#1088; &#1079;&#1072;&#1075;&#1088;&#1091;&#1079;&#1086;&#1082;</div>
+      <div class="header-sub">&#1056;&#1072;&#1089;&#1095;&#1105;&#1090; &#1089;&#1090;&#1086;&#1080;&#1084;&#1086;&#1089;&#1090;&#1080; &#1082;&#1086;&#1083;&#1086;&#1085;&#1085; &#1089; &#1088;&#1072;&#1079;&#1083;&#1080;&#1095;&#1085;&#1099;&#1084;&#1080; &#1079;&#1072;&#1089;&#1099;&#1087;&#1082;&#1072;&#1084;&#1080; &bull; &#1040;&#1088;&#1091;&#1072;&#1085; &amp; &#1040;&#1091;&#1088;&#1091;&#1089;</div>
+    </div>
+    <div class="header-badge">
+      <span class="dot"></span>
+      <span id="headerStats">0 &#1084;&#1086;&#1076;&#1077;&#1083;&#1077;&#1081;</span>
+    </div>
+  </div>
+</header>
+
+<!-- Main Layout -->
+<div class="main-layout">
+  <div class="steps-column">
+
+    <!-- Step 1: Column Type -->
+    <div class="step-section" id="step1">
+      <div class="step-header">
+        <div class="step-number" id="stepNum1">1</div>
+        <div>
+          <div class="step-title">&#1058;&#1080;&#1087; &#1082;&#1086;&#1083;&#1086;&#1085;&#1085;&#1099;</div>
+          <div class="step-subtitle">&#1042;&#1099;&#1073;&#1077;&#1088;&#1080;&#1090;&#1077; &#1085;&#1072;&#1079;&#1085;&#1072;&#1095;&#1077;&#1085;&#1080;&#1077; &#1086;&#1073;&#1086;&#1088;&#1091;&#1076;&#1086;&#1074;&#1072;&#1085;&#1080;&#1103;</div>
+        </div>
+      </div>
+      <div class="type-cards" id="typeCards"></div>
+    </div>
+
+    <!-- Step 2: Column Model -->
+    <div class="step-section" id="step2">
+      <div class="step-header">
+        <div class="step-number" id="stepNum2">2</div>
+        <div>
+          <div class="step-title">&#1052;&#1086;&#1076;&#1077;&#1083;&#1100; &#1082;&#1086;&#1083;&#1086;&#1085;&#1085;&#1099;</div>
+          <div class="step-subtitle">&#1042;&#1099;&#1073;&#1077;&#1088;&#1080;&#1090;&#1077; &#1082;&#1086;&#1083;&#1086;&#1085;&#1085;&#1091; &#1087;&#1086; &#1087;&#1088;&#1086;&#1080;&#1079;&#1074;&#1086;&#1076;&#1080;&#1090;&#1077;&#1083;&#1100;&#1085;&#1086;&#1089;&#1090;&#1080;</div>
+        </div>
+      </div>
+      <div id="modelContent">
+        <div class="empty-state">
+          <div class="empty-state-icon">&#128070;</div>
+          <div class="empty-state-text">&#1057;&#1085;&#1072;&#1095;&#1072;&#1083;&#1072; &#1074;&#1099;&#1073;&#1077;&#1088;&#1080;&#1090;&#1077; &#1090;&#1080;&#1087; &#1082;&#1086;&#1083;&#1086;&#1085;&#1085;&#1099;</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3: Fill Material -->
+    <div class="step-section" id="step3">
+      <div class="step-header">
+        <div class="step-number" id="stepNum3">3</div>
+        <div>
+          <div class="step-title">&#1047;&#1072;&#1089;&#1099;&#1087;&#1082;&#1072;</div>
+          <div class="step-subtitle">&#1042;&#1099;&#1073;&#1077;&#1088;&#1080;&#1090;&#1077; &#1092;&#1080;&#1083;&#1100;&#1090;&#1088;&#1091;&#1102;&#1097;&#1080;&#1081; &#1084;&#1072;&#1090;&#1077;&#1088;&#1080;&#1072;&#1083;</div>
+        </div>
+      </div>
+      <div id="fillContent">
+        <div class="empty-state">
+          <div class="empty-state-icon">&#128070;</div>
+          <div class="empty-state-text">&#1057;&#1085;&#1072;&#1095;&#1072;&#1083;&#1072; &#1074;&#1099;&#1073;&#1077;&#1088;&#1080;&#1090;&#1077; &#1084;&#1086;&#1076;&#1077;&#1083;&#1100;</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Comparison Table -->
+    <div class="comparison-section" id="comparisonSection" style="display:none">
+      <div class="step-header">
+        <div class="step-number" style="background:linear-gradient(135deg,#7B1FA2,#CE93D8)">&#9878;</div>
+        <div>
+          <div class="step-title">&#1057;&#1088;&#1072;&#1074;&#1085;&#1077;&#1085;&#1080;&#1077; &#1079;&#1072;&#1089;&#1099;&#1087;&#1086;&#1082;</div>
+          <div class="step-subtitle">&#1042;&#1089;&#1077; &#1074;&#1072;&#1088;&#1080;&#1072;&#1085;&#1090;&#1099; &#1076;&#1083;&#1103; &#1074;&#1099;&#1073;&#1088;&#1072;&#1085;&#1085;&#1086;&#1081; &#1082;&#1086;&#1083;&#1086;&#1085;&#1085;&#1099;, &#1086;&#1090;&#1089;&#1086;&#1088;&#1090;&#1080;&#1088;&#1086;&#1074;&#1072;&#1085;&#1085;&#1099;&#1077; &#1087;&#1086; &#1094;&#1077;&#1085;&#1077;</div>
+        </div>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="comparison-table" id="comparisonTable"></table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Result Panel -->
+  <div class="result-panel" id="resultPanel">
+    <div class="result-header">
+      <h3>&#1048;&#1090;&#1086;&#1075;&#1086;&#1074;&#1099;&#1081; &#1088;&#1072;&#1089;&#1095;&#1105;&#1090;</h3>
+      <p>&#1057;&#1090;&#1086;&#1080;&#1084;&#1086;&#1089;&#1090;&#1100; &#1082;&#1086;&#1083;&#1086;&#1085;&#1085;&#1099; &#1089; &#1079;&#1072;&#1089;&#1099;&#1087;&#1082;&#1086;&#1081;</p>
+    </div>
+    <div class="result-body" id="resultBody">
+      <div class="result-empty">
+        <div class="result-empty-icon">&#128202;</div>
+        <div>&#1042;&#1099;&#1073;&#1077;&#1088;&#1080;&#1090;&#1077; &#1082;&#1086;&#1083;&#1086;&#1085;&#1085;&#1091; &#1080; &#1079;&#1072;&#1089;&#1099;&#1087;&#1082;&#1091; &#1076;&#1083;&#1103; &#1088;&#1072;&#1089;&#1095;&#1105;&#1090;&#1072;</div>
+      </div>
+    </div>
+    <div class="result-actions" id="resultActions" style="display:none">
+      <a href="index.html" class="btn-primary">&#128203; &#1044;&#1086;&#1073;&#1072;&#1074;&#1080;&#1090;&#1100; &#1074; &#1050;&#1055;</a>
+      <button class="btn-secondary" onclick="resetAll()">&#128260; &#1057;&#1073;&#1088;&#1086;&#1089;&#1080;&#1090;&#1100; &#1074;&#1099;&#1073;&#1086;&#1088;</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  // --- Data ---
+  var DB = typeof EQUIPMENT_DB !== 'undefined' ? EQUIPMENT_DB : [];
+  var FILLS = typeof COLUMN_FILLS !== 'undefined' ? COLUMN_FILLS : {};
+
+  var TYPES = [
+    { key: 'iron_removal', name: 'Обезжелезивание', icon: '🔵', desc: 'Удаление железа и марганца', theme: 'blue-theme' },
+    { key: 'softening',    name: 'Умягчение',       icon: '🟢', desc: 'Снижение жёсткости воды',   theme: 'green-theme' },
+    { key: 'carbon',       name: 'Угольная сорбция', icon: '🟠', desc: 'Удаление органики и хлора', theme: 'orange-theme' }
+  ];
+
+  // --- State ---
+  var state = {
+    type: null,
+    model: null,
+    fillId: null
+  };
+
+  // --- Helpers ---
+  function fmt(n) {
+    return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+  }
+
+  function getColumns(typeKey) {
+    return DB.filter(function(e) { return e.fillType === typeKey; });
+  }
+
+  function getFills(typeKey) {
+    return FILLS[typeKey] || [];
+  }
+
+  function getSelectedFill() {
+    if (!state.type || !state.fillId) return null;
+    var fills = getFills(state.type);
+    return fills.find(function(f) { return f.id === state.fillId; }) || null;
+  }
+
+  function getDefaultFill(typeKey) {
+    var fills = getFills(typeKey);
+    var def = fills.find(function(f) { return f.default; });
+    return def || fills[0] || null;
+  }
+
+  // --- Init ---
+  function init() {
+    renderTypeCards();
+    updateStepStates();
+    updateHeaderStats();
+  }
+
+  function updateHeaderStats() {
+    var total = 0;
+    TYPES.forEach(function(t) { total += getColumns(t.key).length; });
+    document.getElementById('headerStats').textContent = total + ' моделей в базе';
+  }
+
+  // --- Step 1: Type Cards ---
+  function renderTypeCards() {
+    var container = document.getElementById('typeCards');
+    var html = '';
+    TYPES.forEach(function(t) {
+      var fills = getFills(t.key);
+      var cols = getColumns(t.key);
+      var sel = state.type === t.key ? ' selected' : '';
+      html += '<div class="type-card ' + t.theme + sel + '" onclick="selectType(\'' + t.key + '\')">' +
+        '<div class="type-check">&#10003;</div>' +
+        '<div class="type-icon">' + t.icon + '</div>' +
+        '<div class="type-name">' + t.name + '</div>' +
+        '<div class="type-count">' + cols.length + ' колонн &bull; ' + fills.length + ' засыпок</div>' +
+      '</div>';
+    });
+    container.innerHTML = html;
+  }
+
+  window.selectType = function(key) {
+    if (state.type === key) return;
+    state.type = key;
+    state.model = null;
+    state.fillId = null;
+    renderTypeCards();
+    renderModels();
+    renderFills();
+    updateStepStates();
+    updateResult();
+    updateComparison();
+  };
+
+  // --- Step 2: Models ---
+  function renderModels() {
+    var container = document.getElementById('modelContent');
+    if (!state.type) {
+      container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">&#128070;</div><div class="empty-state-text">Сначала выберите тип колонны</div></div>';
+      return;
+    }
+    var columns = getColumns(state.type);
+    if (columns.length === 0) {
+      container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">&#128533;</div><div class="empty-state-text">Нет моделей для этого типа</div></div>';
+      return;
+    }
+    var html = '<div class="model-grid">';
+    columns.forEach(function(col) {
+      var sel = state.model && state.model.id === col.id ? ' selected' : '';
+      html += '<div class="model-card' + sel + '" onclick="selectModel(' + col.id + ')">' +
+        '<div class="model-check">&#10003;</div>' +
+        '<div class="model-name">' + col.name + '</div>' +
+        '<div class="model-specs">';
+      if (col.productivity) {
+        html += '<div class="model-spec"><span class="model-spec-icon">&#9889;</span>' + col.productivity + '</div>';
+      }
+      if (col.fillVolume) {
+        html += '<div class="model-spec"><span class="model-spec-icon">&#128167;</span>Объём засыпки: ' + col.fillVolume + ' л</div>';
+      }
+      html += '<div class="model-spec"><span class="model-spec-icon">&#128196;</span>' + col.specs + '</div>';
+      html += '</div>';
+      html += '<div class="model-price">' + fmt(col.basePrice) + ' &#8381;<br><small>базовая цена (без засыпки)</small></div>';
+      html += '</div>';
+    });
+    html += '</div>';
+    container.innerHTML = html;
+  }
+
+  window.selectModel = function(id) {
+    var col = DB.find(function(e) { return e.id === id; });
+    if (!col) return;
+    state.model = col;
+    // Set fill to model default or type default
+    if (col.fillId) {
+      state.fillId = col.fillId;
+    } else {
+      var def = getDefaultFill(state.type);
+      state.fillId = def ? def.id : null;
+    }
+    renderModels();
+    renderFills();
+    updateStepStates();
+    updateResult();
+    updateComparison();
+    // Scroll to fills
+    document.getElementById('step3').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  };
+
+  // --- Step 3: Fills ---
+  function renderFills() {
+    var container = document.getElementById('fillContent');
+    if (!state.type || !state.model) {
+      container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">&#128070;</div><div class="empty-state-text">Сначала выберите модель</div></div>';
+      return;
+    }
+    var fills = getFills(state.type);
+    if (fills.length === 0) {
+      container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">&#128533;</div><div class="empty-state-text">Нет доступных засыпок</div></div>';
+      return;
+    }
+    var html = '<div class="fill-grid">';
+    fills.forEach(function(f) {
+      var sel = state.fillId === f.id ? ' selected' : '';
+      var cost = Math.round(state.model.fillVolume * f.ppl);
+      html += '<div class="fill-card' + sel + '" onclick="selectFill(\'' + f.id + '\')">' +
+        '<div class="fill-radio"></div>' +
+        '<div class="fill-info">' +
+          '<div class="fill-name">' + f.name + (f.default ? '<span class="fill-badge">по умолчанию</span>' : '') + '</div>' +
+          '<div class="fill-price">' + fmt(Math.round(f.ppl)) + ' &#8381;/л &bull; засыпка: ' + fmt(cost) + ' &#8381;</div>' +
+        '</div>' +
+      '</div>';
+    });
+    html += '</div>';
+
+    // Softening extra info
+    if (state.type === 'softening' && state.model) {
+      html += renderSofteningInfo();
+    }
+
+    container.innerHTML = html;
+  }
+
+  function renderSofteningInfo() {
+    var col = state.model;
+    var html = '<div class="softening-info">';
+    html += '<h4>&#129522; Информация по регенерации</h4>';
+    if (col.salt) {
+      html += '<div class="info-row"><span class="info-label">Расход соли на регенерацию</span><span class="info-value">' + col.salt + ' кг</span></div>';
+    }
+    if (col.fillVolume) {
+      // Approximate: 100g salt per liter of resin is common
+      var saltApprox = col.salt || Math.round(col.fillVolume * 0.1);
+      html += '<div class="info-row"><span class="info-label">Объём ионообменной смолы</span><span class="info-value">' + col.fillVolume + ' л</span></div>';
+      html += '<div class="info-row"><span class="info-label">Расход соли (расчётный)</span><span class="info-value">~' + saltApprox + ' кг/регенерация</span></div>';
+      // Rough days between regens: depends on hardness, but show general note
+      html += '<div class="info-row" style="margin-top:8px;padding-top:8px;border-top:1px solid rgba(46,125,50,.1)">' +
+        '<span class="info-label" style="font-size:11px;line-height:1.4">Частота регенерации зависит от жёсткости воды и объёма потребления. ' +
+        'При жёсткости 5 мг-экв/л и среднем расходе — примерно каждые 5-7 дней.</span></div>';
+    }
+    html += '</div>';
+    return html;
+  }
+
+  window.selectFill = function(id) {
+    state.fillId = id;
+    renderFills();
+    updateStepStates();
+    updateResult();
+    updateComparison();
+  };
+
+  // --- Step States ---
+  function updateStepStates() {
+    var s1 = document.getElementById('stepNum1');
+    var s2 = document.getElementById('stepNum2');
+    var s3 = document.getElementById('stepNum3');
+    var sec2 = document.getElementById('step2');
+    var sec3 = document.getElementById('step3');
+
+    if (state.type) { s1.classList.add('done'); s1.textContent = '✓'; }
+    else { s1.classList.remove('done'); s1.textContent = '1'; }
+
+    if (state.model) { s2.classList.add('done'); s2.textContent = '✓'; }
+    else { s2.classList.remove('done'); s2.textContent = '2'; }
+
+    if (state.fillId) { s3.classList.add('done'); s3.textContent = '✓'; }
+    else { s3.classList.remove('done'); s3.textContent = '3'; }
+
+    // Disable steps that can't be used yet
+    if (!state.type) sec2.classList.add('step-disabled');
+    else sec2.classList.remove('step-disabled');
+
+    if (!state.model) sec3.classList.add('step-disabled');
+    else sec3.classList.remove('step-disabled');
+  }
+
+  // --- Result Panel ---
+  function updateResult() {
+    var body = document.getElementById('resultBody');
+    var actions = document.getElementById('resultActions');
+
+    if (!state.model || !state.fillId) {
+      body.innerHTML = '<div class="result-empty"><div class="result-empty-icon">&#128202;</div><div>Выберите колонну и засыпку для расчёта</div></div>';
+      actions.style.display = 'none';
+      return;
+    }
+
+    var fill = getSelectedFill();
+    if (!fill) return;
+
+    var col = state.model;
+    var fillCost = Math.round(col.fillVolume * fill.ppl);
+    var total = Math.round(col.basePrice + fillCost);
+    var typeName = TYPES.find(function(t) { return t.key === state.type; });
+
+    var html = '';
+    html += '<div class="result-row"><div class="result-label">Тип<div class="result-detail">' + (typeName ? typeName.name : '') + '</div></div></div>';
+    html += '<div class="result-row"><div class="result-label">Модель</div><div class="result-value">' + col.name + ' с засыпкой ' + fill.name + '</div></div>';
+    if (col.productivity) {
+      html += '<div class="result-row"><div class="result-label">Производительность</div><div class="result-value">' + col.productivity + '</div></div>';
+    }
+    html += '<div class="result-row"><div class="result-label">Базовая цена<div class="result-detail">колонна без засыпки</div></div><div class="result-value">' + fmt(col.basePrice) + ' &#8381;</div></div>';
+    html += '<div class="result-row"><div class="result-label">Засыпка: ' + fill.name + '<div class="result-detail">' + col.fillVolume + ' л &times; ' + fmt(Math.round(fill.ppl)) + ' &#8381;/л</div></div><div class="result-value">' + fmt(fillCost) + ' &#8381;</div></div>';
+    html += '<div class="result-total"><div class="result-total-label">ИТОГО</div><div class="result-total-value">' + fmt(total) + ' &#8381;</div></div>';
+
+    body.innerHTML = html;
+    actions.style.display = 'flex';
+  }
+
+  // --- Comparison Table ---
+  function updateComparison() {
+    var section = document.getElementById('comparisonSection');
+    var table = document.getElementById('comparisonTable');
+
+    if (!state.model || !state.type) {
+      section.style.display = 'none';
+      return;
+    }
+
+    section.style.display = 'block';
+    var fills = getFills(state.type);
+    var col = state.model;
+
+    // Build rows sorted by total price
+    var rows = fills.map(function(f) {
+      var fillCost = Math.round(col.fillVolume * f.ppl);
+      return {
+        fill: f,
+        fillCost: fillCost,
+        total: Math.round(col.basePrice + fillCost)
+      };
+    });
+    rows.sort(function(a, b) { return a.total - b.total; });
+
+    var html = '<thead><tr>' +
+      '<th style="width:40px">&#8470;</th>' +
+      '<th>Засыпка</th>' +
+      '<th style="text-align:right">Цена за литр</th>' +
+      '<th style="text-align:right">Стоимость засыпки</th>' +
+      '<th style="text-align:right">Итого</th>' +
+    '</tr></thead><tbody>';
+
+    rows.forEach(function(r, i) {
+      var isDefault = r.fill.default;
+      var isSelected = r.fill.id === state.fillId;
+      var cls = '';
+      if (isSelected) cls = ' class="highlight"';
+      else if (isDefault) cls = ' class="highlight-default"';
+      html += '<tr' + cls + ' style="cursor:pointer" onclick="selectFill(\'' + r.fill.id + '\')">' +
+        '<td style="text-align:center;color:var(--text-muted);font-size:12px">' + (i + 1) + '</td>' +
+        '<td>' + r.fill.name +
+          (isDefault ? '<span class="table-badge badge-default">по умолч.</span>' : '') +
+          (isSelected ? '<span class="table-badge badge-selected">выбрано</span>' : '') +
+        '</td>' +
+        '<td class="price-cell" style="text-align:right">' + fmt(Math.round(r.fill.ppl)) + ' &#8381;</td>' +
+        '<td class="price-cell" style="text-align:right">' + fmt(r.fillCost) + ' &#8381;</td>' +
+        '<td class="total-cell" style="text-align:right">' + fmt(r.total) + ' &#8381;</td>' +
+      '</tr>';
+    });
+    html += '</tbody>';
+    table.innerHTML = html;
+  }
+
+  // --- Reset ---
+  window.resetAll = function() {
+    state.type = null;
+    state.model = null;
+    state.fillId = null;
+    renderTypeCards();
+    renderModels();
+    renderFills();
+    updateStepStates();
+    updateResult();
+    document.getElementById('comparisonSection').style.display = 'none';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // --- Start ---
+  init();
+})();
+</script>
+</body>
+</html>
