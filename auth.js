@@ -1,5 +1,5 @@
 (function () {
-  var SUPA_URL = 'https://uclzyzztoripulpcpshp.supabase.co';
+  var SUPA_URL = 'https://newproject-sb.netlify.app';
   var ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVjbHp5enp0b3JpcHVscGNwc2hwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3ODIyNzMsImV4cCI6MjA5MjM1ODI3M30.rX-WT1WdZiwRakVcUEkcg-_dnWzfU49LvgTNHYgBYQ0';
 
   var _sb = null;

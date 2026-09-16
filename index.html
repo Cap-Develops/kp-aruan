@@ -324,7 +324,7 @@ function renameSvc(key,val){state.client['svcName'+key]=val;}
 function calcServicesTotal(){return getServiceItems().reduce(function(s,i){return s+i.price;},0);}
 
 // ═══ SUPABASE ═══
-var _sb=(typeof supabase!=='undefined')?supabase.createClient('https://uclzyzztoripulpcpshp.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVjbHp5enp0b3JpcHVscGNwc2hwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3ODIyNzMsImV4cCI6MjA5MjM1ODI3M30.rX-WT1WdZiwRakVcUEkcg-_dnWzfU49LvgTNHYgBYQ0'):null;
+var _sb=(typeof supabase!=='undefined')?supabase.createClient('https://newproject-sb.netlify.app','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVjbHp5enp0b3JpcHVscGNwc2hwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3ODIyNzMsImV4cCI6MjA5MjM1ODI3M30.rX-WT1WdZiwRakVcUEkcg-_dnWzfU49LvgTNHYgBYQ0'):null;
 var _cloudSynced=false;
 function _cloudSave(entry){if(!_sb)return;_sb.from('kps').upsert({local_id:String(entry.id),kp_number:entry.client&&entry.client.kpNum||'',client_name:entry.client&&entry.client.name||'',total:entry.total||0,manager_id:entry.client&&entry.client.managerId||1,kp_date:(entry.createdAt||entry.savedAt||new Date().toISOString()).slice(0,10),updated_at:new Date().toISOString(),data:entry},{onConflict:'local_id'}).then(function(r){if(r.error)console.warn('Cloud save:',r.error);});}
 function _cloudDelete(id){if(!_sb)return;_sb.from('kps').delete().eq('local_id',String(id)).then(function(){});}
