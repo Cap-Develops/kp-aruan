@@ -166,7 +166,6 @@ body{font-family:'Muller',Arial,sans-serif;background:linear-gradient(180deg,#EE
 <a href="index.html" style="color:rgba(255,255,255,.6);text-decoration:none">📋 Конструктор КП</a>
 <a href="catalog.html" style="color:rgba(255,255,255,.6);text-decoration:none">📦 Каталог</a>
 <a href="calculator.html" style="color:rgba(255,255,255,.6);text-decoration:none">🔧 Калькулятор</a>
-<a href="ro-design.html" style="color:rgba(255,255,255,.6);text-decoration:none">💧 RO-проект</a>
 </nav>
 
 <!-- HEADER -->
@@ -222,7 +221,7 @@ body{font-family:'Muller',Arial,sans-serif;background:linear-gradient(180deg,#EE
         <span class="stat-label">Категорий</span>
       </div>
       <div class="stat-item">
-        <span class="stat-number" data-target="4" id="statModules">0</span>
+        <span class="stat-number" data-target="5" id="statModules">0</span>
         <span class="stat-label">Активных модулей</span>
       </div>
     </div>
@@ -297,6 +296,19 @@ body{font-family:'Muller',Arial,sans-serif;background:linear-gradient(180deg,#EE
       </div>
       <div class="card-title">Учёт тендеров</div>
       <div class="card-desc">Тендеры Техноинтеллект: заявки, дедлайны, баланс</div>
+      <div class="card-footer">
+        <span class="card-link">Открыть <span class="card-link-arrow">→</span></span>
+      </div>
+    </a>
+
+    <!-- Card 6 — RO-проект -->
+    <a href="ro-design.html" class="module-card active" style="animation-delay:.7s">
+      <div class="card-header">
+        <div class="card-icon">💧</div>
+        <div class="card-badge badge-active">Активен</div>
+      </div>
+      <div class="card-title">RO-проект</div>
+      <div class="card-desc">Проектирование систем обратного осмоса: подбор мембран, давление, качество пермеата</div>
       <div class="card-footer">
         <span class="card-link">Открыть <span class="card-link-arrow">→</span></span>
       </div>
@@ -516,7 +528,7 @@ body{font-family:'Muller',Arial,sans-serif;background:linear-gradient(180deg,#EE
   setTimeout(function(){
     animateCounter(document.getElementById('statItems'), itemCount, 1200);
     animateCounter(document.getElementById('statCategories'), categoryCount, 800);
-    animateCounter(document.getElementById('statModules'), 4, 600);
+    animateCounter(document.getElementById('statModules'), 5, 600);
   }, 400);
 
 })();
