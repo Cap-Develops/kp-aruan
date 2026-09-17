@@ -129,8 +129,20 @@ button:active{transform:scale(.97)}
   .pdf-req-table tr:nth-child(even){background:#EBF5FB}
   .pdf-photo{width:22mm;height:22mm;object-fit:contain}
 }
+body.viewer .viewer-hide{display:none!important}
 </style>
 <script src="supabase.min.js"></script>
+<script src="auth.js"></script>
+<script>
+/* Кто вошёл, тот и подставляется автором предложения. Наблюдатели (90+) выбирают вручную,
+   как было раньше. Роль читается из localStorage, её кладёт auth.js после входа. */
+var MY_UID = +(localStorage.getItem('my_manager_id') || 0);
+var IS_VIEWER = MY_UID >= 90;
+var MY_MGR = (MY_UID >= 1 && MY_UID <= 89) ? MY_UID : 1;
+document.addEventListener('DOMContentLoaded', function () {
+  if (IS_VIEWER && document.body) document.body.classList.add('viewer');
+});
+</script>
 </head>
 <body>
 
@@ -337,9 +349,9 @@ function syncFromCloud(){if(!_sb||_cloudSynced)return;_cloudSynced=true;_sb.from
 // ═══ STORAGE ═══
 function loadHistory(){try{return JSON.parse(localStorage.getItem('kp_history')||'[]');}catch(e){return[];}}
 function saveHistory(list){localStorage.setItem('kp_history',JSON.stringify(list));}
-function saveCurrentKP(){var h=loadHistory();var idx=h.findIndex(function(x){return x.id===state.currentKPId;});var existing=idx>=0?h[idx]:null;var now=new Date().toISOString();var entry={id:state.currentKPId||Date.now(),createdAt:existing&&existing.createdAt?existing.createdAt:now,client:JSON.parse(JSON.stringify(state.client)),items:JSON.parse(JSON.stringify(state.items)),discount:state.discount,savedAt:now,total:calcTotal()};if(idx>=0)h[idx]=entry;else h.unshift(entry);saveHistory(h);state.currentKPId=entry.id;_cloudSave(entry);return entry;}
+function saveCurrentKP(){if(IS_VIEWER)return null;var h=loadHistory();var idx=h.findIndex(function(x){return x.id===state.currentKPId;});var existing=idx>=0?h[idx]:null;var now=new Date().toISOString();var entry={id:state.currentKPId||Date.now(),createdAt:existing&&existing.createdAt?existing.createdAt:now,client:JSON.parse(JSON.stringify(state.client)),items:JSON.parse(JSON.stringify(state.items)),discount:state.discount,savedAt:now,total:calcTotal()};if(idx>=0)h[idx]=entry;else h.unshift(entry);saveHistory(h);state.currentKPId=entry.id;_cloudSave(entry);return entry;}
 function loadKP(id){var h=loadHistory();var e=h.find(function(x){return x.id===id;});if(!e)return;state.client=e.client;state.items=e.items;state.discount=e.discount||0;state.currentKPId=e.id;if(!state.client.kpDate)state.client.kpDate=new Date().toISOString().split('T')[0];state.step=0;render();}
-function deleteKP(id){if(!confirm('Удалить это КП из истории?'))return;saveHistory(loadHistory().filter(function(x){return x.id!==id;}));render();_cloudDelete(id);}
+function deleteKP(id){if(IS_VIEWER)return;if(!confirm('Удалить это КП из истории?'))return;saveHistory(loadHistory().filter(function(x){return x.id!==id;}));render();_cloudDelete(id);}
 function histToggle(id){state._histOpen=state._histOpen||{};state._histOpen[id]=!state._histOpen[id];render();}
 function detectKpSubject(items){
   if(!items||!items.length)return'оборудование для водоподготовки';
@@ -380,13 +392,13 @@ function calcTotal(){var s=state.items.reduce(function(a,i){return a+i.customPri
 function autoKPNum(){var d=new Date();var dd=String(d.getDate()).padStart(2,'0');var mm=String(d.getMonth()+1).padStart(2,'0');var yy=String(d.getFullYear()).slice(-2);var prefix='ТИ-'+dd+'-'+mm+'-'+yy+'/';var hist=loadHistory();var cnt=hist.filter(function(h){return h.client&&h.client.kpNum&&h.client.kpNum.indexOf(prefix)===0;}).length;return prefix+String(cnt+1).padStart(2,'0');}
 
 // ═══ STATE ═══
-var state={step:-1,client:{name:'',contact:'',phone:'',email:'',managerId:1,inclDelivery:false,inclMontage:false,inclObvyazka:false,inclVyezd:false,inclKomandirovka:false,priceDelivery:0,priceMontage:0,priceObvyazka:0,priceVyezd:0,priceKomandirovka:0,kpNum:autoKPNum(),kpDate:new Date().toISOString().split('T')[0],deliveryDays:10,warrantyMonths:12,withoutVat:false,comment:''},items:[],search:'',catFilter:'Все',discount:0,currentKPId:null,historySearch:'',historyManagerFilter:'all',historySort:'date_desc'};
+var state={step:-1,client:{name:'',contact:'',phone:'',email:'',managerId:MY_MGR,inclDelivery:false,inclMontage:false,inclObvyazka:false,inclVyezd:false,inclKomandirovka:false,priceDelivery:0,priceMontage:0,priceObvyazka:0,priceVyezd:0,priceKomandirovka:0,kpNum:autoKPNum(),kpDate:new Date().toISOString().split('T')[0],deliveryDays:10,warrantyMonths:12,withoutVat:false,comment:''},items:[],search:'',catFilter:'Все',discount:0,currentKPId:null,historySearch:'',historyManagerFilter:'all',historySort:'date_desc'};
 function setState(u){if(u.step===1&&state.step!==1){u.search='';u.catFilter='Все';}Object.assign(state,u);render();restoreFocus();}
 var _fid='',_fp=-1;
 function saveFocus(){var e=document.activeElement;if(e&&e.id){_fid=e.id;try{_fp=e.selectionStart!=null?e.selectionStart:-1;}catch(x){_fp=-1;}}else{_fid='';_fp=-1;}_fval=e?e.value:'';}
 function restoreFocus(){if(_fid){var e=document.getElementById(_fid);if(e){e.focus();if(e.type==='number'){var len=String(e.value).length;try{e.setSelectionRange(len,len);}catch(x){}}else if(_fp>=0&&e.setSelectionRange)try{e.setSelectionRange(_fp,_fp);}catch(x){}}}}
 function setClient(k,v){state.client[k]=v;}
-function newKP(){state.currentKPId=null;state.client={name:'',contact:'',phone:'',email:'',managerId:1,inclDelivery:false,inclMontage:false,inclObvyazka:false,inclVyezd:false,inclKomandirovka:false,priceDelivery:0,priceMontage:0,priceObvyazka:0,priceVyezd:0,priceKomandirovka:0,kpNum:autoKPNum(),kpDate:new Date().toISOString().split('T')[0],deliveryDays:10,warrantyMonths:12,withoutVat:false,comment:''};state.items=[];state.discount=0;state.step=0;render();}
+function newKP(){state.currentKPId=null;state.client={name:'',contact:'',phone:'',email:'',managerId:MY_MGR,inclDelivery:false,inclMontage:false,inclObvyazka:false,inclVyezd:false,inclKomandirovka:false,priceDelivery:0,priceMontage:0,priceObvyazka:0,priceVyezd:0,priceKomandirovka:0,kpNum:autoKPNum(),kpDate:new Date().toISOString().split('T')[0],deliveryDays:10,warrantyMonths:12,withoutVat:false,comment:''};state.items=[];state.discount=0;state.step=0;render();}
 
 // ═══ PDF GENERATION ═══
 function pdfHeader(){return '<div class="pdf-header-bar"><div style="background:#fff;border-radius:6px;padding:2mm 4mm;display:flex;align-items:center;gap:4mm"><img src="assets/logo_aruan.png" style="height:10mm"><img src="assets/logo_aurus.png" style="height:10mm"></div><div style="display:flex;align-items:center;gap:6mm;font-size:11px"><span>📞 8-800-100-39-54</span><span>✉ prom10@aruan.ru</span><span>🌐 www.filtr-aruan.ru</span></div></div>';}
@@ -739,7 +751,7 @@ function render(){
     html+='</div>';
     var hOpen=state._histOpen&&state._histOpen[h.id];
     html+='<div style="text-align:right;flex-shrink:0"><div style="font-size:15px;font-weight:800;color:var(--blue)">'+fmt(h.total||0)+' ₽</div><div style="font-size:11px;color:var(--muted);margin-top:2px">'+ds+'</div>'+viewedBadge+'<div style="font-size:11px;color:var(--blue);font-weight:700;margin-top:4px;cursor:pointer;user-select:none" onclick="event.stopPropagation();histToggle('+h.id+')">'+(hOpen?'Скрыть ▴':'Состав ▾')+'</div>'+'</div>';
-    html+='<button class="btn-danger" onclick="event.stopPropagation();deleteKP('+h.id+')">✕</button></div>';
+    html+='<button class="btn-danger viewer-hide" onclick="event.stopPropagation();deleteKP('+h.id+')">✕</button></div>';
     if(hOpen){
       var _hcell='padding:5px 8px;font-size:12px;border-bottom:1px solid #eef2f7;vertical-align:top';
       html+='<div style="margin:-4px 16px 12px;padding:10px 14px;background:#F8FAFC;border:1px solid var(--border);border-radius:10px;overflow-x:auto">';
@@ -774,7 +786,7 @@ function render(){
   html+='<div style="margin-top:12px;padding:16px 18px;background:#FFF8E1;border-radius:8px"><div style="font-size:13px;font-weight:700;margin-bottom:10px;color:#8B6914">Дополнительные услуги (добавляются в спецификацию отдельно):</div><div style="display:flex;flex-wrap:wrap;gap:12px">';
   [['inclVyezd','priceVyezd','Выезд специалиста'],['inclKomandirovka','priceKomandirovka','Командировочные расходы']].forEach(function(a){var k=a[0],pk=a[1],l=a[2];html+='<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:8px;border:1.5px solid '+(client[k]?'var(--accent)':'var(--border)')+';background:'+(client[k]?'#FFF3CD':'#fff')+'"><label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;white-space:nowrap"><input type="checkbox" '+(client[k]?'checked':'')+' onchange="setClient(\''+k+'\',this.checked);render()" style="accent-color:var(--accent)"> '+l+'</label>';if(client[k])html+='<input type="number" id="field_'+pk+'" value="'+client[pk]+'" oninput="setClient(\''+pk+'\',+this.value)" style="width:100px;padding:4px 8px;border-radius:4px;border:1px solid var(--border);font-size:12px;text-align:right" placeholder="Цена"> <span style="font-size:11px;color:var(--muted)">₽</span>';html+='</div>';});
   html+='</div></div>';
-  html+='<div style="margin-top:24px;display:flex;gap:12px;justify-content:flex-end"><button class="btn-outline" onclick="saveCurrentKP();alert(\'КП сохранено!\')">💾 Сохранить</button><button class="btn-primary" onclick="setState({step:1})">Далее → Выбор оборудования</button></div></div>';}
+  html+='<div style="margin-top:24px;display:flex;gap:12px;justify-content:flex-end"><button class="btn-outline viewer-hide" onclick="saveCurrentKP();alert(\'КП сохранено!\')">💾 Сохранить</button><button class="btn-primary" onclick="setState({step:1})">Далее → Выбор оборудования</button></div></div>';}
   // STEP 1
   if(step===1){html+='<div class="catalog-grid"><div><div class="card search-bar" style="margin-bottom:12px"><div class="seg-switch"><button class="seg-btn'+(KP_SEG==='prom'?' on':'')+'" onclick="setSegment(\'prom\')">🏭 Пром</button><button class="seg-btn'+(KP_SEG==='byt'?' on':'')+'" onclick="setSegment(\'byt\')">🏠 Быт</button><button class="seg-btn'+(KP_SEG==='all'?' on':'')+'" onclick="setSegment(\'all\')">📦 Все</button></div><input class="search-input" id="field_search" placeholder="🔍 Поиск по названию, характеристикам..." value="'+search+'" oninput="saveFocus();setState({search:this.value})"><select class="search-select" id="field_catFilter" onchange="saveFocus();setState({catFilter:this.value})">'+categories.map(function(c){return '<option'+(c===catFilter?' selected':'')+'>'+c+'</option>';}).join('')+'</select><span style="font-size:12px;color:var(--muted)">Найдено: '+filtered.length+'</span><button class="btn-outline" style="padding:6px 12px;font-size:12px;margin-left:auto;white-space:nowrap" onclick="addCustomItem()">+ Своя позиция</button></div><div class="eq-list">';
   filtered.forEach(function(eq){var ad=items.some(function(i){return i.id===eq.id;});html+='<div class="eq-item'+(ad?' added':'')+'">'+(eq.img?'<img src="images/'+eq.img+'" class="eq-thumb">':'')+'<div style="flex:1;min-width:0"><div class="eq-name">'+eq.name+'</div><div class="eq-tags"><span class="tag tag-cat">'+eq.category+'</span>'+(eq.productivity?'<span class="tag tag-prod">'+eq.productivity+'</span>':'')+'<span class="tag tag-brand">'+(eq.brand&&eq.brand!=="Другой"?eq.brand:'Другое')+'</span></div>'+(eq.specs?'<div class="eq-specs">'+fmtSpecs(eq.specs)+'</div>':'')+'</div><div style="text-align:right;flex-shrink:0"><div class="eq-price">'+fmt(eq.price)+' ₽</div></div><button class="add-btn add" onclick="addItem('+eq.id+')">+</button></div>';});
@@ -828,7 +840,7 @@ function render(){
   var ni=[];if(!client.inclDelivery)ni.push('доставка');if(!client.inclMontage)ni.push('монтаж');if(!client.inclObvyazka)ni.push('обвязка');;
   html+='<div style="margin-top:20px;padding:14px 18px;background:#E8F5E9;border-radius:8px;font-size:13px;color:#1B5E20;line-height:1.5"><strong>Срок поставки:</strong> '+(/^\d+$/.test((''+client.deliveryDays).trim())?client.deliveryDays+' '+plRu(client.deliveryDays,'рабочий день','рабочих дня','рабочих дней'):client.deliveryDays)+' • <strong>Гарантия:</strong> '+client.warrantyMonths+' '+plRu(client.warrantyMonths,'месяц','месяца','месяцев')+'';if(ni.length)html+='<br><span style="font-size:11px;color:#388E3C">В стоимость не входит: '+ni.join(', ')+'.</span>';html+='</div></div></div>';
   html+='<div style="margin-top:20px;padding:16px 20px;background:#F8FAFC;border:1px solid var(--border);border-radius:8px"><label style="display:block;font-size:13px;font-weight:600;color:var(--text);margin-bottom:8px">📝 Примечания <span style="font-weight:400;color:var(--muted)">(адрес доставки, габариты, особые условия — появятся в PDF)</span></label><textarea id="kp-comment" rows="3" placeholder="Например: доставка по адресу ул. Ленина, 10; высота помещения 3м; подъезд с торца здания" style="width:100%;box-sizing:border-box;padding:10px 12px;font-size:13px;font-family:inherit;border:1.5px solid var(--border);border-radius:6px;resize:vertical;color:var(--text);background:#fff" oninput="setClient(\'comment\',this.value)">'+(client.comment||'').replace(/</g,'&lt;')+'</textarea></div>';
-  html+='<div style="display:flex;gap:12px;margin-top:16px;justify-content:center;flex-wrap:wrap"><button class="btn-outline" onclick="setState({step:1})">← Редактировать</button><button class="btn-outline" onclick="saveCurrentKP();showToast(\'✅ КП сохранено\')">💾 Сохранить</button><button class="btn-outline" style="border-color:#1565C0;color:#1565C0;font-weight:700" onclick="shareKP()">🔗 Поделиться ссылкой</button><button class="btn-outline" style="border-color:#5C6BC0;color:#5C6BC0;font-weight:700" onclick="openAltKP()">📄 Альт. КП</button><button class="btn-accent" style="font-size:16px;padding:14px 40px" onclick="generatePDF()">📥 Сформировать КП (PDF)</button></div>';}
+  html+='<div style="display:flex;gap:12px;margin-top:16px;justify-content:center;flex-wrap:wrap"><button class="btn-outline" onclick="setState({step:1})">← Редактировать</button><button class="btn-outline viewer-hide" onclick="saveCurrentKP();showToast(\'✅ КП сохранено\')">💾 Сохранить</button><button class="btn-outline" style="border-color:#1565C0;color:#1565C0;font-weight:700" onclick="shareKP()">🔗 Поделиться ссылкой</button><button class="btn-outline" style="border-color:#5C6BC0;color:#5C6BC0;font-weight:700" onclick="openAltKP()">📄 Альт. КП</button><button class="btn-accent" style="font-size:16px;padding:14px 40px" onclick="generatePDF()">📥 Сформировать КП (PDF)</button></div>';}
   html+='</div>';var _eqScroll=0;var _eqEl=document.querySelector('.eq-list');if(_eqEl)_eqScroll=_eqEl.scrollTop;document.getElementById('app').innerHTML=html;var _eqEl2=document.querySelector('.eq-list');if(_eqEl2)_eqEl2.scrollTop=_eqScroll;
 }
 
