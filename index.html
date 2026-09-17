@@ -134,10 +134,11 @@ body.viewer .viewer-hide{display:none!important}
 <script src="supabase.min.js"></script>
 <script src="auth.js"></script>
 <script>
-/* Кто вошёл, тот и подставляется автором предложения. Наблюдатели (90+) выбирают вручную,
-   как было раньше. Роль читается из localStorage, её кладёт auth.js после входа. */
+/* Кто вошёл, тот и подставляется автором предложения. Номера: 1-89 менеджеры,
+   90-98 наблюдатели (только просмотр), 99 владелец (полный доступ).
+   Роль читается из localStorage, её кладёт auth.js после входа. */
 var MY_UID = +(localStorage.getItem('my_manager_id') || 0);
-var IS_VIEWER = MY_UID >= 90;
+var IS_VIEWER = MY_UID >= 90 && MY_UID <= 98;   /* наблюдатели 90-98; владелец 99 работает полностью */
 var MY_MGR = (MY_UID >= 1 && MY_UID <= 89) ? MY_UID : 1;
 document.addEventListener('DOMContentLoaded', function () {
   if (IS_VIEWER && document.body) document.body.classList.add('viewer');
