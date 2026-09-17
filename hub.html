@@ -290,7 +290,7 @@ body{font-family:'Muller',Arial,sans-serif;background:linear-gradient(180deg,#EE
     </a>
 
     <!-- Card 5 — Учёт тендеров -->
-    <a href="https://techno-tenders.new--project.ru" id="tendersCard" class="module-card active" style="animation-delay:.6s">
+    <a href="https://techno-tenders.new--project.ru" id="tendersCard" hidden class="module-card active" style="animation-delay:.6s">
       <div class="card-header">
         <div class="card-icon">📊</div>
         <div class="card-badge badge-active">Активен</div>
@@ -528,7 +528,9 @@ body{font-family:'Muller',Arial,sans-serif;background:linear-gradient(180deg,#EE
   setTimeout(function(){
     animateCounter(document.getElementById('statItems'), itemCount, 1200);
     animateCounter(document.getElementById('statCategories'), categoryCount, 800);
-    animateCounter(document.getElementById('statModules'), document.querySelectorAll('.module-card .badge-active').length, 600);
+    var _mEl = document.getElementById('statModules');
+    animateCounter(_mEl, document.querySelectorAll('.module-card:not([hidden]) .badge-active').length, 600);
+    if (_mEl) _mEl.dataset.counted = '1';
   }, 400);
 
 })();
@@ -536,16 +538,24 @@ body{font-family:'Muller',Arial,sans-serif;background:linear-gradient(180deg,#EE
 
 <script>
 /* Модуль «Учёт тендеров» виден только наблюдателям: директор (90) и владелец (99).
-   Номера 1-89 закреплены за менеджерами, им карточка не показывается. */
+   Номера 1-89 закреплены за менеджерами, им карточка не показывается.
+   В разметке карточка скрыта: показывается только подтверждённому наблюдателю, поэтому
+   у менеджера она не мелькнёт даже на мгновение. Номер приходит от проверки входа
+   асинхронно, поэтому правило применяется дважды: сразу (номер с прошлого раза) и по auth-ready. */
 (function () {
   function _applyModuleAccess() {
     var id = +(localStorage.getItem('my_manager_id') || 0);
     var card = document.getElementById('tendersCard');
-    if (card && id < 90) card.parentNode.removeChild(card);
+    if (card) card.hidden = !(id >= 90);
+    var el = document.getElementById('statModules');
+    if (el && el.dataset.counted === '1') {
+      el.textContent = String(document.querySelectorAll('.module-card:not([hidden]) .badge-active').length);
+    }
   }
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', _applyModuleAccess);
   } else { _applyModuleAccess(); }
+  document.addEventListener('auth-ready', _applyModuleAccess);
 })();
 </script>
 </body>
