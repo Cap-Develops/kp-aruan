@@ -53,15 +53,58 @@ body{font-family:'Muller',sans-serif;background:#F0F4F8;min-height:100vh;display
 
 <script src="supabase.min.js"></script>
 <script>
-var SUPA_URL = 'https://newproject-sb.netlify.app';
+/* Выбор пути к базе — компактная копия логики из auth.js, менять синхронно.
+   У одних провайдеров душится прокси netlify.app, у других прямой supabase.co,
+   поэтому путь выбирается пробой по реальному запросу и запоминается. */
+var SUPA_BASES = ['https://newproject-sb.netlify.app', 'https://uclzyzztoripulpcpshp.supabase.co'];
+var BASE_KEY = 'kp_base';
+var STORAGE_KEY = 'sb-newproject-sb-auth-token';
+var PROBE_TIMEOUT_MS = 2500;
+var PROBE_PAD = new Array(1201).join('x');
 var ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVjbHp5enp0b3JpcHVscGNwc2hwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3ODIyNzMsImV4cCI6MjA5MjM1ODI3M30.rX-WT1WdZiwRakVcUEkcg-_dnWzfU49LvgTNHYgBYQ0';
-var _sb = supabase.createClient(SUPA_URL, ANON);
+var _sb = null;
 
-// Если уже авторизован — сразу редирект
-_sb.auth.getSession().then(function(r) {
-  if (r.data && r.data.session) {
-    window.location.replace(sessionStorage.getItem('auth_redirect') || '/hub.html');
+function _store(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+
+function _probe(base) {
+  var ctrl = new AbortController();
+  var t = setTimeout(function () { ctrl.abort(); }, PROBE_TIMEOUT_MS);
+  return fetch(base + '/rest/v1/managers?select=id&limit=1', {
+    headers: { apikey: ANON, Authorization: 'Bearer ' + ANON, 'X-Probe-Pad': PROBE_PAD },
+    signal: ctrl.signal
+  }).then(function (r) { clearTimeout(t); return r.status < 500; })
+    .catch(function () { clearTimeout(t); return false; });
+}
+
+function _resolveBase() {
+  var forced = /[?&]base=(proxy|direct)/.exec(window.location.search);
+  if (forced) {
+    _store(BASE_KEY, forced[1]);
+    return Promise.resolve(forced[1] === 'direct' ? SUPA_BASES[1] : SUPA_BASES[0]);
   }
+  var saved = null;
+  try { saved = localStorage.getItem(BASE_KEY); } catch (e) {}
+  if (saved === 'proxy' || saved === 'direct') {
+    return Promise.resolve(saved === 'direct' ? SUPA_BASES[1] : SUPA_BASES[0]);
+  }
+  return _probe(SUPA_BASES[0]).then(function (ok) {
+    if (ok) { _store(BASE_KEY, 'proxy'); return SUPA_BASES[0]; }
+    return _probe(SUPA_BASES[1]).then(function (ok2) {
+      if (ok2) { _store(BASE_KEY, 'direct'); return SUPA_BASES[1]; }
+      return SUPA_BASES[0];
+    });
+  });
+}
+
+var _ready = _resolveBase().then(function (base) {
+  _sb = supabase.createClient(base, ANON, { auth: { storageKey: STORAGE_KEY } });
+  // уже вошёл — сразу внутрь
+  _sb.auth.getSession().then(function (r) {
+    if (r.data && r.data.session) {
+      window.location.replace(sessionStorage.getItem('auth_redirect') || '/hub.html');
+    }
+  });
+  return _sb;
 });
 
 document.getElementById('pass').addEventListener('keydown', function(e) {
@@ -83,7 +126,7 @@ function doLogin() {
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span>Вхожу...';
 
-  _sb.auth.signInWithPassword({ email: email, password: pass }).then(function(result) {
+  _ready.then(function (sb) { return sb.auth.signInWithPassword({ email: email, password: pass }); }).then(function(result) {
     if (result.error) {
       showErr('Неверный email или пароль');
       btn.disabled = false;
@@ -94,7 +137,11 @@ function doLogin() {
     sessionStorage.removeItem('auth_redirect');
     window.location.replace(redirect);
   }).catch(function() {
-    showErr('Ошибка соединения. Попробуйте ещё раз.');
+    var other = null;
+    try { other = localStorage.getItem(BASE_KEY) === 'direct' ? 'proxy' : 'direct'; } catch (e) { other = 'direct'; }
+    var err2 = document.getElementById('err');
+    err2.innerHTML = 'Сервер не отвечает. <a href="?base=' + other + '" style="color:#1565C0;font-weight:600">Сменить канал связи</a> или попробовать ещё раз.';
+    err2.style.display = 'block';
     btn.disabled = false;
     btn.innerHTML = 'Войти';
   });
