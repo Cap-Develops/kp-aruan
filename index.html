@@ -319,7 +319,8 @@ function _processPhotoSimple(file,onDone,onErr){
 var KP_SEG=localStorage.getItem('kp_segment')||'prom';
 function _inSeg(e){if(KP_SEG==='all')return true;var s=e.segment||'prom';return s==='both'||s===KP_SEG;}
 var EQUIPMENT_VIEW=[];var CATEGORIES=[];
-function _rebuildSegView(){EQUIPMENT_VIEW=EQUIPMENT_DB.filter(_inSeg);CATEGORIES=[];var _cs={};EQUIPMENT_VIEW.forEach(function(e){if(!_cs[e.category]){_cs[e.category]=1;CATEGORIES.push(e.category);}});}
+function _rebuildSegView(){/* порядок показа берём из базы (поле sort от sync-catalog.py): семьями и по возрастанию модели, как в каталоге */
+EQUIPMENT_VIEW=EQUIPMENT_DB.filter(_inSeg).sort(function(a,b){return (a.sort||0)-(b.sort||0);});CATEGORIES=[];var _cs={};EQUIPMENT_VIEW.forEach(function(e){if(!_cs[e.category]){_cs[e.category]=1;CATEGORIES.push(e.category);}});}
 _rebuildSegView();
 function setSegment(s){KP_SEG=s;localStorage.setItem('kp_segment',s);_rebuildSegView();setState({search:'',catFilter:'Все'});}
 var fmt=function(n){return n.toLocaleString('ru-RU');};

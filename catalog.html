@@ -525,9 +525,6 @@ input,select,button,textarea{font-family:inherit}
   const brands = _hasOther ? [..._namedBrands, 'Другое'] : _namedBrands;
   const categoryCounts = {};
   categories.forEach(c => { categoryCounts[c] = DB.filter(e => e.category === c).length; });
-  /* Порядок категорий как в базе - для дефолтной группировки */
-  const catOrder = {};
-  DB.forEach(e => { if (!(e.category in catOrder)) catOrder[e.category] = Object.keys(catOrder).length; });
 
   /* ===== STATE ===== */
   let state = {
@@ -652,9 +649,11 @@ input,select,button,textarea{font-family:inherit}
       case 'price-desc': items.sort((a, b) => b.price - a.price); break;
       case 'category': items.sort((a, b) => a.category.localeCompare(b.category, 'ru') || a.name.localeCompare(b.name, 'ru')); break;
       default:
-        /* По умолчанию: группировка по категории (порядок как в базе) + модельный ряд по возрастанию.
+        /* По умолчанию: порядок показа из базы (поле sort) - категории идут подряд,
+           внутри категории однотипные товары стоят семьёй и по возрастанию модели.
+           Порядок считает sync-catalog.py, поэтому он одинаков с конструктором.
            При активном поиске порядок релевантности не трогаем. */
-        if (!state.search) items.sort((a, b) => (catOrder[a.category] - catOrder[b.category]) || a.name.localeCompare(b.name, 'ru', { numeric: true }));
+        if (!state.search) items.sort((a, b) => (a.sort || 0) - (b.sort || 0));
     }
     return items;
   }
