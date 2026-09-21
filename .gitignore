@@ -14,3 +14,7 @@ research/
 .netlify/
 *.backup_*
 .vercelignore
+
+# служебное от Supabase CLI - в репозиторий не нужно
+supabase/.temp/
+supabase/.branches/
