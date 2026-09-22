@@ -1,14 +1,21 @@
-// Разбор протокола анализа воды: распознанный текст -> показатели.
-// Вызывается из конструктора после того, как браузер прочитал файл.
+// Разбор протокола анализа воды -> показатели. Вызывается из конструктора.
 //
-// К GigaChat напрямую не ходим: ключ живёт в проекте EchoFlow, туда же вынесен
-// сертификат Минцифры и авторизация. Здесь - только проверка сотрудника,
-// промпт и разбор ответа. Общий секрет двух серверов в браузер не попадает.
+// Основной путь с 22.09.2026: браузер присылает изображение страницы, разбирает
+// Claude. Браузерное распознавание (tesseract.js + PaddleOCR, 26 МБ моделей,
+// полторы-две минуты на протокол) снято: замеры показали, что модель по картинке
+// читает лучше и быстрее, включая рукописные бланки и кривые фото.
+//
+// Запасной путь: GigaChat по тексту. Он работает там, где текст есть и без
+// распознавания - PDF с текстовым слоем и документы Word. Для сканов запасного
+// пути нет: разбирать нечего, честнее сказать об этом, чем отдать мусор.
+// Ключ GigaChat живёт в проекте EchoFlow, за шлюзом; сюда он не попадает.
 import { SYSTEM, buildUser } from "./prompt.ts";
+import { VISION_SYSTEM, askVision, pickPage } from "./vision.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const GATEWAY = "https://jreqglzifmkcshgkwrhh.supabase.co/functions/v1/ai-gateway";
-const MODEL = "GigaChat-2";          // замеры: этой модели достаточно, Max не нужен
+const MODEL = "GigaChat-2-Max";        // младшая теряла строки таблицы от прогона к прогону
+const VISION_MODEL = "claude-sonnet-5"; // Haiku дешевле вдвое, но врёт на рукописных бланках
 
 const cors = {
   "Access-Control-Allow-Origin": "*",
@@ -31,12 +38,12 @@ async function checkManager(req: Request): Promise<{ ok: boolean; who?: string }
   return mgr ? { ok: true, who: mgr.name } : { ok: false };
 }
 
-
 /** Модель иногда ломает JSON на длинных ответах: обрываем по последней целой строке таблицы. */
 function repairJson(text: string): unknown | null {
-  const from = text.indexOf("{");
+  const cleaned = String(text).replace(/```json/gi, "").replace(/```/g, "");
+  const from = cleaned.indexOf("{");
   if (from < 0) return null;
-  const body = text.slice(from);
+  const body = cleaned.slice(from);
   try {
     return JSON.parse(body.slice(0, body.lastIndexOf("}") + 1));
   } catch { /* чиним ниже */ }
@@ -49,7 +56,7 @@ function repairJson(text: string): unknown | null {
   }
 }
 
-/** Один заход к шлюзу. */
+/** Один заход к шлюзу GigaChat. */
 async function ask(secret: string, model: string, system: string, user: string) {
   const r = await fetch(GATEWAY, {
     method: "POST",
@@ -67,45 +74,91 @@ async function ask(secret: string, model: string, system: string, user: string) 
   return JSON.parse(raw);
 }
 
+/** Запасной разбор по тексту - когда картинки нет или Claude недоступен. */
+async function byText(texts: string[], started: number, who?: string) {
+  const user = buildUser(texts);
+  if (user.length < 40) return json({ error: "Текст протокола пуст или слишком короткий" }, 400);
+
+  const secret = Deno.env.get("AI_GATEWAY_SECRET");
+  if (!secret) return json({ error: "AI_GATEWAY_SECRET не задан в секретах проекта" }, 500);
+
+  let parsed: any = null;
+  let used = MODEL;
+  let usage = null;
+  for (const model of [MODEL, "GigaChat-2"]) {
+    let gw;
+    try {
+      gw = await ask(secret, model, SYSTEM, user);
+    } catch (e) {
+      if (model === "GigaChat-2") return json({ error: String(e) }, 502);
+      continue;
+    }
+    const candidate = repairJson(gw.answer ?? "");
+    if (candidate && Array.isArray((candidate as any).rows) && (candidate as any).rows.length) {
+      parsed = candidate;
+      used = model;
+      usage = gw.usage ?? null;
+      break;
+    }
+  }
+  if (!parsed) return json({ error: "Не удалось разобрать ответ модели" }, 502);
+  return json({ ...parsed, ms: Date.now() - started, by: who, model: used, usage, engine: "gigachat" });
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: cors });
   try {
     const gate = await checkManager(req);
     if (!gate.ok) return json({ error: "Нужен вход в конструктор" }, 401);
 
-    const { passes } = await req.json();
-    const texts: string[] = Array.isArray(passes) ? passes : [String(passes || "")];
-    const user = buildUser(texts);
-    if (user.length < 40) return json({ error: "Текст протокола пуст или слишком короткий" }, 400);
-
-    const secret = Deno.env.get("AI_GATEWAY_SECRET");
-    if (!secret) return json({ error: "AI_GATEWAY_SECRET не задан в секретах проекта" }, 500);
-
+    const body = await req.json();
+    const images: string[] = Array.isArray(body?.images) ? body.images : [];
+    const texts: string[] = Array.isArray(body?.passes) ? body.passes : [];
     const started = Date.now();
 
-    // сначала дешёвая модель; если она вернула мусор вместо JSON - повторяем на старшей
-    let parsed: any = null;
-    let used = MODEL;
-    let usage = null;
-    for (const model of [MODEL, "GigaChat-2-Max"]) {
-      let gw;
+    // служебный вызов: выбрать страницу с таблицей по эскизам, чтобы не платить
+    // за разбор титульного листа и перечня методик
+    if (body?.pick && images.length) {
+      const key = Deno.env.get("ANTHROPIC_API_KEY");
+      if (!key) return json({ pages: [1] });
       try {
-        gw = await ask(secret, model, SYSTEM, user);
-      } catch (e) {
-        if (model === "GigaChat-2-Max") return json({ error: String(e) }, 502);
-        continue;
-      }
-      const candidate = repairJson(gw.answer ?? "");
-      if (candidate && Array.isArray((candidate as any).rows) && (candidate as any).rows.length) {
-        parsed = candidate;
-        used = model;
-        usage = gw.usage ?? null;
-        break;
+        return json({ pages: await pickPage(key, images) });
+      } catch {
+        return json({ pages: [1] });   // не смогли выбрать - читаем первую
       }
     }
-    if (!parsed) return json({ error: "Не удалось разобрать ответ модели" }, 502);
 
-    return json({ ...parsed, ms: Date.now() - started, passes: texts.length, by: gate.who, model: used, usage });
+    if (images.length) {
+      const key = Deno.env.get("ANTHROPIC_API_KEY");
+      if (key) {
+        try {
+          const got = await askVision(key, body?.model || VISION_MODEL, images, VISION_SYSTEM);
+          const parsed = repairJson(got.answer);
+          if (parsed && Array.isArray((parsed as any).rows)) {
+            return json({
+              ...(parsed as any),
+              ms: Date.now() - started,
+              by: gate.who,
+              model: got.model,
+              usage: got.usage,
+              engine: "claude",
+            });
+          }
+        } catch (e) {
+          // доступ отозван, лимит, сбой сети - падать нельзя, пробуем текст
+          console.error("claude:", String(e));
+        }
+      }
+      if (!texts.length) {
+        return json({
+          error: "Разбор по изображению сейчас недоступен. Попробуйте позже " +
+                 "или загрузите протокол в виде PDF с текстом либо документа Word.",
+          engine: "none",
+        }, 503);
+      }
+    }
+
+    return await byText(texts, started, gate.who);
   } catch (e) {
     return json({ error: String(e) }, 500);
   }

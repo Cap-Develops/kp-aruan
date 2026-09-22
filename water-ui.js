@@ -57,7 +57,12 @@
 
   function showValue(row) {
     if (row.value !== null && row.value !== undefined) return String(row.value).replace('.', ',');
-    if (row.below !== null && row.below !== undefined) return 'менее ' + String(row.below).replace('.', ',');
+    // в below приходит и число («0,01»), и словами («не обнаружено», «менее 6»):
+    // «менее» приписываем только к голому числу, иначе выходит «менее не обнаружено»
+    if (row.below !== null && row.below !== undefined) {
+      var b = String(row.below).replace('.', ',').trim();
+      return /^\d+(?:,\d+)?$/.test(b) ? 'менее ' + b : b;
+    }
     return '';
   }
 
@@ -217,11 +222,12 @@
       });
 
       el('workTitle').textContent = 'Разбираю показатели';
-      var data = await window.WaterPipeline.parse(read.passes, function (note) {
+      var data = await window.WaterPipeline.parse(read, function (note) {
         el('workTitle').textContent = note;
       });
 
       state.rows = (data.rows || []).slice();
+      window.__lastRows = state.rows;      // для проверок: сверка с эталоном снаружи
       state.meta = data;
 
       if (!state.rows.length) {
@@ -232,7 +238,7 @@
       }
 
       // мало показателей со скриншота - честно предупреждаем, а не делаем вид, что всё хорошо
-      if (read.small && state.rows.length < 6) {
+      if (read.width && read.width < 1000 && state.rows.length < 6) {
         warn('Со скриншота удалось прочитать всего ' + state.rows.length +
              ' показателей — снимок мелкий (' + read.width + ' точек по ширине). ' +
              'Лучше вставить файл целиком или переснять при увеличенном масштабе страницы.');
