@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Разбор анализа воды — Аруан &amp; Аурус</title>
+<style>
+@font-face{font-family:'Muller';src:url('fonts/muller-regular.woff2') format('woff2');font-display:swap;font-weight:400}
+@font-face{font-family:'Muller';src:url('fonts/muller-medium.woff2') format('woff2');font-display:swap;font-weight:500}
+@font-face{font-family:'Muller';src:url('fonts/muller-bold.woff2') format('woff2');font-display:swap;font-weight:700}
+:root{
+  --blue:#1565C0; --blue-dark:#0D47A1; --blue-light:#E3F2FD; --blue-pale:#f0f7ff;
+  --accent:#FF6F00; --accent-light:#FFF3E0; --accent-dark:#E65100;
+  --text:#1a2332; --text-muted:#64748b; --text-light:#94a3b8; --border:#e2e8f0;
+  --ok:#E8F5E9; --ok-b:#66BB6A; --ok-t:#2E7D32;
+  --bad:#FDECEA; --bad-b:#E53935; --bad-t:#B71C1C;
+  --bg:#F0F4F8;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.55 'Muller',system-ui,sans-serif}
+header{background:#fff;border-bottom:1px solid var(--border);padding:12px 22px;display:flex;
+       align-items:center;gap:14px;flex-wrap:wrap;position:sticky;top:0;z-index:20}
+header h1{font-size:17px;margin:0;font-weight:700}
+header a{color:var(--blue);text-decoration:none;font-size:14px;font-weight:500}
+header a:hover{text-decoration:underline}
+.spacer{flex:1}
+.wrap{padding:20px 22px;max-width:1500px;margin:0 auto}
+
+/* ── загрузка ─────────────────────────────────────────── */
+.drop{background:#fff;border:2px dashed #c7d3e3;border-radius:14px;padding:44px 24px;text-align:center;
+      transition:border-color .15s,background .15s}
+.drop.over{border-color:var(--blue);background:var(--blue-pale)}
+.drop h2{margin:0 0 6px;font-size:19px;font-weight:700}
+.drop p{margin:0 0 18px;color:var(--text-muted);font-size:14px}
+.kbd{background:#eef2f7;border:1px solid var(--border);border-radius:5px;padding:1px 6px;font-size:12.5px;
+     font-family:ui-monospace,Consolas,monospace}
+button{font:inherit;font-weight:700;border-radius:9px;padding:10px 20px;cursor:pointer;border:1px solid transparent}
+.primary{background:var(--blue);color:#fff}
+.primary:hover{background:var(--blue-dark)}
+.primary:disabled{background:#b9c6d8;cursor:not-allowed}
+.ghost{background:#fff;border-color:var(--border);color:var(--text)}
+.ghost:hover{border-color:var(--blue);color:var(--blue)}
+
+/* ── прогресс ─────────────────────────────────────────── */
+.progress{background:#fff;border:1px solid var(--border);border-radius:14px;padding:22px;text-align:center}
+.bar{height:6px;background:#eef2f7;border-radius:4px;overflow:hidden;margin:14px auto 0;max-width:420px}
+.bar i{display:block;height:100%;background:var(--blue);width:30%;border-radius:4px;
+       animation:run 1.4s ease-in-out infinite}
+@keyframes run{0%{margin-left:-30%}100%{margin-left:100%}}
+.note{color:var(--text-muted);font-size:13px;margin-top:10px}
+
+/* ── проверка ─────────────────────────────────────────── */
+.grid{display:grid;grid-template-columns:minmax(300px,.85fr) 1.15fr;gap:18px;align-items:start}
+.card{background:#fff;border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.card h3{font-size:12.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--text-muted);
+         margin:0;padding:12px 16px;border-bottom:1px solid var(--border);font-weight:700}
+.doc{position:sticky;top:76px;max-height:calc(100vh - 100px);overflow:auto}
+.doc img{width:100%;display:block;border-bottom:1px solid var(--border)}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.03em;color:var(--text-muted);text-align:left;
+   padding:8px 12px;border-bottom:1px solid var(--border);font-weight:700}
+td{padding:8px 12px;border-bottom:1px solid #f1f4f8;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+.grp td{background:#f7f9fc;font-size:11px;text-transform:uppercase;letter-spacing:.04em;
+        color:var(--text-muted);font-weight:700;padding:7px 12px}
+.num{color:var(--text-light);font-size:12px;width:28px;text-align:right}
+.val{width:116px;padding:5px 8px;border:1px solid var(--border);border-radius:7px;font:inherit;
+     font-weight:700;text-align:right;background:#fff}
+.val:focus{outline:2px solid var(--blue);outline-offset:-1px;border-color:var(--blue)}
+.unit{color:var(--text-muted);font-size:12.5px}
+.norm{color:var(--text-muted);font-size:13px;white-space:nowrap}
+tr.over td{background:var(--accent-light)}
+tr.over .val{border-color:var(--accent)}
+tr.pick td{background:var(--bad)}
+tr.pick .val{border-color:var(--bad-b);color:var(--bad-t)}
+.flag{display:block;font-size:12px;color:var(--bad-t);margin-top:4px}
+.pills{display:inline-flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+.pill{padding:3px 11px;font-size:13px;border-radius:7px;border:1px solid var(--border);background:#fff;
+      cursor:pointer;font-weight:700}
+.pill:hover{border-color:var(--blue)}
+.pill.on{background:var(--ok);border-color:var(--ok-b);color:var(--ok-t)}
+.tag{font-size:11px;border-radius:5px;padding:2px 7px;font-weight:700;white-space:nowrap}
+.t-ok{background:var(--ok);color:var(--ok-t)}
+.t-over{background:#FFE9C7;color:var(--accent-dark)}
+.t-bad{background:#FBD7D4;color:var(--bad-t)}
+.t-none{background:#eef1f5;color:var(--text-muted)}
+.sum{padding:14px 16px}
+.sum ul{margin:8px 0 0;padding-left:18px}
+.actions{display:flex;gap:10px;padding:14px 16px;border-top:1px solid var(--border);flex-wrap:wrap;align-items:center}
+.warn{background:var(--bad);border:1px solid var(--bad-b);color:var(--bad-t);border-radius:10px;
+      padding:12px 14px;margin:0 0 16px;font-size:14px}
+.hide{display:none}
+@media(max-width:1000px){.grid{grid-template-columns:1fr}.doc{position:static;max-height:none}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Разбор анализа воды</h1>
+  <span id="fileName" style="color:var(--text-muted);font-size:13.5px"></span>
+  <div class="spacer"></div>
+  <a href="hub.html">← Рабочее пространство</a>
+</header>
+
+<div class="wrap">
+  <div id="warn" class="warn hide"></div>
+
+  <!-- шаг 1: загрузка -->
+  <div id="stepLoad" class="drop">
+    <h2>Загрузите протокол анализа</h2>
+    <p>Перетащите файл сюда, нажмите <span class="kbd">Ctrl</span>+<span class="kbd">V</span>,
+       чтобы вставить из буфера, или выберите вручную.<br>
+       Подойдёт PDF (в том числе скан), фотография, скриншот или документ Word.</p>
+    <button class="primary" id="pick">Выбрать файл</button>
+    <input type="file" id="file" class="hide" accept=".pdf,.docx,image/*">
+  </div>
+
+  <!-- шаг 2: работа -->
+  <div id="stepWork" class="progress hide">
+    <b id="workTitle">Читаю файл</b>
+    <div class="bar"><i></i></div>
+    <div class="note" id="workNote">Это занимает от нескольких секунд до минуты</div>
+  </div>
+
+  <!-- шаг 3: проверка -->
+  <div id="stepCheck" class="grid hide">
+    <div class="card doc">
+      <h3>Исходный документ</h3>
+      <div id="previews"></div>
+    </div>
+    <div>
+      <div class="card">
+        <h3 id="checkTitle">Что система прочитала — сверьте построчно</h3>
+        <table><tbody id="rows"></tbody></table>
+      </div>
+      <div class="card" style="margin-top:16px">
+        <h3>Что из этого следует</h3>
+        <div class="sum" id="summary"></div>
+        <div class="actions">
+          <button class="primary" id="confirm">Подтвердить показатели</button>
+          <button class="ghost" id="again">Загрузить другой файл</button>
+          <span id="blockNote" class="note" style="margin:0"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="supabase.min.js"></script>
+<script src="auth.js"></script>
+<script src="vendor/tesseract.min.js"></script>
+<script src="water-pipeline.js"></script>
+<script src="water-ui.js"></script>
+</body>
+</html>
