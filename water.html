@@ -146,6 +146,10 @@ tr.pick .val{border-color:var(--bad-b);color:var(--bad-t)}
 .history .row .m{font-size:12px;color:var(--text-muted)}
 .history .row .when{margin-left:auto;font-size:12px;color:var(--text-light);white-space:nowrap}
 .history .empty{font-size:13px;color:var(--text-muted)}
+/* когда страница открыта окном поверх конструктора, своя шапка не нужна */
+body.embed header{display:none}
+body.embed .wrap{padding:14px}
+body.embed .doc{top:0;max-height:calc(100vh - 150px)}
 .hide{display:none}
 @media(max-width:1000px){.grid{grid-template-columns:1fr}.doc{position:static;max-height:none}}
 </style>

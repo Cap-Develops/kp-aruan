@@ -674,6 +674,11 @@
   /* ── события ─────────────────────────────────────────── */
 
   document.addEventListener('DOMContentLoaded', function () {
+    // встроенный режим: страница открыта внутри конструктора
+    if (/[?&]embed=1/.test(location.search)) {
+      document.body.classList.add('embed');
+      el('confirm').textContent = 'Использовать в КП';
+    }
     bindViewer();
     docZoom.bind();
     bindObject();
@@ -727,6 +732,11 @@
           if (sb) sb.from('water_analyses').update({ object_json: readObject(), rows_json: state.rows })
                     .eq('id', state.savedId).then(function () {});
         } catch (e) {}
+      }
+      // страница может быть открыта окном поверх конструктора: тогда отдаём
+      // разбор ему сразу, чтобы менеджеру не пришлось никуда возвращаться
+      if (window.parent && window.parent !== window) {
+        try { window.parent.postMessage({ type: 'water-analysis', payload: payload }, '*'); } catch (e) {}
       }
       el('confirm').textContent = 'Показатели сохранены';
       el('confirm').disabled = true;

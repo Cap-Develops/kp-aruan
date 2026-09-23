@@ -364,6 +364,17 @@ function keySpecNew(it){
    внутри КП целиком (показатели, нормативы, анкета объекта) и уходит в облако
    вместе с ним. Побочная, но важная польза: в базе копятся пары «какая вода и
    какой объект - что поставили», по ним потом проверяется автоподбор. */
+/** Превышение считаем одинаково в блоке КП и в документе. Норматив пишут
+ *  по-разному: «0,3», «не более 1,5», «6,0-9,0» - у диапазона нарушение это
+ *  выход за любую границу, иначе pH 7,7 при норме 6,0-9,0 считался превышением. */
+function limitOver(value,limit){
+  if(value===null||value===undefined||!limit)return false;
+  var t=String(limit).replace(/,/g,'.');
+  var pair=t.match(/(\d+(?:\.\d+)?)\s*(?:-|–|до)\s*(\d+(?:\.\d+)?)/);
+  if(pair)return value<parseFloat(pair[1])||value>parseFloat(pair[2]);
+  var one=t.match(/(\d+(?:\.\d+)?)/);
+  return one?value>parseFloat(one[1]):false;
+}
 function _lastAnalysis(){try{return JSON.parse(localStorage.getItem('water_analysis')||'null');}catch(e){return null;}}
 function attachAnalysis(){
   var a=_lastAnalysis();
@@ -371,17 +382,45 @@ function attachAnalysis(){
   a.inKp=true;                       // по умолчанию прикладываем к КП, снимается галочкой
   state.analysis=a;render();
 }
-function openAnalysisPage(){window.open('water.html','_blank');}
+/* Разбор открывается окном поверх КП: менеджер не уходит со страницы и не
+   теряет собранное. Внутри работает та же страница water.html, поэтому
+   поведение одинаковое, а код не дублируется. */
+function openAnalysisPage(){
+  var box=document.getElementById('waterModal');
+  if(!box){
+    box=document.createElement('div');
+    box.id='waterModal';
+    box.style.cssText='position:fixed;inset:0;z-index:2000;background:rgba(15,23,42,.6);display:flex;align-items:center;justify-content:center;padding:18px';
+    box.innerHTML='<div style="background:#F0F4F8;border-radius:14px;width:min(1400px,100%);height:100%;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.35)">'
+      +'<div style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:#fff;border-bottom:1px solid var(--border)">'
+      +'<b style="font-size:15px">Разбор анализа воды</b>'
+      +'<span style="font-size:12.5px;color:var(--muted)">подтвердите показатели — они сразу попадут в это КП</span>'
+      +'<button class="btn-outline" style="margin-left:auto;padding:6px 12px;font-size:13px" onclick="closeAnalysisModal()">Закрыть</button>'
+      +'</div>'
+      +'<iframe id="waterFrame" src="water.html?embed=1" style="flex:1;border:0;width:100%"></iframe></div>';
+    document.body.appendChild(box);
+  }else{
+    box.style.display='flex';
+    var fr=document.getElementById('waterFrame');
+    if(fr)fr.src='water.html?embed=1&n='+Date.now();
+  }
+}
+function closeAnalysisModal(){var b=document.getElementById('waterModal');if(b)b.style.display='none';}
+/* Результат приходит из окна разбора - кладём в КП и закрываем окно. */
+window.addEventListener('message',function(e){
+  if(!e.data||e.data.type!=='water-analysis'||!e.data.payload)return;
+  var a=e.data.payload;
+  a.inKp=true;
+  state.analysis=a;
+  closeAnalysisModal();
+  render();
+});
 function detachAnalysis(){if(confirm('Убрать анализ из этого КП?')){state.analysis=null;render();}}
 function toggleAnalysisInKp(v){if(state.analysis)state.analysis.inKp=v;render();}
 /** Коротко: что за вода и сколько превышений - чтобы не разворачивать всю таблицу. */
 function analysisSummary(a){
   var rows=a.rows||[];
-  var over=rows.filter(function(r){
-    if(r.value===null||r.value===undefined||!r.limit)return false;
-    var lim=String(r.limit).replace(',','.').match(/(\d+(?:\.\d+)?)/);
-    return lim&&r.value>parseFloat(lim[1]);
-  });
+  var over=rows.filter(function(r){return limitOver(r.value,r.limit);});
   return {count:rows.length,over:over.map(function(r){return r.name;})};
 }
 
@@ -628,11 +667,7 @@ function generatePDF(){
       var val=(r.value!==null&&r.value!==undefined)?String(r.value).replace('.',',')
              :((r.below!==null&&r.below!==undefined)?('менее '+String(r.below).replace('.',',')):'—');
       var lim=r.limit?String(r.limit).replace(/(\d)\.(?=\d)/g,'$1,'):'—';
-      var over=false;
-      if(r.value!==null&&r.value!==undefined&&r.limit){
-        var lm=String(r.limit).replace(',','.').match(/(\d+(?:\.\d+)?)/);
-        over=!!lm&&r.value>parseFloat(lm[1]);
-      }
+      var over=limitOver(r.value,r.limit);
       h+='<tr'+(over?' style="background:#FFF3E0"':'')+'>'
        +'<td style="padding:3px 6px;border:0.5px solid #e5eef7">'+String(r.name||'').replace(/</g,'&lt;')+'</td>'
        +'<td style="padding:3px 6px;border:0.5px solid #e5eef7;text-align:right;font-weight:'+(over?'800':'600')+';color:'+(over?'#E65100':'#1a2332')+'">'+val+'</td>'
@@ -907,9 +942,9 @@ function render(){
     html+='<button class="btn-outline" style="padding:6px 12px;font-size:12px" onclick="detachAnalysis()">Убрать</button>';
     html+='</div>';
   }else{
-    html+='<div style="font-size:12.5px;color:var(--muted);margin-bottom:10px">Разберите протокол клиента - показатели и данные объекта сохранятся вместе с этим КП, а при желании попадут в документ отдельной страницей.</div>';
+    html+='<div style="font-size:12.5px;color:var(--muted);margin-bottom:10px">Разберите протокол клиента прямо здесь - окно откроется поверх КП, собранное не потеряется. Показатели и данные объекта сохранятся вместе с этим КП, а при желании попадут в документ отдельной страницей.</div>';
     html+='<div style="display:flex;gap:10px;flex-wrap:wrap">';
-    html+='<button class="btn-outline" style="padding:8px 14px;font-size:13px" onclick="openAnalysisPage()">Разобрать анализ</button>';
+    html+='<button class="btn-outline" style="padding:8px 14px;font-size:13px" onclick="openAnalysisPage()">Загрузить и разобрать анализ</button>';
     html+='<button class="btn-outline" style="padding:8px 14px;font-size:13px" onclick="attachAnalysis()">Взять последний разбор</button>';
     html+='</div>';
   }
