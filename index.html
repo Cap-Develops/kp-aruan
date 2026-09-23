@@ -329,6 +329,34 @@ function plRu(n,one,few,many){var a=Math.abs(n)%100,b=a%10;if(a>=11&&a<=19)retur
 function _normalizeSpecs(s){if(!s)return s;s=s.replace(/мешк\./g,'мешков').replace(/мешк\b/g,'мешков');s=s.replace(/(\d+\s+мешков)\s*\+\s*/g,'$1, ');s=s.replace(/([a-zA-Zа-яёА-ЯЁ0-9x\/]+)\s+(\d+(?:\.\d+)?)\s+мешков/g,'$1, $2 мешков');s=s.replace(/(\d+(?:\.\d+)?)\s+мешков/g,function(m,n){return n+' '+_pluralMeshok(parseFloat(n));});return s;}
 function fmtSpecs(s){s=_normalizeSpecs(s);if(!s)return '';var p=s.split(/\. (?=[А-ЯЁA-Z])/).filter(function(x){return x.trim();});if(p.length<=1)return s;return p.map(function(x){return '• '+x.replace(/\.$/,'');}).join('<br>');}
 function fmtSpecsTxt(s){s=_normalizeSpecs(s);if(!s)return '';var p=s.split(/\. (?=[А-ЯЁA-Z])/).filter(function(x){return x.trim();});if(p.length<=1)return s;return p.map(function(x){return '• '+x.replace(/\.$/,'');}).join('\n');}
+/* Одна ключевая характеристика позиции - для списков, где нет места на полные
+   характеристики. Без неё «Накопительная ёмкость» в составе КП не отличить от
+   такой же на 1000 л. Берём то, чем позиции реально различаются: объём, произ-
+   водительность, тонкость фильтрации. Всё остальное в кратком списке лишнее. */
+function keySpec(it){
+  if(!it)return '';
+  var s=_normalizeSpecs(it.specs||'');
+  var parts=s.split(/\. (?=[А-ЯЁA-Z])/).map(function(x){return x.trim().replace(/\.$/,'');}).filter(Boolean);
+  var PRIOR=[/^\s*\d+[\d\s.,]*\s*л\b/i,/производительн/i,/объ[её]м/i,/тонкость/i,/мембран/i,/напор/i,/диаметр|присоединен|ду\s*\d/i];
+  for(var p=0;p<PRIOR.length;p++){
+    for(var i=0;i<parts.length;i++){if(PRIOR[p].test(parts[i]))return _shortSpec(parts[i]);}
+  }
+  if(it.productivity)return _shortSpec(it.productivity);
+  return parts.length?_shortSpec(parts[0]):'';
+}
+function _shortSpec(t){t=String(t).replace(/^[^:]{0,24}:\s*/,'');return t.length>34?t.slice(0,33)+'…':t;}
+/* Если объём или производительность уже стоят в названии («Ёмкость 500 л»),
+   повторять их незачем: показываем характеристику, только когда она добавляет
+   что-то новое. */
+function keySpecNew(it){
+  var k=keySpec(it);if(!k)return '';
+  var name=String(it&&it.name||'').toLowerCase().replace(/\s+/g,' ');
+  var probe=k.toLowerCase().replace(/\s+/g,' ').replace(/…$/,'');
+  // только точное совпадение: «Ёмкость 500 л» и «500 л» - дубль, а «Насос CHLF4»
+  // и «4 м3/ч» - нет, там цифра в артикуле, а производительность менеджеру нужна
+  if(probe&&name.indexOf(probe)>=0)return '';
+  return k;
+}
 
 // ═══ SERVICES ═══
 function getServiceItems(){var c=state.client,r=[];var hasBMZ=state.items&&state.items.some(function(i){return i.category==='Блочно-модульные здания';});var bmzSuffix=hasBMZ?' (внутри БМЗ)':'';if(c.inclDelivery&&c.priceDelivery>0)r.push({name:c.svcNameDelivery||'Транспортные услуги (без разгрузки)',price:c.priceDelivery});if(c.inclMontage&&c.priceMontage>0)r.push({name:c.svcNameMontage||(hasBMZ?'Монтаж оборудования (внутри БМЗ)':'Монтаж и пуско-наладка оборудования'),price:c.priceMontage});if(c.inclObvyazka&&c.priceObvyazka>0)r.push({name:c.svcNameObvyazka||('Трубная обвязка'+bmzSuffix),price:c.priceObvyazka});if(c.inclVyezd&&c.priceVyezd>0)r.push({name:c.svcNameVyezd||'Выезд технического специалиста',price:c.priceVyezd});if(c.inclKomandirovka&&c.priceKomandirovka>0)r.push({name:c.svcNameKomandirovka||'Командировочные расходы',price:c.priceKomandirovka});return r;}
@@ -762,7 +790,8 @@ function render(){
       html+='</tr></thead><tbody>';
       (h.items||[]).forEach(function(it,idx){
         var hfl='';if(it.fillType&&typeof COLUMN_FILLS!=='undefined'&&!it.name.includes('с засыпкой')){var hff=COLUMN_FILLS[it.fillType].find(function(f){return f.id===it.fillId;});if(hff)hfl=' с засыпкой '+hff.name;}
-        html+='<tr><td style="'+_hcell+'">'+(idx+1)+'. '+String(it.name+hfl).replace(/</g,'&lt;')+'</td><td style="'+_hcell+';text-align:center;white-space:nowrap">'+it.quantity+'</td><td style="'+_hcell+';text-align:right;white-space:nowrap">'+fmt(it.customPrice)+' ₽</td><td style="'+_hcell+';text-align:right;white-space:nowrap;font-weight:700">'+fmt(it.quantity*it.customPrice)+' ₽</td></tr>';
+        var _ks=keySpecNew(it);
+        html+='<tr><td style="'+_hcell+'">'+(idx+1)+'. '+String(it.name+hfl).replace(/</g,'&lt;')+(_ks?'<span style="color:#94a3b8;font-weight:500"> · '+String(_ks).replace(/</g,'&lt;')+'</span>':'')+'</td><td style="'+_hcell+';text-align:center;white-space:nowrap">'+it.quantity+'</td><td style="'+_hcell+';text-align:right;white-space:nowrap">'+fmt(it.customPrice)+' ₽</td><td style="'+_hcell+';text-align:right;white-space:nowrap;font-weight:700">'+fmt(it.quantity*it.customPrice)+' ₽</td></tr>';
       });
       var hc=h.client||{};
       [['inclDelivery','priceDelivery','svcNameDelivery','Транспортные услуги'],['inclMontage','priceMontage','svcNameMontage','Монтаж и пуско-наладка'],['inclObvyazka','priceObvyazka','svcNameObvyazka','Монтаж трубопроводной обвязки'],['inclVyezd','priceVyezd','svcNameVyezd','Выезд технического специалиста'],['inclKomandirovka','priceKomandirovka','svcNameKomandirovka','Командировочные расходы']].forEach(function(sv){
