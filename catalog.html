@@ -282,6 +282,22 @@ input,select,button,textarea{font-family:inherit}
   font-size:12px;color:var(--text-muted);line-height:1.8;
   margin-bottom:auto;padding-bottom:14px;
 }
+/* Дополнительная таблица позиции (напорная характеристика насоса и подобное):
+   в общие характеристики такое не влезает, поэтому держим свёрнутым. */
+.card-extra{margin:0 0 12px}
+.card-extra summary{
+  cursor:pointer;font-size:12px;font-weight:700;color:var(--blue);list-style:none;
+  display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:7px;
+  border:1px solid var(--border-light);background:#f7faff;
+}
+.card-extra summary::-webkit-details-marker{display:none}
+.card-extra summary:hover{background:#eef5ff}
+.card-extra[open] summary{margin-bottom:8px}
+.card-extra .extra-note{font-size:11px;color:var(--text-light);margin-bottom:6px;line-height:1.5}
+.card-extra table{border-collapse:collapse;width:100%;font-size:11.5px}
+.card-extra th{background:#f1f5fb;color:var(--text-muted);font-weight:700;text-align:left;
+               padding:4px 8px;border:1px solid var(--border-light);white-space:nowrap}
+.card-extra td{padding:4px 8px;border:1px solid var(--border-light);color:var(--text)}
 .card-footer{
   display:flex;align-items:flex-end;justify-content:space-between;
   padding-top:14px;border-top:1px solid var(--border-light);margin-top:auto;
@@ -697,6 +713,7 @@ input,select,button,textarea{font-family:inherit}
             <div class="card-name">${item.name}</div>
             ${item.productivity ? `<div class="card-productivity">⚡ ${item.productivity}</div>` : ''}
             <div class="card-specs">${item.specs ? item.specs.replace(/\. ([А-ЯЁA-Z])/g, '.<br>$1') : ''}</div>
+            ${renderExtra(item.extra)}
             <div class="card-footer">
               <div>
                 <div class="card-price">${fmtPrice(item.price)}</div>
@@ -707,6 +724,27 @@ input,select,button,textarea{font-family:inherit}
         </div>
       `;
     }).join('');
+  }
+
+  /* Дополнительная таблица позиции: напорная характеристика насоса и подобное.
+     В общие характеристики такое не поместится, поэтому показываем свёрнутым -
+     менеджер раскрывает, когда нужно подобрать рабочую точку. */
+  function renderExtra(raw) {
+    if (!raw) return '';
+    var data;
+    try { data = typeof raw === 'string' ? JSON.parse(raw) : raw; } catch (e) { return ''; }
+    if (!data || !Array.isArray(data.rows) || !data.rows.length) return '';
+    var esc = function (t) { return String(t == null ? '' : t).replace(/</g, '&lt;'); };
+    var head = (data.head || []).map(function (h) { return '<th>' + esc(h) + '</th>'; }).join('');
+    var body = data.rows.map(function (r) {
+      return '<tr>' + (Array.isArray(r) ? r : [r]).map(function (c) {
+        return '<td>' + esc(c) + '</td>';
+      }).join('') + '</tr>';
+    }).join('');
+    return '<details class="card-extra"><summary>📈 ' + esc(data.title || 'Подробные характеристики') +
+           '</summary>' + (data.note ? '<div class="extra-note">' + esc(data.note) + '</div>' : '') +
+           '<table>' + (head ? '<thead><tr>' + head + '</tr></thead>' : '') +
+           '<tbody>' + body + '</tbody></table></details>';
   }
 
   /* ===== PAGINATION ===== */
