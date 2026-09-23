@@ -550,7 +550,19 @@ function autoKPNum(){var d=new Date();var dd=String(d.getDate()).padStart(2,'0')
 
 // ═══ STATE ═══
 var state={step:-1,analysis:null,client:{name:'',contact:'',phone:'',email:'',managerId:MY_MGR,inclDelivery:false,inclMontage:false,inclObvyazka:false,inclVyezd:false,inclKomandirovka:false,priceDelivery:0,priceMontage:0,priceObvyazka:0,priceVyezd:0,priceKomandirovka:0,kpNum:autoKPNum(),kpDate:new Date().toISOString().split('T')[0],deliveryDays:10,warrantyMonths:12,withoutVat:false,comment:''},items:[],search:'',catFilter:'Все',discount:0,currentKPId:null,historySearch:'',historyManagerFilter:'all',historySort:'date_desc'};
-function setState(u){if(u.step===1&&state.step!==1){u.search='';u.catFilter='Все';}Object.assign(state,u);render();restoreFocus();saveDraft();}
+function setState(u){
+  var stepChanged=(u.step!==undefined&&u.step!==state.step);
+  if(u.step===1&&state.step!==1){u.search='';u.catFilter='Все';}
+  Object.assign(state,u);render();restoreFocus();saveDraft();
+  // при переходе на другой этап возвращаем к началу: иначе новый экран
+  // открывается там же, где вы жали кнопку - то есть в самом низу
+  if(stepChanged)scrollTop();
+}
+function scrollTop(){
+  try{window.scrollTo({top:0,behavior:'smooth'});}
+  catch(e){window.scrollTo(0,0);}
+  var list=document.querySelector('.eq-list');if(list)list.scrollTop=0;
+}
 
 /* ═══ ЧЕРНОВИК: пережить обновление страницы ═══
    Раньше F5 выбрасывал в историю и терял несохранённое. Теперь текущий этап
@@ -588,7 +600,7 @@ var _fid='',_fp=-1;
 function saveFocus(){var e=document.activeElement;if(e&&e.id){_fid=e.id;try{_fp=e.selectionStart!=null?e.selectionStart:-1;}catch(x){_fp=-1;}}else{_fid='';_fp=-1;}_fval=e?e.value:'';}
 function restoreFocus(){if(_fid){var e=document.getElementById(_fid);if(e){e.focus();if(e.type==='number'){var len=String(e.value).length;try{e.setSelectionRange(len,len);}catch(x){}}else if(_fp>=0&&e.setSelectionRange)try{e.setSelectionRange(_fp,_fp);}catch(x){}}}}
 function setClient(k,v){state.client[k]=v;}
-function newKP(){state.currentKPId=null;state.client={name:'',contact:'',phone:'',email:'',managerId:MY_MGR,inclDelivery:false,inclMontage:false,inclObvyazka:false,inclVyezd:false,inclKomandirovka:false,priceDelivery:0,priceMontage:0,priceObvyazka:0,priceVyezd:0,priceKomandirovka:0,kpNum:autoKPNum(),kpDate:new Date().toISOString().split('T')[0],deliveryDays:10,warrantyMonths:12,withoutVat:false,comment:''};state.items=[];state.discount=0;state.analysis=null;state.step=0;try{localStorage.removeItem(DRAFT_KEY);}catch(e){}render();saveDraft();}
+function newKP(){state.currentKPId=null;state.client={name:'',contact:'',phone:'',email:'',managerId:MY_MGR,inclDelivery:false,inclMontage:false,inclObvyazka:false,inclVyezd:false,inclKomandirovka:false,priceDelivery:0,priceMontage:0,priceObvyazka:0,priceVyezd:0,priceKomandirovka:0,kpNum:autoKPNum(),kpDate:new Date().toISOString().split('T')[0],deliveryDays:10,warrantyMonths:12,withoutVat:false,comment:''};state.items=[];state.discount=0;state.analysis=null;state.step=0;try{localStorage.removeItem(DRAFT_KEY);}catch(e){}render();saveDraft();scrollTop();}
 
 // ═══ PDF GENERATION ═══
 function pdfHeader(){return '<div class="pdf-header-bar"><div style="background:#fff;border-radius:6px;padding:2mm 4mm;display:flex;align-items:center;gap:4mm"><img src="assets/logo_aruan.png" style="height:10mm"><img src="assets/logo_aurus.png" style="height:10mm"></div><div style="display:flex;align-items:center;gap:6mm;font-size:11px"><span>📞 8-800-100-39-54</span><span>✉ prom10@aruan.ru</span><span>🌐 www.filtr-aruan.ru</span></div></div>';}
