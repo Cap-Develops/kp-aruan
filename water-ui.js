@@ -224,15 +224,6 @@
     updateSummary();
   }
 
-  /** Необязательные поля свёрнуты. Если в сохранённом разборе они заполнены,
-   *  раскрываем блок - иначе данные не видно и кажется, что их потеряли. */
-  function openMoreIfFilled() {
-    var box = el('objMore');
-    if (!box) return;
-    var o = readObject();
-    if (o.purpose || o.mode || o.pressure || o.notes) box.open = true;
-  }
-
   function bindObject() {
     OBJ_FIELDS.forEach(function (id) {
       var node = el(id);
@@ -624,7 +615,6 @@
       var node = el('obj' + k.charAt(0).toUpperCase() + k.slice(1));
       if (node) node.value = obj[k];
     });
-    openMoreIfFilled();
 
     renderSamples();
     var title = 'Разбор от ' + new Date(saved.created_at).toLocaleDateString('ru-RU');
