@@ -52,7 +52,6 @@ button:active{transform:scale(.97)}
 .step-nav-hint{font-size:12.5px;color:var(--muted)}
 @media(max-width:700px){.step-nav{flex-direction:column;align-items:stretch}
   .step-nav button{width:100%}.step-nav-space{display:none}}
-.step-badge{margin-left:5px;background:linear-gradient(135deg,#FF6F00,#FF8F00);color:#fff;border-radius:10px;padding:2px 7px;font-size:10px;font-weight:700}
 .container{max-width:1240px;margin:0 auto;padding:24px 20px}
 .card{background:var(--glass);border-radius:var(--radius);box-shadow:var(--shadow);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.6)}
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
@@ -964,7 +963,7 @@ function render(){
   // недоступен, пока не выбрано оборудование
   var _ok='<span class="step-done">✓</span>';
   html+='<button class="step-btn '+(step===0?'active':'')+(step>0?' done':'')+'" onclick="setState({step:0})">1. Клиент'+(step>0?_ok:'')+'</button>';
-  html+='<button class="step-btn '+(step===1?'active':'')+(step>1&&items.length?' done':'')+'" onclick="setState({step:1})">2. Оборудование'+(items.length?'<span class="step-badge">'+items.length+'</span>':'')+(step>1&&items.length?_ok:'')+'</button>';
+  html+='<button class="step-btn '+(step===1?'active':'')+(step>1&&items.length?' done':'')+'" onclick="setState({step:1})">2. Оборудование'+(step>1&&items.length?_ok:'')+'</button>';
   html+='<button class="step-btn '+(step===2?'active':'')+(items.length?'':' locked')+'" title="'+(items.length?'':'Сначала выберите оборудование')+'" onclick="'+(items.length?'setState({step:2})':'')+'">3. Предпросмотр</button>';
   html+='</div></div></div>';
   // полоса прогресса идёт отдельной строкой под шапкой: внутри шапки-флекса
