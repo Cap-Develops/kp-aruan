@@ -30,8 +30,12 @@ button:active{transform:scale(.97)}
 .step-btn:not(.active):hover{background:rgba(255,255,255,.18);color:#fff}
 .step-btn.done{background:rgba(255,255,255,.22);color:#fff;border-color:rgba(255,255,255,.35)}
 .step-btn.locked{opacity:.45;cursor:not-allowed}
-.step-progress{height:3px;background:rgba(255,255,255,.18);border-radius:2px;margin:10px 0 0;overflow:hidden}
-.step-progress i{display:block;height:100%;background:linear-gradient(90deg,#FFB300,#FF6F00);border-radius:2px;transition:width .35s ease}
+.step-progress{background:#fff;border-bottom:1px solid var(--border);padding:10px 20px 9px;
+               display:flex;align-items:center;gap:12px}
+.step-progress-bar{flex:1;height:6px;background:#e8eef6;border-radius:4px;overflow:hidden;min-width:120px}
+.step-progress-bar i{display:block;height:100%;background:linear-gradient(90deg,#42A5F5,#1565C0);
+                     border-radius:4px;transition:width .35s ease}
+.step-progress-text{font-size:12px;font-weight:700;color:var(--muted);white-space:nowrap}
 .step-nav{margin-top:24px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
 .step-nav-space{flex:1}
 .step-badge{margin-left:5px;background:linear-gradient(135deg,#FF6F00,#FF8F00);color:#fff;border-radius:10px;padding:2px 7px;font-size:10px;font-weight:700}
@@ -900,11 +904,16 @@ function render(){
   html+='<button class="step-btn '+(step===0?'active':'')+(step>0?' done':'')+'" onclick="setState({step:0})">'+(step>0?'✓ ':'1. ')+'Клиент</button>';
   html+='<button class="step-btn '+(step===1?'active':'')+(step>1&&items.length?' done':'')+'" onclick="setState({step:1})">'+(step>1&&items.length?'✓ ':'2. ')+'Оборудование'+(items.length?'<span class="step-badge">'+items.length+'</span>':'')+'</button>';
   html+='<button class="step-btn '+(step===2?'active':'')+(items.length?'':' locked')+'" title="'+(items.length?'':'Сначала выберите оборудование')+'" onclick="'+(items.length?'setState({step:2})':'')+'">3. Предпросмотр</button>';
-  html+='</div>';
-  // тонкая полоса прогресса: видно, сколько этапов позади
-  if(step>=0){var _pc=step===0?33:(step===1?66:100);
-    html+='<div class="step-progress"><i style="width:'+_pc+'%"></i></div>';}
-  html+='</div><div class="container">';
+  html+='</div></div>';
+  // полоса прогресса идёт отдельной строкой под шапкой: внутри шапки-флекса
+  // она схлопывалась в ноль и была не видна
+  if(step>=0){
+    var _pc=step===0?33:(step===1?66:100);
+    var _label=step===0?'Этап 1 из 3 — данные клиента':(step===1?'Этап 2 из 3 — выбор оборудования':'Этап 3 из 3 — предпросмотр и отправка');
+    html+='<div class="step-progress"><div class="step-progress-bar"><i style="width:'+_pc+'%"></i></div>'
+         +'<span class="step-progress-text">'+_label+'</span></div>';
+  }
+  html+='<div class="container">';
   // HISTORY
   if(step===-1){var hist=loadHistory();var hs=state.historySearch?state.historySearch.toLowerCase():'';var hmf=state.historyManagerFilter;var hsort=state.historySort;
   // Фильтр по поиску
