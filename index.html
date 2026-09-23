@@ -38,10 +38,11 @@ button:active{transform:scale(.97)}
 .step-progress-text{font-size:12px;font-weight:700;color:var(--muted);white-space:nowrap}
 /* Одна и та же панель на всех этапах: слева возврат, справа действия.
    Липнет к низу экрана, чтобы не теряться под длинными списками. */
-.step-nav{position:sticky;bottom:0;z-index:30;margin:24px -20px 0;padding:14px 20px;
+.step-nav{position:sticky;bottom:14px;z-index:30;margin:24px 0 14px;padding:14px 18px;
           display:flex;gap:12px;align-items:center;flex-wrap:wrap;
-          background:rgba(255,255,255,.94);backdrop-filter:blur(10px);
-          border-top:1px solid var(--border);box-shadow:0 -6px 18px rgba(15,23,42,.06)}
+          background:rgba(255,255,255,.95);backdrop-filter:blur(10px);
+          border:1px solid var(--border);border-radius:var(--radius);
+          box-shadow:0 8px 24px rgba(15,23,42,.1)}
 .step-nav-space{flex:1}
 .step-nav .btn-primary,.step-nav .btn-accent{min-width:210px;justify-content:center}
 .step-nav-hint{font-size:12.5px;color:var(--muted)}
