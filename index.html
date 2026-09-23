@@ -358,6 +358,33 @@ function keySpecNew(it){
   return k;
 }
 
+
+/* ═══ АНАЛИЗ ВОДЫ В КП ═══
+   Анализ необязателен: нет его - КП собирается как раньше. Если есть, он лежит
+   внутри КП целиком (показатели, нормативы, анкета объекта) и уходит в облако
+   вместе с ним. Побочная, но важная польза: в базе копятся пары «какая вода и
+   какой объект - что поставили», по ним потом проверяется автоподбор. */
+function _lastAnalysis(){try{return JSON.parse(localStorage.getItem('water_analysis')||'null');}catch(e){return null;}}
+function attachAnalysis(){
+  var a=_lastAnalysis();
+  if(!a||!(a.rows||[]).length){alert('Свежего разбора не нашлось. Нажмите «Разобрать анализ», прочитайте протокол и подтвердите показатели — потом возвращайтесь сюда.');return;}
+  a.inKp=true;                       // по умолчанию прикладываем к КП, снимается галочкой
+  state.analysis=a;render();
+}
+function openAnalysisPage(){window.open('water.html','_blank');}
+function detachAnalysis(){if(confirm('Убрать анализ из этого КП?')){state.analysis=null;render();}}
+function toggleAnalysisInKp(v){if(state.analysis)state.analysis.inKp=v;render();}
+/** Коротко: что за вода и сколько превышений - чтобы не разворачивать всю таблицу. */
+function analysisSummary(a){
+  var rows=a.rows||[];
+  var over=rows.filter(function(r){
+    if(r.value===null||r.value===undefined||!r.limit)return false;
+    var lim=String(r.limit).replace(',','.').match(/(\d+(?:\.\d+)?)/);
+    return lim&&r.value>parseFloat(lim[1]);
+  });
+  return {count:rows.length,over:over.map(function(r){return r.name;})};
+}
+
 // ═══ SERVICES ═══
 function getServiceItems(){var c=state.client,r=[];var hasBMZ=state.items&&state.items.some(function(i){return i.category==='Блочно-модульные здания';});var bmzSuffix=hasBMZ?' (внутри БМЗ)':'';if(c.inclDelivery&&c.priceDelivery>0)r.push({name:c.svcNameDelivery||'Транспортные услуги (без разгрузки)',price:c.priceDelivery});if(c.inclMontage&&c.priceMontage>0)r.push({name:c.svcNameMontage||(hasBMZ?'Монтаж оборудования (внутри БМЗ)':'Монтаж и пуско-наладка оборудования'),price:c.priceMontage});if(c.inclObvyazka&&c.priceObvyazka>0)r.push({name:c.svcNameObvyazka||('Трубная обвязка'+bmzSuffix),price:c.priceObvyazka});if(c.inclVyezd&&c.priceVyezd>0)r.push({name:c.svcNameVyezd||'Выезд технического специалиста',price:c.priceVyezd});if(c.inclKomandirovka&&c.priceKomandirovka>0)r.push({name:c.svcNameKomandirovka||'Командировочные расходы',price:c.priceKomandirovka});return r;}
 function renameSvc(key,val){state.client['svcName'+key]=val;}
@@ -379,8 +406,8 @@ function syncFromCloud(){if(!_sb||_cloudSynced)return;_cloudSynced=true;_sb.from
 // ═══ STORAGE ═══
 function loadHistory(){try{return JSON.parse(localStorage.getItem('kp_history')||'[]');}catch(e){return[];}}
 function saveHistory(list){localStorage.setItem('kp_history',JSON.stringify(list));}
-function saveCurrentKP(){if(IS_VIEWER)return null;var h=loadHistory();var idx=h.findIndex(function(x){return x.id===state.currentKPId;});var existing=idx>=0?h[idx]:null;var now=new Date().toISOString();var entry={id:state.currentKPId||Date.now(),createdAt:existing&&existing.createdAt?existing.createdAt:now,client:JSON.parse(JSON.stringify(state.client)),items:JSON.parse(JSON.stringify(state.items)),discount:state.discount,savedAt:now,total:calcTotal()};if(idx>=0)h[idx]=entry;else h.unshift(entry);saveHistory(h);state.currentKPId=entry.id;_cloudSave(entry);return entry;}
-function loadKP(id){var h=loadHistory();var e=h.find(function(x){return x.id===id;});if(!e)return;state.client=e.client;state.items=e.items;state.discount=e.discount||0;state.currentKPId=e.id;if(!state.client.kpDate)state.client.kpDate=new Date().toISOString().split('T')[0];state.step=0;render();}
+function saveCurrentKP(){if(IS_VIEWER)return null;var h=loadHistory();var idx=h.findIndex(function(x){return x.id===state.currentKPId;});var existing=idx>=0?h[idx]:null;var now=new Date().toISOString();var entry={id:state.currentKPId||Date.now(),createdAt:existing&&existing.createdAt?existing.createdAt:now,client:JSON.parse(JSON.stringify(state.client)),items:JSON.parse(JSON.stringify(state.items)),analysis:state.analysis?JSON.parse(JSON.stringify(state.analysis)):null,discount:state.discount,savedAt:now,total:calcTotal()};if(idx>=0)h[idx]=entry;else h.unshift(entry);saveHistory(h);state.currentKPId=entry.id;_cloudSave(entry);return entry;}
+function loadKP(id){var h=loadHistory();var e=h.find(function(x){return x.id===id;});if(!e)return;state.client=e.client;state.items=e.items;state.analysis=e.analysis||null;state.discount=e.discount||0;state.currentKPId=e.id;if(!state.client.kpDate)state.client.kpDate=new Date().toISOString().split('T')[0];state.step=0;render();}
 function deleteKP(id){if(IS_VIEWER)return;if(!confirm('Удалить это КП из истории?'))return;saveHistory(loadHistory().filter(function(x){return x.id!==id;}));render();_cloudDelete(id);}
 function histToggle(id){state._histOpen=state._histOpen||{};state._histOpen[id]=!state._histOpen[id];render();}
 function detectKpSubject(items){
@@ -422,7 +449,7 @@ function calcTotal(){var s=state.items.reduce(function(a,i){return a+i.customPri
 function autoKPNum(){var d=new Date();var dd=String(d.getDate()).padStart(2,'0');var mm=String(d.getMonth()+1).padStart(2,'0');var yy=String(d.getFullYear()).slice(-2);var prefix='ТИ-'+dd+'-'+mm+'-'+yy+'/';var hist=loadHistory();var cnt=hist.filter(function(h){return h.client&&h.client.kpNum&&h.client.kpNum.indexOf(prefix)===0;}).length;return prefix+String(cnt+1).padStart(2,'0');}
 
 // ═══ STATE ═══
-var state={step:-1,client:{name:'',contact:'',phone:'',email:'',managerId:MY_MGR,inclDelivery:false,inclMontage:false,inclObvyazka:false,inclVyezd:false,inclKomandirovka:false,priceDelivery:0,priceMontage:0,priceObvyazka:0,priceVyezd:0,priceKomandirovka:0,kpNum:autoKPNum(),kpDate:new Date().toISOString().split('T')[0],deliveryDays:10,warrantyMonths:12,withoutVat:false,comment:''},items:[],search:'',catFilter:'Все',discount:0,currentKPId:null,historySearch:'',historyManagerFilter:'all',historySort:'date_desc'};
+var state={step:-1,analysis:null,client:{name:'',contact:'',phone:'',email:'',managerId:MY_MGR,inclDelivery:false,inclMontage:false,inclObvyazka:false,inclVyezd:false,inclKomandirovka:false,priceDelivery:0,priceMontage:0,priceObvyazka:0,priceVyezd:0,priceKomandirovka:0,kpNum:autoKPNum(),kpDate:new Date().toISOString().split('T')[0],deliveryDays:10,warrantyMonths:12,withoutVat:false,comment:''},items:[],search:'',catFilter:'Все',discount:0,currentKPId:null,historySearch:'',historyManagerFilter:'all',historySort:'date_desc'};
 function setState(u){if(u.step===1&&state.step!==1){u.search='';u.catFilter='Все';}Object.assign(state,u);render();restoreFocus();}
 var _fid='',_fp=-1;
 function saveFocus(){var e=document.activeElement;if(e&&e.id){_fid=e.id;try{_fp=e.selectionStart!=null?e.selectionStart:-1;}catch(x){_fp=-1;}}else{_fid='';_fp=-1;}_fval=e?e.value:'';}
@@ -566,6 +593,47 @@ function generatePDF(){
   // Placeholder — will be replaced after measurement by paginateTable()
   h+='<div id="pdfTableMount" data-rows=\''+JSON.stringify(rowsArr).replace(/'/g,'&#39;')+'\' data-header=\''+headerRow.replace(/'/g,'&#39;')+'\' data-intro=\''+introHtml.replace(/'/g,'&#39;')+'\' data-sign=\''+signHtml.replace(/'/g,'&#39;')+'\'></div>';
   var pgNum=2;
+
+  // PAGE: АНАЛИЗ ВОДЫ - только если менеджер приложил разбор.
+  // Клиент видит, на основании каких показателей собрана схема.
+  if(state.analysis&&state.analysis.inKp&&(state.analysis.rows||[]).length){
+    var _a=state.analysis, _ao=_a.object||{};
+    h+='<div class="pdf-page" style="background:#fff">';
+    h+=pdfHeader();
+    h+='<div style="padding:6mm 10mm">';
+    h+='<div style="font-size:18px;font-weight:900;color:#0D47A1;text-align:center;letter-spacing:.5px">ИСХОДНЫЕ ДАННЫЕ: АНАЛИЗ ВОДЫ</div>';
+    var _sub=[_a.sample,_a.lab,_a.date].filter(Boolean).join(' · ');
+    if(_sub)h+='<div style="text-align:center;font-size:11px;color:#666;margin-top:2mm">'+String(_sub).replace(/</g,'&lt;')+'</div>';
+    var _oline=[_ao.source,_ao.flow?_ao.flow+' м3/ч':'',_ao.points,_ao.purpose,_ao.mode].filter(Boolean).join(' · ');
+    if(_oline)h+='<div style="text-align:center;font-size:11px;color:#333;margin-top:1mm"><b>Объект:</b> '+String(_oline).replace(/</g,'&lt;')+'</div>';
+    h+='<table style="width:100%;border-collapse:collapse;margin-top:4mm;font-size:10.5px">';
+    h+='<thead><tr style="background:#EBF5FB;color:#0D47A1">'
+     +'<th style="padding:4px 6px;border:0.5px solid #cfe0f0;text-align:left">Показатель</th>'
+     +'<th style="padding:4px 6px;border:0.5px solid #cfe0f0;text-align:right;white-space:nowrap">Результат</th>'
+     +'<th style="padding:4px 6px;border:0.5px solid #cfe0f0;text-align:center;white-space:nowrap">Ед. изм.</th>'
+     +'<th style="padding:4px 6px;border:0.5px solid #cfe0f0;text-align:center;white-space:nowrap">Норматив</th></tr></thead><tbody>';
+    (_a.rows||[]).forEach(function(r){
+      var val=(r.value!==null&&r.value!==undefined)?String(r.value).replace('.',',')
+             :((r.below!==null&&r.below!==undefined)?('менее '+String(r.below).replace('.',',')):'—');
+      var lim=r.limit?String(r.limit).replace(/(\d)\.(?=\d)/g,'$1,'):'—';
+      var over=false;
+      if(r.value!==null&&r.value!==undefined&&r.limit){
+        var lm=String(r.limit).replace(',','.').match(/(\d+(?:\.\d+)?)/);
+        over=!!lm&&r.value>parseFloat(lm[1]);
+      }
+      h+='<tr'+(over?' style="background:#FFF3E0"':'')+'>'
+       +'<td style="padding:3px 6px;border:0.5px solid #e5eef7">'+String(r.name||'').replace(/</g,'&lt;')+'</td>'
+       +'<td style="padding:3px 6px;border:0.5px solid #e5eef7;text-align:right;font-weight:'+(over?'800':'600')+';color:'+(over?'#E65100':'#1a2332')+'">'+val+'</td>'
+       +'<td style="padding:3px 6px;border:0.5px solid #e5eef7;text-align:center;color:#666">'+String(r.unit||'').replace(/</g,'&lt;')+'</td>'
+       +'<td style="padding:3px 6px;border:0.5px solid #e5eef7;text-align:center;color:#666">'+lim+'</td></tr>';
+    });
+    h+='</tbody></table>';
+    var _over=analysisSummary(_a).over;
+    if(_over.length)h+='<div style="margin-top:3mm;font-size:11px;color:#333"><b>Превышения по нормативам протокола:</b> '+_over.map(function(n){return String(n).replace(/</g,'&lt;');}).join(', ')+'.</div>';
+    if(_ao.notes)h+='<div style="margin-top:2mm;font-size:11px;color:#666"><b>Особенности объекта:</b> '+String(_ao.notes).replace(/</g,'&lt;')+'</div>';
+    h+='<div style="margin-top:3mm;font-size:9.5px;color:#999">Данные приведены по протоколу лабораторных испытаний, предоставленному заказчиком.</div>';
+    h+='</div></div>';
+  }
 
   // PAGE 3: CERTIFICATES (white bg, title-page color palette)
   h+='<div class="pdf-page" style="background:#fff">';
@@ -805,6 +873,31 @@ function render(){
   // STEP 0
   if(step===0){html+='<div class="card" style="padding:28px"><h2 style="font-size:20px;font-weight:800;margin-bottom:20px">Данные клиента и КП</h2><div class="form-grid">';[['Наименование клиента','name','text','Необязательно'],['Контактное лицо','contact','text','ФИО'],['Телефон заказчика','phone','tel','Необязательно'],['Почта заказчика','email','email','Необязательно'],['Номер КП','kpNum','text',''],['Дата КП','kpDate','date',''],['Срок поставки','deliveryDays','text','напр. 10 или «по согласованию»'],['Гарантия (месяцев)','warrantyMonths','number','']].forEach(function(a){html+='<div><label class="form-label">'+a[0]+'</label><input class="form-input" id="field_'+a[1]+'" type="'+a[2]+'" value="'+client[a[1]]+'" placeholder="'+a[3]+'" oninput="setClient(\''+a[1]+'\',this.value)"></div>';});
   html+='<div><label class="form-label">Менеджер</label><select class="form-input" onchange="setClient(\'managerId\',+this.value);_pingPresence(+this.value);render()">';MANAGERS.forEach(function(m){html+='<option value="'+m.id+'"'+(client.managerId===m.id?' selected':'')+'>'+(m.name||'— Без менеджера —')+'</option>';});html+='</select></div>';
+  html+='</div>';
+  // Анализ воды: необязательный блок. Есть анализ - в КП появится страница
+  // с показателями, и пара «вода - сборка» сохранится для будущего подбора.
+  html+='<div style="margin-top:20px;padding:16px 18px;background:#F1F8FF;border:1px solid #D6E7FB;border-radius:8px">';
+  html+='<div style="font-size:13px;font-weight:700;margin-bottom:10px">Анализ воды <span style="font-weight:500;color:var(--muted)">— необязательно</span></div>';
+  if(state.analysis){
+    var _as=analysisSummary(state.analysis), _ao=state.analysis.object||{};
+    html+='<div style="font-size:13px;line-height:1.7">';
+    html+='<b>'+String(state.analysis.sample||'Проба').replace(/</g,'&lt;')+'</b>';
+    if(state.analysis.lab)html+=' <span style="color:var(--muted)">· '+String(state.analysis.lab).replace(/</g,'&lt;')+'</span>';
+    html+='<br>Показателей: '+_as.count+(_as.over.length?'. Превышения: <span style="color:#E65100;font-weight:700">'+_as.over.map(function(n){return String(n).replace(/</g,'&lt;');}).join(', ')+'</span>':'. Превышений нет');
+    if(_ao.source||_ao.flow)html+='<br><span style="color:var(--muted)">Объект: '+[_ao.source,_ao.flow?_ao.flow+' м3/ч':'',_ao.purpose,_ao.mode].filter(Boolean).join(', ').replace(/</g,'&lt;')+'</span>';
+    html+='</div>';
+    html+='<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px">';
+    html+='<label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer"><input type="checkbox" '+(state.analysis.inKp?'checked':'')+' onchange="toggleAnalysisInKp(this.checked)" style="accent-color:var(--blue)"> Приложить к КП для клиента</label>';
+    html+='<button class="btn-outline" style="padding:6px 12px;font-size:12px" onclick="attachAnalysis()">Обновить из разбора</button>';
+    html+='<button class="btn-outline" style="padding:6px 12px;font-size:12px" onclick="detachAnalysis()">Убрать</button>';
+    html+='</div>';
+  }else{
+    html+='<div style="font-size:12.5px;color:var(--muted);margin-bottom:10px">Разберите протокол клиента - показатели и данные объекта сохранятся вместе с этим КП, а при желании попадут в документ отдельной страницей.</div>';
+    html+='<div style="display:flex;gap:10px;flex-wrap:wrap">';
+    html+='<button class="btn-outline" style="padding:8px 14px;font-size:13px" onclick="openAnalysisPage()">Разобрать анализ</button>';
+    html+='<button class="btn-outline" style="padding:8px 14px;font-size:13px" onclick="attachAnalysis()">Взять последний разбор</button>';
+    html+='</div>';
+  }
   html+='</div>';
   html+='<div style="margin-top:20px;padding:16px 18px;background:#F8FAFC;border-radius:8px"><div style="font-size:13px;font-weight:700;margin-bottom:10px">Включено в стоимость:</div><div style="display:flex;flex-wrap:wrap;gap:12px">';
   [['inclDelivery','priceDelivery','Транспортные услуги'],['inclMontage','priceMontage','Монтаж и пуско-наладка'],['inclObvyazka','priceObvyazka','Трубопроводная обвязка']].forEach(function(a){var k=a[0],pk=a[1],l=a[2];html+='<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:8px;border:1.5px solid '+(client[k]?'var(--blue)':'var(--border)')+';background:'+(client[k]?'var(--blue-light)':'#fff')+'"><label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;white-space:nowrap"><input type="checkbox" '+(client[k]?'checked':'')+' onchange="setClient(\''+k+'\',this.checked);render()" style="accent-color:var(--blue)"> '+l+'</label>';if(client[k])html+='<input type="number" id="field_'+pk+'" value="'+client[pk]+'" oninput="setClient(\''+pk+'\',+this.value)" style="width:100px;padding:4px 8px;border-radius:4px;border:1px solid var(--border);font-size:12px;text-align:right" placeholder="Цена"> <span style="font-size:11px;color:var(--muted)">₽</span>';html+='</div>';});
