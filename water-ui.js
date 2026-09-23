@@ -12,7 +12,7 @@
   'use strict';
 
   var el = function (id) { return document.getElementById(id); };
-  var state = { rows: [], meta: null, kind: '' };
+  var state = { rows: [], samples: [], pages: [], current: 0, meta: null, kind: '' };
 
   /* ── статусы ─────────────────────────────────────────── */
 
@@ -188,6 +188,48 @@
       .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   }
 
+  /* ── пробы ───────────────────────────────────────────────
+   * В одном протоколе бывает несколько проб: скважина и водопровод, точки отбора,
+   * колонки «проба 1» и «проба 2». Смешивать их нельзя - оборудование подбирают
+   * под конкретную воду. Поэтому пробы переключаются, а правки хранятся у каждой
+   * свои: вернулись к первой - ваши исправления на месте. */
+
+  function renderSamples() {
+    var box = el('samples');
+    box.innerHTML = '';
+    if (!state.samples || state.samples.length < 2) {
+      box.classList.add('hide');
+      return;
+    }
+    box.classList.remove('hide');
+
+    var lbl = document.createElement('span');
+    lbl.className = 'lbl';
+    lbl.textContent = 'В протоколе ' + state.samples.length + ' пробы:';
+    box.appendChild(lbl);
+
+    // две пробы из одного места называются одинаково - различаем страницей
+    var seen = {};
+    state.samples.forEach(function (s) { seen[s.name] = (seen[s.name] || 0) + 1; });
+
+    state.samples.forEach(function (s, i) {
+      var b = document.createElement('button');
+      var page = (state.pages || [])[i];
+      b.textContent = s.name +
+        (seen[s.name] > 1 && page ? ' · стр. ' + page : '') +
+        (s.date ? ' · ' + s.date : '');
+      if (i === state.current) b.className = 'on';
+      b.onclick = function () {
+        state.current = i;
+        state.rows = state.samples[i].rows;
+        window.__lastRows = state.rows;
+        renderSamples();
+        render();
+      };
+      box.appendChild(b);
+    });
+  }
+
   /* ── просмотр страницы ───────────────────────────────────
    * Шрифт в протоколах мелкий, в колонке слева его не разобрать. Поэтому
    * страница открывается во весь экран: колесо - масштаб к точке под курсором,
@@ -331,9 +373,23 @@
         el('workTitle').textContent = note;
       });
 
-      state.rows = (data.rows || []).slice();
+      // протокол может содержать несколько проб - держим их раздельно и даём выбрать
+      state.samples = (data.samples && data.samples.length)
+        ? data.samples.map(function (s, i) {
+            return {
+              name: s.sample || ('Проба ' + (i + 1)),
+              date: s.date || null,
+              rows: (s.rows || []).slice(),
+            };
+          })
+        : [{ name: data.sample || 'Проба', date: data.date || null, rows: (data.rows || []).slice() }];
+      state.current = 0;
+      state.pages = read.pages || [];
+      state.rows = state.samples[0].rows;
       window.__lastRows = state.rows;      // для проверок: сверка с эталоном снаружи
+      window.__lastSamples = state.samples;
       state.meta = data;
+      renderSamples();
 
       if (!state.rows.length) {
         step('stepLoad');
@@ -397,7 +453,10 @@
         savedAt: new Date().toISOString(),
         lab: state.meta && state.meta.lab,
         date: state.meta && state.meta.date,
-        sample: state.meta && state.meta.sample,
+        // какая именно проба подтверждена - по ней дальше пойдёт подбор
+        sample: (state.samples[state.current] || {}).name ||
+                (state.meta && state.meta.sample) || null,
+        samplesTotal: state.samples.length,
         kind: state.kind,
         rows: state.rows,
       };

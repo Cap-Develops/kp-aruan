@@ -122,9 +122,9 @@ Deno.serve(async (req: Request) => {
       const key = Deno.env.get("ANTHROPIC_API_KEY");
       if (!key) return json({ pages: [1] });
       try {
-        return json({ pages: await pickPage(key, images) });
+        return json(await pickPage(key, images));
       } catch {
-        return json({ pages: [1] });   // не смогли выбрать - читаем первую
+        return json({ pages: [1], titles: [""] });   // не смогли выбрать - читаем первую
       }
     }
 
@@ -133,7 +133,29 @@ Deno.serve(async (req: Request) => {
       if (key) {
         try {
           const got = await askVision(key, body?.model || VISION_MODEL, images, VISION_SYSTEM);
-          const parsed = repairJson(got.answer);
+          const parsed = repairJson(got.answer) as any;
+          // протокол с несколькими пробами приходит как samples[]; старая форма с
+          // одним rows тоже принимается - на неё отвечает запасной путь
+          if (parsed && Array.isArray(parsed.samples) && parsed.samples.length) {
+            const titles: string[] = Array.isArray(body?.titles) ? body.titles : [];
+            parsed.samples.forEach((s: any, i: number) => {
+              const own = String(s?.sample ?? "").trim();
+              const fromTitle = String(titles[i] ?? "").trim();
+              // «Проба 1» - это заглушка модели, титул из документа информативнее
+              if (fromTitle && (!own || /^проба\s*\d+$/i.test(own))) s.sample = fromTitle;
+            });
+            return json({
+              lab: parsed.lab ?? null,
+              date: parsed.date ?? null,
+              samples: parsed.samples,
+              rows: parsed.samples[0]?.rows ?? [],
+              ms: Date.now() - started,
+              by: gate.who,
+              model: got.model,
+              usage: got.usage,
+              engine: "claude",
+            });
+          }
           if (parsed && Array.isArray((parsed as any).rows)) {
             return json({
               ...(parsed as any),

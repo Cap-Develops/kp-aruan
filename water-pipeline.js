@@ -105,7 +105,7 @@
     }
 
     var hasText = layers.join('').replace(/\s/g, '').length > 200;
-    var picked = [];
+    var picked = [], titles = [];
 
     if (total === 1) {
       picked = [1];
@@ -120,7 +120,9 @@
       onProgress('Ищу таблицу результатов');
       var thumbs = [];
       for (var t = 0; t < total; t++) thumbs.push(toJpeg(await renderPdfPage(pages[t], THUMB_DPI), 0.7));
-      picked = await pickPages(thumbs);
+      var chosen = await pickPages(thumbs);
+      picked = chosen.pages;
+      titles = chosen.titles;
     }
     if (!picked.length) picked = [1];
     if (picked.length > MAX_SEND) picked = picked.slice(0, MAX_SEND);
@@ -136,6 +138,7 @@
 
     return {
       images: images,
+      titles: titles,
       passes: hasText ? [picked.map(function (n) { return layers[n - 1]; }).join('\n')] : [],
       previews: previews,
       kind: (hasText ? 'PDF с текстом' : 'PDF-скан') +
@@ -205,20 +208,23 @@
     return data;
   }
 
-  /** Выбор страниц с таблицей - отдельный дешёвый вызов по эскизам. */
+  /** Выбор страниц с таблицей - отдельный дешёвый вызов по эскизам.
+   *  Оттуда же приходят названия проб: место отбора печатают на титульном листе,
+   *  а на разбор уходят только страницы с таблицами, где его уже нет. */
   async function pickPages(thumbs) {
     try {
       var res = await call({ pick: true, images: thumbs });
-      return res.pages || [1];
+      return { pages: res.pages || [1], titles: res.titles || [] };
     } catch (e) {
-      return [1];
+      return { pages: [1], titles: [] };
     }
   }
 
   /** model - для стенда: там сравнивают Sonnet и Haiku. В работе не передаётся. */
   async function parse(read, onProgress, model) {
     onProgress('Разбираю показатели');
-    var payload = { images: read.images || [], passes: read.passes || [] };
+    var payload = { images: read.images || [], passes: read.passes || [],
+                    titles: read.titles || [] };
     if (model) payload.model = model;
     return await call(payload);
   }
