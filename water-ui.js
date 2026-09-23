@@ -177,15 +177,54 @@
     }
     el('summary').innerHTML = html;
 
-    el('confirm').disabled = picks.length > 0;
+    var needObject = !objectReady();
+    el('confirm').disabled = picks.length > 0 || needObject;
     el('blockNote').textContent = picks.length
       ? 'Пока есть спорные строки, подбор не запускается'
-      : '';
+      : (needObject ? 'Заполните источник воды и производительность — без них подбор невозможен' : '');
   }
 
   function escapeHtml(s) {
     return String(s === null || s === undefined ? '' : s)
       .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  /* ── анкета объекта ──────────────────────────────────────
+   * Анализ говорит, что в воде, но схему определяет ещё и объект: откуда вода,
+   * сколько её нужно, как работает. Скважине нужна аэрация, которой не нужен
+   * водопровод; непрерывному производству нужен резерв, жилью нет. Без источника
+   * и расхода подбор смысла не имеет, поэтому эти два поля обязательны. */
+
+  var OBJ_FIELDS = ['objSource', 'objFlow', 'objPoints', 'objPurpose', 'objMode', 'objPressure', 'objNotes'];
+
+  function readObject() {
+    var o = {};
+    OBJ_FIELDS.forEach(function (id) {
+      var node = el(id);
+      if (node) o[id.replace(/^obj/, '').toLowerCase()] = String(node.value || '').trim();
+    });
+    return o;
+  }
+
+  /** Расход можно не знать точно - тогда достаточно точек и людей. */
+  function objectReady() {
+    var o = readObject();
+    return !!o.source && (!!o.flow || !!o.points);
+  }
+
+  function markObject() {
+    var o = readObject();
+    el('objSource').classList.toggle('need', !o.source);
+    el('objFlow').classList.toggle('need', !o.flow && !o.points);
+    updateSummary();
+  }
+
+  function bindObject() {
+    OBJ_FIELDS.forEach(function (id) {
+      var node = el(id);
+      if (node) node.addEventListener('input', markObject);
+      if (node && node.tagName === 'SELECT') node.addEventListener('change', markObject);
+    });
   }
 
   /* ── пробы ───────────────────────────────────────────────
@@ -497,6 +536,7 @@
   document.addEventListener('DOMContentLoaded', function () {
     bindViewer();
     docZoom.bind();
+    bindObject();
     el('pick').onclick = function () { el('file').click(); };
     el('file').onchange = function () { if (this.files[0]) handle(this.files[0]); };
     el('again').onclick = function () { step('stepLoad'); warn(''); el('fileName').textContent = ''; };
@@ -533,6 +573,7 @@
         sample: (state.samples[state.current] || {}).name ||
                 (state.meta && state.meta.sample) || null,
         samplesTotal: state.samples.length,
+        object: readObject(),
         kind: state.kind,
         rows: state.rows,
       };

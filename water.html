@@ -121,6 +121,16 @@ tr.pick .val{border-color:var(--bad-b);color:var(--bad-t)}
 .t-over{background:#FFE9C7;color:var(--accent-dark)}
 .t-bad{background:#FBD7D4;color:var(--bad-t)}
 .t-none{background:#eef1f5;color:var(--text-muted)}
+/* ── анкета объекта ───────────────────────────────────── */
+.obj{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px 16px;padding:14px 16px}
+.obj label{display:flex;flex-direction:column;gap:5px}
+.obj label.wide{grid-column:1/-1}
+.obj span{font-size:11.5px;color:var(--text-muted);font-weight:700}
+.obj input,.obj select,.obj textarea{font:inherit;font-size:14px;padding:7px 10px;border:1px solid var(--border);
+       border-radius:8px;background:#fff;color:var(--text);width:100%;resize:vertical}
+.obj input:focus,.obj select:focus,.obj textarea:focus{outline:2px solid var(--blue);outline-offset:-1px;
+       border-color:var(--blue)}
+.obj .need{border-color:var(--accent)}
 .sum{padding:14px 16px}
 .sum ul{margin:8px 0 0;padding-left:18px}
 .actions{display:flex;gap:10px;padding:14px 16px;border-top:1px solid var(--border);flex-wrap:wrap;align-items:center}
@@ -181,6 +191,61 @@ tr.pick .val{border-color:var(--bad-b);color:var(--bad-t)}
         <div id="samples" class="samples hide"></div>
         <table><tbody id="rows"></tbody></table>
       </div>
+      <!-- Анализ говорит, что в воде. Схему определяет ещё и объект: откуда вода,
+           сколько её нужно, как работает. Без этого подбор невозможен. -->
+      <div class="card" style="margin-top:16px">
+        <h3>Объект — что нужно знать для подбора</h3>
+        <div class="obj">
+          <label>
+            <span>Источник воды</span>
+            <select id="objSource">
+              <option value="">— выберите —</option>
+              <option>Скважина</option>
+              <option>Городской водопровод</option>
+              <option>Открытый водоём</option>
+              <option>Другое</option>
+            </select>
+          </label>
+          <label>
+            <span>Производительность, м³/ч</span>
+            <input id="objFlow" type="number" min="0" step="0.1" placeholder="например, 2">
+          </label>
+          <label>
+            <span>Если расход неизвестен</span>
+            <input id="objPoints" type="text" placeholder="точек / человек, напр. 6 точек, 4 чел.">
+          </label>
+          <label>
+            <span>Назначение</span>
+            <select id="objPurpose">
+              <option value="">— выберите —</option>
+              <option>Жильё, коттедж</option>
+              <option>Производство</option>
+              <option>Автомойка</option>
+              <option>Пищевое производство</option>
+              <option>Общепит</option>
+              <option>Другое</option>
+            </select>
+          </label>
+          <label>
+            <span>Режим работы</span>
+            <select id="objMode">
+              <option value="">— выберите —</option>
+              <option>С ночным простоем</option>
+              <option>Круглосуточно, без простоя</option>
+            </select>
+          </label>
+          <label>
+            <span>Входное давление, бар</span>
+            <input id="objPressure" type="number" min="0" step="0.1" placeholder="необязательно">
+          </label>
+          <label class="wide">
+            <span>Особенности объекта</span>
+            <textarea id="objNotes" rows="2"
+              placeholder="место под оборудование, вода на котельную, нужен подмес, пожелания заказчика"></textarea>
+          </label>
+        </div>
+      </div>
+
       <div class="card" style="margin-top:16px">
         <h3>Что из этого следует</h3>
         <div class="sum" id="summary"></div>
