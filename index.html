@@ -408,7 +408,19 @@ function loadHistory(){try{return JSON.parse(localStorage.getItem('kp_history')|
 function saveHistory(list){localStorage.setItem('kp_history',JSON.stringify(list));}
 function saveCurrentKP(){if(IS_VIEWER)return null;var h=loadHistory();var idx=h.findIndex(function(x){return x.id===state.currentKPId;});var existing=idx>=0?h[idx]:null;var now=new Date().toISOString();var entry={id:state.currentKPId||Date.now(),createdAt:existing&&existing.createdAt?existing.createdAt:now,client:JSON.parse(JSON.stringify(state.client)),items:JSON.parse(JSON.stringify(state.items)),analysis:state.analysis?JSON.parse(JSON.stringify(state.analysis)):null,discount:state.discount,savedAt:now,total:calcTotal()};if(idx>=0)h[idx]=entry;else h.unshift(entry);saveHistory(h);state.currentKPId=entry.id;_cloudSave(entry);return entry;}
 function loadKP(id){var h=loadHistory();var e=h.find(function(x){return x.id===id;});if(!e)return;state.client=e.client;state.items=e.items;state.analysis=e.analysis||null;state.discount=e.discount||0;state.currentKPId=e.id;if(!state.client.kpDate)state.client.kpDate=new Date().toISOString().split('T')[0];state.step=0;render();}
-function deleteKP(id){if(IS_VIEWER)return;if(!confirm('Удалить это КП из истории?'))return;saveHistory(loadHistory().filter(function(x){return x.id!==id;}));render();_cloudDelete(id);}
+/** Своё КП определяем по менеджеру, записанному в КП. Та же проверка стоит
+ *  в базе: даже если обойти интерфейс, чужую запись удалить не дадут. */
+function canDeleteKP(entry){
+  var me=+(localStorage.getItem('my_manager_id')||0);
+  if(!me)return false;
+  if(me>=90)return true;                       // директор и владелец
+  var owner=+((entry&&entry.client&&entry.client.managerId)||0);
+  return owner===me;
+}
+function deleteKP(id){if(IS_VIEWER)return;
+  var entry=loadHistory().find(function(x){return x.id===id;});
+  if(entry&&!canDeleteKP(entry)){alert('Это КП создал другой менеджер — удалить его может только он.');return;}
+  if(!confirm('Удалить это КП из истории?'))return;saveHistory(loadHistory().filter(function(x){return x.id!==id;}));render();_cloudDelete(id);}
 function histToggle(id){state._histOpen=state._histOpen||{};state._histOpen[id]=!state._histOpen[id];render();}
 function detectKpSubject(items){
   if(!items||!items.length)return'оборудование для водоподготовки';
@@ -849,7 +861,10 @@ function render(){
     html+='</div>';
     var hOpen=state._histOpen&&state._histOpen[h.id];
     html+='<div style="text-align:right;flex-shrink:0"><div style="font-size:15px;font-weight:800;color:var(--blue)">'+fmt(h.total||0)+' ₽</div><div style="font-size:11px;color:var(--muted);margin-top:2px">'+ds+'</div>'+viewedBadge+'<div style="font-size:11px;color:var(--blue);font-weight:700;margin-top:4px;cursor:pointer;user-select:none" onclick="event.stopPropagation();histToggle('+h.id+')">'+(hOpen?'Скрыть ▴':'Состав ▾')+'</div>'+'</div>';
-    html+='<button class="btn-danger viewer-hide" onclick="event.stopPropagation();deleteKP('+h.id+')">✕</button></div>';
+    // чужое КП удалять нельзя: кнопка есть только у автора, а директор и владелец
+    // (90 и 99) видят её у всех - им нужно вычищать мусор и КП уволившихся
+    if(canDeleteKP(h))html+='<button class="btn-danger viewer-hide" title="Удалить своё КП" onclick="event.stopPropagation();deleteKP('+h.id+')">✕</button>';
+    html+='</div>';
     if(hOpen){
       var _hcell='padding:5px 8px;font-size:12px;border-bottom:1px solid #eef2f7;vertical-align:top';
       html+='<div style="margin:-4px 16px 12px;padding:10px 14px;background:#F8FAFC;border:1px solid var(--border);border-radius:10px;overflow-x:auto">';
