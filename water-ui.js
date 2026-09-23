@@ -12,7 +12,8 @@
   'use strict';
 
   var el = function (id) { return document.getElementById(id); };
-  var state = { rows: [], samples: [], pages: [], current: 0, meta: null, kind: '' };
+  var state = { rows: [], samples: [], pages: [], current: 0, meta: null, kind: '',
+              fileName: '', fileHash: null, savedId: null };
 
   /* ── статусы ─────────────────────────────────────────── */
 
@@ -201,7 +202,11 @@
     var o = {};
     OBJ_FIELDS.forEach(function (id) {
       var node = el(id);
-      if (node) o[id.replace(/^obj/, '').toLowerCase()] = String(node.value || '').trim();
+      if (!node) return;
+      var v = String(node.value || '').trim();
+      // расход и давление пишут с запятой - приводим к точке, чтобы число читалось
+      if (id === 'objFlow' || id === 'objPressure') v = v.replace(',', '.');
+      o[id.replace(/^obj/, '').toLowerCase()] = v;
     });
     return o;
   }
@@ -457,9 +462,24 @@
     el('workTitle').textContent = 'Читаю файл';
 
     try {
+      // тот же файл второй раз не оплачиваем: если он уже разобран, открываем
+      // сохранённое. Это заодно бережёт время - разбор занимает до полуминуты
+      var hash = null;
+      try {
+        el('workTitle').textContent = 'Проверяю, не разбирали ли этот файл раньше';
+        hash = await window.WaterPipeline.fileHash(file);
+        var saved = await window.WaterPipeline.findSaved(hash);
+        if (saved) {
+          showSaved(saved);
+          return;
+        }
+      } catch (e) { /* не смогли проверить - просто разбираем заново */ }
+
       var read = await window.WaterPipeline.readFile(file, function (note) {
         el('workTitle').textContent = note;
       });
+      state.fileHash = hash;
+      state.fileName = file.name || 'вставленное изображение';
       state.kind = read.kind;
 
       el('previews').innerHTML = '';
@@ -525,10 +545,130 @@
 
       render();
       step('stepCheck');
+
+      // сохраняем сразу, а не по кнопке: деньги за разбор уже потрачены,
+      // терять результат из-за закрытой вкладки нельзя
+      keepAnalysis(read, data);
     } catch (e) {
       step('stepLoad');
       warn('Не получилось: ' + (e && e.message ? e.message : e));
     }
+  }
+
+  /** Кладём разбор в общую историю. Ошибка сохранения не должна ломать работу -
+   *  менеджер видит таблицу в любом случае. */
+  async function keepAnalysis(read, data) {
+    try {
+      var cur = state.samples[state.current] || {};
+      var saved = await window.WaterPipeline.saveAnalysis({
+        manager_id: +(localStorage.getItem('my_manager_id') || 0) || null,
+        manager_name: data.by || null,
+        file_name: state.fileName || null,
+        file_hash: state.fileHash || null,
+        kind: state.kind || null,
+        lab: data.lab || null,
+        sample_name: cur.name || null,
+        sample_date: cur.date || data.date || null,
+        samples_total: state.samples.length,
+        rows_json: state.rows,
+        samples_json: state.samples,
+        object_json: null,               // анкету дописываем при подтверждении
+        preview: (read.previews || [])[0] || null,
+        usage_json: data.usage || null,
+        model: data.model || null,
+      });
+      state.savedId = saved && saved.id;
+    } catch (e) { /* история не главное, молчим */ }
+  }
+
+  /** Показ ранее сохранённого разбора - без обращения к модели и без оплаты. */
+  function showSaved(saved) {
+    state.kind = saved.kind || 'сохранённый разбор';
+    state.fileName = saved.file_name || '';
+    state.savedId = saved.id;
+
+    el('previews').innerHTML = '';
+    if (saved.preview) {
+      var inner = document.createElement('div');
+      inner.className = 'inner';
+      var img = new Image();
+      img.src = saved.preview;
+      img.dataset.full = saved.preview;
+      img.dataset.title = 'Исходный документ';
+      img.title = 'Ctrl + колесо — масштаб, двойной щелчок — во весь экран';
+      img.ondblclick = function () { openViewer(saved.preview, 'Исходный документ'); };
+      inner.appendChild(img);
+      el('previews').appendChild(inner);
+      docZoom.reset();
+    }
+
+    state.samples = (saved.samples_json && saved.samples_json.length)
+      ? saved.samples_json
+      : [{ name: saved.sample_name || 'Проба', date: saved.sample_date, rows: saved.rows_json || [] }];
+    state.current = 0;
+    state.rows = state.samples[0].rows;
+    state.meta = { lab: saved.lab, date: saved.sample_date };
+    state.pages = [];
+
+    var obj = saved.object_json || {};
+    Object.keys(obj).forEach(function (k) {
+      var node = el('obj' + k.charAt(0).toUpperCase() + k.slice(1));
+      if (node) node.value = obj[k];
+    });
+
+    renderSamples();
+    var title = 'Разбор от ' + new Date(saved.created_at).toLocaleDateString('ru-RU');
+    if (saved.manager_name) title += ' · ' + saved.manager_name;
+    if (saved.lab) title += ' · ' + saved.lab;
+    el('checkTitle').textContent = title;
+    render();
+    step('stepCheck');
+    warn('Этот файл уже разбирали — открыт сохранённый результат, деньги за повтор не списаны. ' +
+         'Нужно перечитать заново? Нажмите «Загрузить другой файл» и переименуйте файл.');
+  }
+
+  /* ── список ранее разобранных ────────────────────────────
+   * Повторно открыть разбор ничего не стоит, а разобрать заново - от трёх до
+   * десяти рублей. Поэтому список висит прямо на экране загрузки. */
+
+  async function showHistory() {
+    var box = el('history');
+    box.classList.remove('hide');
+    box.innerHTML = '<h4>Ранее разобранные</h4><div class="empty">Загружаю…</div>';
+    var list = [];
+    try { list = await window.WaterPipeline.listAnalyses(20); } catch (e) {}
+
+    if (!list.length) {
+      box.innerHTML = '<h4>Ранее разобранные</h4><div class="empty">Пока пусто — разберите первый протокол.</div>';
+      return;
+    }
+    box.innerHTML = '<h4>Ранее разобранные</h4>';
+    list.forEach(function (rec) {
+      var row = document.createElement('div');
+      row.className = 'row';
+
+      var left = document.createElement('div');
+      var b = document.createElement('b');
+      b.textContent = rec.sample_name || rec.file_name || 'Разбор';
+      left.appendChild(b);
+
+      var m = document.createElement('div');
+      m.className = 'm';
+      m.textContent = [rec.lab, rec.manager_name,
+                       (rec.samples_json || []).length > 1 ? 'проб: ' + rec.samples_json.length : ''
+                      ].filter(Boolean).join(' · ');
+      left.appendChild(m);
+
+      var when = document.createElement('span');
+      when.className = 'when';
+      when.textContent = new Date(rec.created_at).toLocaleDateString('ru-RU') + ' ' +
+                         new Date(rec.created_at).toLocaleTimeString('ru-RU').slice(0, 5);
+
+      row.appendChild(left);
+      row.appendChild(when);
+      row.onclick = function () { showSaved(rec); };
+      box.appendChild(row);
+    });
   }
 
   /* ── события ─────────────────────────────────────────── */
@@ -538,8 +678,10 @@
     docZoom.bind();
     bindObject();
     el('pick').onclick = function () { el('file').click(); };
+    el('histBtn').onclick = showHistory;
     el('file').onchange = function () { if (this.files[0]) handle(this.files[0]); };
-    el('again').onclick = function () { step('stepLoad'); warn(''); el('fileName').textContent = ''; };
+    el('again').onclick = function () { step('stepLoad'); warn(''); el('fileName').textContent = '';
+      state.savedId = null; el('history').classList.add('hide'); };
 
     var drop = el('stepLoad');
     ['dragenter', 'dragover'].forEach(function (t) {
@@ -578,6 +720,14 @@
         rows: state.rows,
       };
       try { localStorage.setItem('water_analysis', JSON.stringify(payload)); } catch (e) {}
+      // анкету объекта дописываем в историю: при разборе её ещё не заполнили
+      if (state.savedId) {
+        try {
+          var sb = window.Auth && window.Auth.getSupabase ? window.Auth.getSupabase() : null;
+          if (sb) sb.from('water_analyses').update({ object_json: readObject(), rows_json: state.rows })
+                    .eq('id', state.savedId).then(function () {});
+        } catch (e) {}
+      }
       el('confirm').textContent = 'Показатели сохранены';
       el('confirm').disabled = true;
       el('blockNote').textContent = 'Дальше их подхватит подбор — он делается следующим этапом';

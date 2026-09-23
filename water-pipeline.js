@@ -180,6 +180,47 @@
     return { images: [], passes: [res.value || ''], previews: [], kind: 'документ Word' };
   }
 
+  /* ── история разборов ─────────────────────────────────────────────────
+   * Разбор стоит денег, поэтому результат сохраняется сразу и навсегда, а не
+   * до закрытия вкладки. Файл узнаём по отпечатку: тот же протокол второй раз
+   * не оплачивается, открывается сохранённый разбор. */
+
+  /** Отпечаток содержимого: размер плюс SHA-256. Имя файла не в счёт - один
+   *  и тот же протокол приходит под разными именами. */
+  async function fileHash(file) {
+    var buf = await file.arrayBuffer();
+    var digest = await crypto.subtle.digest('SHA-256', buf);
+    var hex = Array.prototype.map.call(new Uint8Array(digest), function (b) {
+      return ('0' + b.toString(16)).slice(-2);
+    }).join('');
+    return file.size + '-' + hex;
+  }
+
+  async function findSaved(hash) {
+    var sb = global.Auth && global.Auth.getSupabase ? global.Auth.getSupabase() : null;
+    if (!sb) return null;
+    var res = await sb.from('water_analyses')
+      .select('id,created_at,manager_name,file_name,kind,lab,sample_name,sample_date,samples_total,rows_json,samples_json,object_json,preview')
+      .eq('file_hash', hash).order('created_at', { ascending: false }).limit(1);
+    return (res.data && res.data[0]) || null;
+  }
+
+  async function saveAnalysis(entry) {
+    var sb = global.Auth && global.Auth.getSupabase ? global.Auth.getSupabase() : null;
+    if (!sb) return null;
+    var res = await sb.from('water_analyses').insert(entry).select('id').single();
+    return res.data || null;
+  }
+
+  async function listAnalyses(limit) {
+    var sb = global.Auth && global.Auth.getSupabase ? global.Auth.getSupabase() : null;
+    if (!sb) return [];
+    var res = await sb.from('water_analyses')
+      .select('id,created_at,manager_name,file_name,kind,lab,sample_name,sample_date,samples_total,rows_json,samples_json,object_json,preview')
+      .order('created_at', { ascending: false }).limit(limit || 20);
+    return res.data || [];
+  }
+
   async function readFile(file, onProgress) {
     var name = (file.name || '').toLowerCase();
     if (file.type === 'application/pdf' || name.endsWith('.pdf')) return fromPdf(file, onProgress);
@@ -236,5 +277,7 @@
     return res;
   }
 
-  global.WaterPipeline = { readFile: readFileDebug, parse: parse };
+  global.WaterPipeline = { readFile: readFileDebug, parse: parse,
+                           fileHash: fileHash, findSaved: findSaved,
+                           saveAnalysis: saveAnalysis, listAnalyses: listAnalyses };
 })(window);

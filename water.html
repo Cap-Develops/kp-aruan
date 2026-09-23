@@ -136,6 +136,16 @@ tr.pick .val{border-color:var(--bad-b);color:var(--bad-t)}
 .actions{display:flex;gap:10px;padding:14px 16px;border-top:1px solid var(--border);flex-wrap:wrap;align-items:center}
 .warn{background:var(--bad);border:1px solid var(--bad-b);color:var(--bad-t);border-radius:10px;
       padding:12px 14px;margin:0 0 16px;font-size:14px}
+/* ── история разборов ─────────────────────────────────── */
+.history{margin-top:22px;text-align:left;border-top:1px solid var(--border);padding-top:16px}
+.history h4{margin:0 0 10px;font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--text-muted)}
+.history .row{display:flex;gap:12px;align-items:center;padding:9px 10px;border:1px solid var(--border);
+              border-radius:10px;margin-bottom:7px;cursor:pointer;background:#fff;text-align:left}
+.history .row:hover{border-color:var(--blue);background:var(--blue-pale)}
+.history .row b{font-size:13.5px;font-weight:700}
+.history .row .m{font-size:12px;color:var(--text-muted)}
+.history .row .when{margin-left:auto;font-size:12px;color:var(--text-light);white-space:nowrap}
+.history .empty{font-size:13px;color:var(--text-muted)}
 .hide{display:none}
 @media(max-width:1000px){.grid{grid-template-columns:1fr}.doc{position:static;max-height:none}}
 </style>
@@ -158,7 +168,10 @@ tr.pick .val{border-color:var(--bad-b);color:var(--bad-t)}
        чтобы вставить из буфера, или выберите вручную.<br>
        Подойдёт PDF (в том числе скан), фотография, скриншот или документ Word.</p>
     <button class="primary" id="pick">Выбрать файл</button>
+    <button class="ghost" id="histBtn">Ранее разобранные</button>
     <input type="file" id="file" class="hide" accept=".pdf,.docx,image/*">
+    <!-- история: повторно открыть разбор бесплатно, платить второй раз незачем -->
+    <div id="history" class="history hide"></div>
   </div>
 
   <!-- шаг 2: работа -->
@@ -208,7 +221,7 @@ tr.pick .val{border-color:var(--bad-b);color:var(--bad-t)}
           </label>
           <label>
             <span>Производительность, м³/ч</span>
-            <input id="objFlow" type="number" min="0" step="0.1" placeholder="например, 2">
+            <input id="objFlow" type="text" inputmode="decimal" placeholder="например, 2,5">
           </label>
           <label>
             <span>Если расход неизвестен</span>
@@ -236,7 +249,7 @@ tr.pick .val{border-color:var(--bad-b);color:var(--bad-t)}
           </label>
           <label>
             <span>Входное давление, бар</span>
-            <input id="objPressure" type="number" min="0" step="0.1" placeholder="необязательно">
+            <input id="objPressure" type="text" inputmode="decimal" placeholder="необязательно">
           </label>
           <label class="wide">
             <span>Особенности объекта</span>
