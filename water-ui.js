@@ -188,6 +188,101 @@
       .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   }
 
+  /* ── просмотр страницы ───────────────────────────────────
+   * Шрифт в протоколах мелкий, в колонке слева его не разобрать. Поэтому
+   * страница открывается во весь экран: колесо - масштаб к точке под курсором,
+   * перетаскивание - сдвиг. Показываем то изображение, что уходило на разбор,
+   * оно крупнее превью. */
+
+  var view = { scale: 1, x: 0, y: 0, dragging: false, sx: 0, sy: 0 };
+
+  function applyView() {
+    var img = el('viewerImg');
+    img.style.transform = 'translate(' + view.x + 'px,' + view.y + 'px) scale(' + view.scale + ')';
+    el('zoomLevel').textContent = Math.round(view.scale * 100) + '%';
+  }
+
+  /** Вписать страницу по ширине окна - так её открывают в первый раз. */
+  function fitView() {
+    var img = el('viewerImg');
+    if (!img.naturalWidth) return;
+    var pad = 48;
+    view.scale = Math.min((window.innerWidth - pad) / img.naturalWidth,
+                          (window.innerHeight - pad * 2) / img.naturalHeight);
+    view.x = (window.innerWidth - img.naturalWidth * view.scale) / 2;
+    view.y = (window.innerHeight - img.naturalHeight * view.scale) / 2;
+    applyView();
+  }
+
+  function zoomAt(factor, cx, cy) {
+    var next = Math.min(8, Math.max(0.2, view.scale * factor));
+    // точка под курсором остаётся на месте - иначе при увеличении уезжает не туда
+    view.x = cx - (cx - view.x) * (next / view.scale);
+    view.y = cy - (cy - view.y) * (next / view.scale);
+    view.scale = next;
+    applyView();
+  }
+
+  function openViewer(src, title) {
+    var img = el('viewerImg');
+    el('viewerTitle').textContent = title || 'Исходный документ';
+    img.onload = fitView;
+    img.src = src;
+    el('viewer').classList.remove('hide');
+    if (img.complete) fitView();
+  }
+
+  function closeViewer() {
+    el('viewer').classList.add('hide');
+    el('viewerImg').src = '';
+  }
+
+  function bindViewer() {
+    var box = el('viewer');
+
+    box.addEventListener('wheel', function (e) {
+      e.preventDefault();
+      zoomAt(e.deltaY < 0 ? 1.15 : 1 / 1.15, e.clientX, e.clientY);
+    }, { passive: false });
+
+    box.addEventListener('mousedown', function (e) {
+      if (e.target.tagName === 'BUTTON') return;
+      view.dragging = true;
+      view.sx = e.clientX - view.x;
+      view.sy = e.clientY - view.y;
+      box.classList.add('drag');
+    });
+    window.addEventListener('mousemove', function (e) {
+      if (!view.dragging) return;
+      view.x = e.clientX - view.sx;
+      view.y = e.clientY - view.sy;
+      applyView();
+    });
+    window.addEventListener('mouseup', function () {
+      view.dragging = false;
+      box.classList.remove('drag');
+    });
+
+    // двойной щелчок - быстрое приближение и обратно
+    box.addEventListener('dblclick', function (e) {
+      if (e.target.tagName === 'BUTTON') return;
+      if (view.scale > 1.2) fitView();
+      else zoomAt(2.2, e.clientX, e.clientY);
+    });
+
+    el('zoomIn').onclick = function () { zoomAt(1.3, window.innerWidth / 2, window.innerHeight / 2); };
+    el('zoomOut').onclick = function () { zoomAt(1 / 1.3, window.innerWidth / 2, window.innerHeight / 2); };
+    el('zoomFit').onclick = fitView;
+    el('viewerClose').onclick = closeViewer;
+
+    document.addEventListener('keydown', function (e) {
+      if (el('viewer').classList.contains('hide')) return;
+      if (e.key === 'Escape') closeViewer();
+      if (e.key === '+' || e.key === '=') zoomAt(1.3, window.innerWidth / 2, window.innerHeight / 2);
+      if (e.key === '-') zoomAt(1 / 1.3, window.innerWidth / 2, window.innerHeight / 2);
+    });
+  }
+
   /* ── шаги ────────────────────────────────────────────── */
 
   function step(name) {
@@ -215,9 +310,19 @@
       state.kind = read.kind;
 
       el('previews').innerHTML = '';
-      read.previews.forEach(function (src) {
+      // страницы, ушедшие на разбор, отрисованы крупнее - их и показываем в увеличении
+      var big = {};
+      (read.pages || []).forEach(function (n, i) {
+        if (read.images && read.images[i]) big[n] = read.images[i];
+      });
+      read.previews.forEach(function (src, idx) {
         var img = new Image();
         img.src = src;
+        img.title = 'Нажмите, чтобы рассмотреть страницу';
+        img.onclick = function () {
+          openViewer(big[idx + 1] || src,
+            read.previews.length > 1 ? 'Страница ' + (idx + 1) : 'Исходный документ');
+        };
         el('previews').appendChild(img);
       });
 
@@ -259,6 +364,7 @@
   /* ── события ─────────────────────────────────────────── */
 
   document.addEventListener('DOMContentLoaded', function () {
+    bindViewer();
     el('pick').onclick = function () { el('file').click(); };
     el('file').onchange = function () { if (this.files[0]) handle(this.files[0]); };
     el('again').onclick = function () { step('stepLoad'); warn(''); el('fileName').textContent = ''; };

@@ -56,7 +56,23 @@ button{font:inherit;font-weight:700;border-radius:9px;padding:10px 20px;cursor:p
 .card h3{font-size:12.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--text-muted);
          margin:0;padding:12px 16px;border-bottom:1px solid var(--border);font-weight:700}
 .doc{position:sticky;top:76px;max-height:calc(100vh - 100px);overflow:auto}
-.doc img{width:100%;display:block;border-bottom:1px solid var(--border)}
+.doc img{width:100%;display:block;border-bottom:1px solid var(--border);cursor:zoom-in}
+
+/* ── просмотр страницы во весь экран ──────────────────── */
+.viewer{position:fixed;inset:0;z-index:100;background:rgba(15,23,42,.93);display:flex;
+        align-items:center;justify-content:center;overflow:hidden;cursor:grab}
+.viewer.drag{cursor:grabbing}
+.viewer img{position:absolute;top:0;left:0;transform-origin:0 0;max-width:none;user-select:none;
+            -webkit-user-drag:none;box-shadow:0 12px 48px rgba(0,0,0,.5);background:#fff;z-index:1}
+.viewer .bar{position:absolute;top:0;left:0;right:0;z-index:3;padding:12px 18px;display:flex;gap:10px;
+             align-items:center;background:linear-gradient(rgba(15,23,42,.75),transparent);color:#e2e8f0}
+.viewer .bar b{font-size:14px;font-weight:700}
+.viewer .bar .spacer{flex:1}
+.viewer button{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:#fff;
+               border-radius:8px;padding:6px 12px;font:inherit;font-size:13px;font-weight:700;cursor:pointer}
+.viewer button:hover{background:rgba(255,255,255,.22)}
+.viewer .hint{position:absolute;z-index:3;bottom:14px;left:50%;transform:translateX(-50%);color:#cbd5e1;
+              font-size:12.5px;background:rgba(15,23,42,.6);padding:6px 12px;border-radius:8px}
 table{border-collapse:collapse;width:100%;font-size:14px}
 th{font-size:11px;text-transform:uppercase;letter-spacing:.03em;color:var(--text-muted);text-align:left;
    padding:8px 12px;border-bottom:1px solid var(--border);font-weight:700}
@@ -144,6 +160,21 @@ tr.pick .val{border-color:var(--bad-b);color:var(--bad-t)}
       </div>
     </div>
   </div>
+</div>
+
+<!-- просмотр страницы во весь экран: мелкий шрифт протокола иначе не разобрать -->
+<div id="viewer" class="viewer hide">
+  <div class="bar">
+    <b id="viewerTitle">Исходный документ</b>
+    <span class="spacer"></span>
+    <button id="zoomOut" title="Уменьшить">−</button>
+    <span id="zoomLevel" style="min-width:52px;text-align:center;font-size:13px">100%</span>
+    <button id="zoomIn" title="Увеличить">+</button>
+    <button id="zoomFit">По ширине</button>
+    <button id="viewerClose">Закрыть ✕</button>
+  </div>
+  <img id="viewerImg" alt="Страница протокола">
+  <div class="hint">Колесо мыши — масштаб, перетаскивание — сдвиг, Esc — закрыть</div>
 </div>
 
 <script src="supabase.min.js"></script>
