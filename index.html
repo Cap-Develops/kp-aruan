@@ -549,12 +549,45 @@ function autoKPNum(){var d=new Date();var dd=String(d.getDate()).padStart(2,'0')
 
 // ═══ STATE ═══
 var state={step:-1,analysis:null,client:{name:'',contact:'',phone:'',email:'',managerId:MY_MGR,inclDelivery:false,inclMontage:false,inclObvyazka:false,inclVyezd:false,inclKomandirovka:false,priceDelivery:0,priceMontage:0,priceObvyazka:0,priceVyezd:0,priceKomandirovka:0,kpNum:autoKPNum(),kpDate:new Date().toISOString().split('T')[0],deliveryDays:10,warrantyMonths:12,withoutVat:false,comment:''},items:[],search:'',catFilter:'Все',discount:0,currentKPId:null,historySearch:'',historyManagerFilter:'all',historySort:'date_desc'};
-function setState(u){if(u.step===1&&state.step!==1){u.search='';u.catFilter='Все';}Object.assign(state,u);render();restoreFocus();}
+function setState(u){if(u.step===1&&state.step!==1){u.search='';u.catFilter='Все';}Object.assign(state,u);render();restoreFocus();saveDraft();}
+
+/* ═══ ЧЕРНОВИК: пережить обновление страницы ═══
+   Раньше F5 выбрасывал в историю и терял несохранённое. Теперь текущий этап
+   и всё набранное лежат в браузере: вернулись на ту же страницу с теми же
+   данными. Черновик живёт сутки и стирается при создании нового КП. */
+var DRAFT_KEY='kp_draft', DRAFT_TTL=24*60*60*1000;
+function saveDraft(){
+  try{
+    if(IS_VIEWER)return;
+    if(state.step<0){localStorage.removeItem(DRAFT_KEY);return;}   // в истории черновик не нужен
+    localStorage.setItem(DRAFT_KEY,JSON.stringify({
+      at:Date.now(), step:state.step, currentKPId:state.currentKPId,
+      client:state.client, items:state.items, discount:state.discount, analysis:state.analysis}));
+  }catch(e){}
+}
+function loadDraft(){
+  try{
+    var d=JSON.parse(localStorage.getItem(DRAFT_KEY)||'null');
+    if(!d||!d.at||Date.now()-d.at>DRAFT_TTL)return null;
+    return d;
+  }catch(e){return null;}
+}
+function restoreDraft(){
+  var d=loadDraft();
+  if(!d||d.step<0)return false;
+  state.step=d.step;
+  state.currentKPId=d.currentKPId||null;
+  if(d.client)state.client=d.client;
+  state.items=d.items||[];
+  state.discount=d.discount||0;
+  state.analysis=d.analysis||null;
+  return true;
+}
 var _fid='',_fp=-1;
 function saveFocus(){var e=document.activeElement;if(e&&e.id){_fid=e.id;try{_fp=e.selectionStart!=null?e.selectionStart:-1;}catch(x){_fp=-1;}}else{_fid='';_fp=-1;}_fval=e?e.value:'';}
 function restoreFocus(){if(_fid){var e=document.getElementById(_fid);if(e){e.focus();if(e.type==='number'){var len=String(e.value).length;try{e.setSelectionRange(len,len);}catch(x){}}else if(_fp>=0&&e.setSelectionRange)try{e.setSelectionRange(_fp,_fp);}catch(x){}}}}
 function setClient(k,v){state.client[k]=v;}
-function newKP(){state.currentKPId=null;state.client={name:'',contact:'',phone:'',email:'',managerId:MY_MGR,inclDelivery:false,inclMontage:false,inclObvyazka:false,inclVyezd:false,inclKomandirovka:false,priceDelivery:0,priceMontage:0,priceObvyazka:0,priceVyezd:0,priceKomandirovka:0,kpNum:autoKPNum(),kpDate:new Date().toISOString().split('T')[0],deliveryDays:10,warrantyMonths:12,withoutVat:false,comment:''};state.items=[];state.discount=0;state.step=0;render();}
+function newKP(){state.currentKPId=null;state.client={name:'',contact:'',phone:'',email:'',managerId:MY_MGR,inclDelivery:false,inclMontage:false,inclObvyazka:false,inclVyezd:false,inclKomandirovka:false,priceDelivery:0,priceMontage:0,priceObvyazka:0,priceVyezd:0,priceKomandirovka:0,kpNum:autoKPNum(),kpDate:new Date().toISOString().split('T')[0],deliveryDays:10,warrantyMonths:12,withoutVat:false,comment:''};state.items=[];state.discount=0;state.analysis=null;state.step=0;try{localStorage.removeItem(DRAFT_KEY);}catch(e){}render();saveDraft();}
 
 // ═══ PDF GENERATION ═══
 function pdfHeader(){return '<div class="pdf-header-bar"><div style="background:#fff;border-radius:6px;padding:2mm 4mm;display:flex;align-items:center;gap:4mm"><img src="assets/logo_aruan.png" style="height:10mm"><img src="assets/logo_aurus.png" style="height:10mm"></div><div style="display:flex;align-items:center;gap:6mm;font-size:11px"><span>📞 8-800-100-39-54</span><span>✉ prom10@aruan.ru</span><span>🌐 www.filtr-aruan.ru</span></div></div>';}
@@ -1112,7 +1145,7 @@ function commitChange(){render();}
 function moveItem(idx,dir){var a=state.items;var n=idx+dir;if(n<0||n>=a.length)return;var t=a[idx];a[idx]=a[n];a[n]=t;render();}
 function openAltKP(){var entry=saveCurrentKP();window.open('alt-kp.html?kpId='+entry.id+'&m1=20&m2=35','_blank');}
 async function shareAltKP(){var entry=saveCurrentKP();if(!_sb){alert('Облако недоступно');return;}showToast('Сохраняю в облако…',1500);await new Promise(function(r){setTimeout(r,1200);});var r=await _sb.from('kps').select('share_token').eq('local_id',String(entry.id)).single();if(r.error||!r.data){alert('Ошибка получения ссылки');return;}var token=r.data.share_token;var url=location.origin+'/alt-kp.html?t='+token+'&m1=20&m2=35';try{await navigator.clipboard.writeText(url);}catch(e){prompt('Скопируйте ссылку:',url);return;}showToast('✅ Ссылка на альт. КП скопирована',4000);}
-render();syncFromCloud();setTimeout(_bulkSync,2000);if(_myMgrId)_pingPresence(_myMgrId);setInterval(function(){if(_myMgrId)_pingPresence(_myMgrId);},5*60*1000);
+restoreDraft();render();syncFromCloud();setTimeout(_bulkSync,2000);if(_myMgrId)_pingPresence(_myMgrId);setInterval(function(){if(_myMgrId)_pingPresence(_myMgrId);},5*60*1000);
 </script>
 </body>
 </html>
