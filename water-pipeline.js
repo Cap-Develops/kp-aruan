@@ -212,6 +212,16 @@
     return res.data || null;
   }
 
+  /** Одна запись истории по номеру - чтобы вернуться к разбору и поправить его. */
+  async function getAnalysis(id) {
+    var sb = global.Auth && global.Auth.getSupabase ? global.Auth.getSupabase() : null;
+    if (!sb) return null;
+    var res = await sb.from('water_analyses')
+      .select('id,created_at,manager_name,file_name,kind,lab,sample_name,sample_date,samples_total,rows_json,samples_json,object_json,preview')
+      .eq('id', id).maybeSingle();
+    return res.data || null;
+  }
+
   async function listAnalyses(limit) {
     var sb = global.Auth && global.Auth.getSupabase ? global.Auth.getSupabase() : null;
     if (!sb) return [];
@@ -279,5 +289,6 @@
 
   global.WaterPipeline = { readFile: readFileDebug, parse: parse,
                            fileHash: fileHash, findSaved: findSaved,
-                           saveAnalysis: saveAnalysis, listAnalyses: listAnalyses };
+                             saveAnalysis: saveAnalysis, listAnalyses: listAnalyses,
+                           getAnalysis: getAnalysis };
 })(window);

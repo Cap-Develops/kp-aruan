@@ -671,6 +671,33 @@
     });
   }
 
+  /** Открыть конкретный разбор на правку: КП передаёт его номер в адресе.
+   *  Записи нет (старое КП, разбор удалён) - показываем список, пусть выберет сам. */
+  async function openById(id, sample) {
+    var saved = null;
+    try { saved = await window.WaterPipeline.getAnalysis(id); } catch (e) {}
+    if (saved) {
+      showSaved(saved);
+      // в протоколе может быть несколько проб: открываем ту, что стоит в КП,
+      // иначе менеджер молча вернёт в предложение чужую воду
+      if (sample && state.samples.length > 1) {
+        var i = state.samples.map(function (s) { return s.name; }).indexOf(sample);
+        if (i > 0) {
+          state.current = i;
+          state.rows = state.samples[i].rows;
+          window.__lastRows = state.rows;
+          renderSamples();
+          render();
+        }
+      }
+      warn('Правьте показатели и анкету объекта. «Использовать в КП» вернёт исправленное в предложение — ' +
+           'модель к протоколу не обращается, деньги не списываются.');
+      return;
+    }
+    await showHistory();
+    warn('Этот разбор в истории не нашёлся - выберите нужный из списка.');
+  }
+
   /* ── события ─────────────────────────────────────────── */
 
   document.addEventListener('DOMContentLoaded', function () {
@@ -679,6 +706,7 @@
       document.body.classList.add('embed');
       el('confirm').textContent = 'Использовать в КП';
     }
+    var openId = (/[?&]open=([0-9a-f-]+)/i.exec(location.search) || [])[1];
     bindViewer();
     docZoom.bind();
     bindObject();
@@ -687,6 +715,16 @@
     el('file').onchange = function () { if (this.files[0]) handle(this.files[0]); };
     el('again').onclick = function () { step('stepLoad'); warn(''); el('fileName').textContent = '';
       state.savedId = null; el('history').classList.add('hide'); };
+
+    // историю читаем от имени менеджера - до входа запроса делать нельзя
+    var wantList = /[?&]list=1/.test(location.search);
+    if (openId || wantList) {
+      var wantSample = (/[?&]sample=([^&]*)/.exec(location.search) || [])[1];
+      wantSample = wantSample ? decodeURIComponent(wantSample) : '';
+      var start = function () { openId ? openById(openId, wantSample) : showHistory(); };
+      if (window.Auth && window.Auth.getManager && window.Auth.getManager()) start();
+      else document.addEventListener('auth-ready', start, { once: true });
+    }
 
     var drop = el('stepLoad');
     ['dragenter', 'dragover'].forEach(function (t) {
@@ -723,6 +761,8 @@
         object: readObject(),
         kind: state.kind,
         rows: state.rows,
+        // номер записи в истории: по нему КП открывает этот же разбор на правку
+        savedId: state.savedId || null,
       };
       try { localStorage.setItem('water_analysis', JSON.stringify(payload)); } catch (e) {}
       // анкету объекта дописываем в историю: при разборе её ещё не заполнили

@@ -441,7 +441,8 @@ function attachAnalysis(){
 /* Разбор открывается окном поверх КП: менеджер не уходит со страницы и не
    теряет собранное. Внутри работает та же страница water.html, поэтому
    поведение одинаковое, а код не дублируется. */
-function openAnalysisPage(){
+function openAnalysisPage(extra){
+  var src='water.html?embed=1'+(extra||'');
   var box=document.getElementById('waterModal');
   if(!box){
     box=document.createElement('div');
@@ -453,13 +454,23 @@ function openAnalysisPage(){
       +'<span style="font-size:12.5px;color:var(--muted)">подтвердите показатели — они сразу попадут в это КП</span>'
       +'<button class="btn-outline" style="margin-left:auto;padding:6px 12px;font-size:13px" onclick="closeAnalysisModal()">Закрыть</button>'
       +'</div>'
-      +'<iframe id="waterFrame" src="water.html?embed=1" style="flex:1;border:0;width:100%"></iframe></div>';
+      +'<iframe id="waterFrame" style="flex:1;border:0;width:100%"></iframe></div>';
     document.body.appendChild(box);
+    document.getElementById('waterFrame').src=src;
   }else{
     box.style.display='flex';
     var fr=document.getElementById('waterFrame');
-    if(fr)fr.src='water.html?embed=1&n='+Date.now();
+    if(fr)fr.src=src+'&n='+Date.now();
   }
+}
+/* Возврат к разбору: открываем ту же запись истории, где лежат показатели,
+   анкета объекта и снимок протокола. Номера записи нет (КП собрано раньше
+   этой возможности) - окно откроется на списке разобранных. */
+function editAnalysis(){
+  if(!state.analysis)return;
+  var id=state.analysis.savedId;
+  var smp=state.analysis.sample?'&sample='+encodeURIComponent(state.analysis.sample):'';
+  openAnalysisPage(id?'&open='+encodeURIComponent(id)+smp:'&list=1');
 }
 function closeAnalysisModal(){var b=document.getElementById('waterModal');if(b)b.style.display='none';}
 /* Результат приходит из окна разбора - кладём в КП и закрываем окно. */
@@ -1061,6 +1072,7 @@ function render(){
     html+='</div>';
     html+='<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px">';
     html+='<label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer"><input type="checkbox" '+(state.analysis.inKp?'checked':'')+' onchange="toggleAnalysisInKp(this.checked)" style="accent-color:var(--blue)"> Приложить к КП для клиента</label>';
+    html+='<button class="btn-outline" style="padding:6px 12px;font-size:12px" onclick="editAnalysis()">Изменить</button>';
     html+='<button class="btn-outline" style="padding:6px 12px;font-size:12px" onclick="attachAnalysis()">Обновить из разбора</button>';
     html+='<button class="btn-outline" style="padding:6px 12px;font-size:12px" onclick="detachAnalysis()">Убрать</button>';
     html+='</div>';
