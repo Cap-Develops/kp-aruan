@@ -230,6 +230,78 @@
     });
   }
 
+  /* ── масштаб документа в колонке ─────────────────────────
+   * Главный сценарий работы: менеджер держит строку протокола слева и таблицу
+   * справа и сверяет их глазами. Поэтому увеличение происходит на месте, а не
+   * в отдельном окне: колесо мыши меняет масштаб, колонка прокручивается,
+   * перетаскивание сдвигает. Полноэкранный просмотр остался кнопкой ⛶ и
+   * двойным щелчком - для случаев, когда нужен совсем крупный план. */
+
+  var docZoom = (function () {
+    var scale = 1, dragging = false, sx = 0, sy = 0, sl = 0, st = 0;
+
+    function inner() { return el('previews').querySelector('.inner'); }
+
+    function apply() {
+      var box = inner();
+      if (box) box.style.width = Math.round(scale * 100) + '%';
+      el('docLevel').textContent = Math.round(scale * 100) + '%';
+    }
+
+    function set(next, anchorY) {
+      var pane = el('previews');
+      var before = pane.scrollTop + (anchorY || 0);
+      var ratio = Math.min(4, Math.max(1, next)) / scale;
+      scale = Math.min(4, Math.max(1, next));
+      apply();
+      // точка под курсором остаётся на месте, иначе при увеличении уезжает не туда
+      pane.scrollTop = before * ratio - (anchorY || 0);
+    }
+
+    return {
+      reset: function () { scale = 1; apply(); el('previews').scrollTop = 0; },
+      zoom: function (k, anchorY) { set(scale * k, anchorY); },
+      fit: function () { this.reset(); },
+      bind: function () {
+        var pane = el('previews');
+
+        // колесо оставлено прокрутке - иначе не пролистать длинный протокол.
+        // Масштаб на Ctrl + колесо, как в браузере и картах, плюс кнопки в шапке
+        pane.addEventListener('wheel', function (e) {
+          if (!inner() || !(e.ctrlKey || e.metaKey)) return;
+          e.preventDefault();
+          docZoom.zoom(e.deltaY < 0 ? 1.15 : 1 / 1.15, e.clientY - pane.getBoundingClientRect().top);
+        }, { passive: false });
+
+        pane.addEventListener('mousedown', function (e) {
+          if (scale <= 1) return;         // пока не увеличено, тащить нечего
+          dragging = true;
+          sx = e.clientX; sy = e.clientY;
+          sl = pane.scrollLeft; st = pane.scrollTop;
+          pane.classList.add('drag');
+          e.preventDefault();
+        });
+        window.addEventListener('mousemove', function (e) {
+          if (!dragging) return;
+          pane.scrollLeft = sl - (e.clientX - sx);
+          pane.scrollTop = st - (e.clientY - sy);
+        });
+        window.addEventListener('mouseup', function () {
+          dragging = false;
+          pane.classList.remove('drag');
+        });
+
+        el('docIn').onclick = function () { docZoom.zoom(1.3, pane.clientHeight / 2); };
+        el('docOut').onclick = function () { docZoom.zoom(1 / 1.3, pane.clientHeight / 2); };
+        el('docFit').onclick = function () { docZoom.fit(); };
+        el('docFull').onclick = function () {
+          var img = pane.querySelector('img');
+          if (img) openViewer(img.dataset.full || img.src, img.dataset.title || 'Исходный документ');
+        };
+      },
+    };
+  })();
+
   /* ── просмотр страницы ───────────────────────────────────
    * Шрифт в протоколах мелкий, в колонке слева его не разобрать. Поэтому
    * страница открывается во весь экран: колесо - масштаб к точке под курсором,
@@ -352,6 +424,9 @@
       state.kind = read.kind;
 
       el('previews').innerHTML = '';
+      var inner = document.createElement('div');
+      inner.className = 'inner';
+      docZoom.reset();
       // страницы, ушедшие на разбор, отрисованы крупнее - их и показываем в увеличении
       var big = {};
       (read.pages || []).forEach(function (n, i) {
@@ -360,13 +435,13 @@
       read.previews.forEach(function (src, idx) {
         var img = new Image();
         img.src = src;
-        img.title = 'Нажмите, чтобы рассмотреть страницу';
-        img.onclick = function () {
-          openViewer(big[idx + 1] || src,
-            read.previews.length > 1 ? 'Страница ' + (idx + 1) : 'Исходный документ');
-        };
-        el('previews').appendChild(img);
+        img.dataset.full = big[idx + 1] || src;
+        img.dataset.title = read.previews.length > 1 ? 'Страница ' + (idx + 1) : 'Исходный документ';
+        img.title = 'Ctrl + колесо — масштаб, двойной щелчок — во весь экран';
+        img.ondblclick = function () { openViewer(img.dataset.full, img.dataset.title); };
+        inner.appendChild(img);
       });
+      el('previews').appendChild(inner);
 
       el('workTitle').textContent = 'Разбираю показатели';
       var data = await window.WaterPipeline.parse(read, function (note) {
@@ -421,6 +496,7 @@
 
   document.addEventListener('DOMContentLoaded', function () {
     bindViewer();
+    docZoom.bind();
     el('pick').onclick = function () { el('file').click(); };
     el('file').onchange = function () { if (this.files[0]) handle(this.files[0]); };
     el('again').onclick = function () { step('stepLoad'); warn(''); el('fileName').textContent = ''; };

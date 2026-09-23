@@ -55,8 +55,20 @@ button{font:inherit;font-weight:700;border-radius:9px;padding:10px 20px;cursor:p
 .card{background:#fff;border:1px solid var(--border);border-radius:14px;overflow:hidden}
 .card h3{font-size:12.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--text-muted);
          margin:0;padding:12px 16px;border-bottom:1px solid var(--border);font-weight:700}
-.doc{position:sticky;top:76px;max-height:calc(100vh - 100px);overflow:auto}
-.doc img{width:100%;display:block;border-bottom:1px solid var(--border);cursor:zoom-in}
+/* Документ увеличивается прямо в колонке: менеджер сверяет строку протокола
+   с таблицей справа, не переключая окна. Колесо мыши меняет масштаб, при
+   увеличении колонка прокручивается. */
+.doc{position:sticky;top:76px;max-height:calc(100vh - 100px);display:flex;flex-direction:column}
+.doc h3{display:flex;align-items:center;gap:10px;flex-wrap:wrap;flex-shrink:0}
+.doc h3 .zoom{margin-left:auto;display:inline-flex;align-items:center;gap:4px}
+.doc h3 .zoom button{font:inherit;font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;
+                     border:1px solid var(--border);background:#fff;color:var(--text-muted);cursor:pointer}
+.doc h3 .zoom button:hover{border-color:var(--blue);color:var(--blue)}
+.doc h3 .zoom #docLevel{font-size:11px;color:var(--text-light);min-width:38px;text-align:center}
+#previews{overflow:auto;flex:1;cursor:grab;background:#fafbfd}
+#previews.drag{cursor:grabbing}
+#previews .inner{width:100%;transition:width .08s linear}
+.doc img{width:100%;display:block;border-bottom:1px solid var(--border)}
 
 /* ── просмотр страницы во весь экран ──────────────────── */
 .viewer{position:fixed;inset:0;z-index:100;background:rgba(15,23,42,.93);display:flex;
@@ -149,7 +161,17 @@ tr.pick .val{border-color:var(--bad-b);color:var(--bad-t)}
   <!-- шаг 3: проверка -->
   <div id="stepCheck" class="grid hide">
     <div class="card doc">
-      <h3>Исходный документ</h3>
+      <h3>
+        Исходный документ
+        <span class="zoom">
+          <button id="docOut" title="Уменьшить">−</button>
+          <span id="docLevel">100%</span>
+          <button id="docIn" title="Увеличить">+</button>
+          <button id="docFit" title="Вписать по ширине">По ширине</button>
+          <span style="font-size:10px;color:var(--text-light);font-weight:500">Ctrl+колесо</span>
+          <button id="docFull" title="Открыть во весь экран">⛶</button>
+        </span>
+      </h3>
       <div id="previews"></div>
     </div>
     <div>
