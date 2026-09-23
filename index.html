@@ -25,6 +25,10 @@ button:active{transform:scale(.97)}
 .header-sub{color:rgba(255,255,255,.55);font-size:11px;font-weight:400}
 .steps{display:flex;gap:20px;margin-left:auto;flex-wrap:wrap;align-items:center}
 .steps-group{display:flex;gap:5px;align-items:center}
+.new-kp-btn{padding:10px 22px;border:none;border-radius:24px;cursor:pointer;white-space:nowrap;
+  background:linear-gradient(135deg,#FF6F00,#FF9800);color:#fff;font-size:14px;font-weight:800;
+  box-shadow:0 3px 14px rgba(255,111,0,.4);transition:all .2s ease}
+.new-kp-btn:hover{transform:translateY(-1px);box-shadow:0 5px 18px rgba(255,111,0,.55)}
 .steps-flow{display:flex;gap:5px;align-items:center;padding-left:20px;border-left:1px solid rgba(255,255,255,.38)}
 @media(max-width:700px){.steps-flow{padding-left:0;border-left:none}}
 .step-done{margin-left:6px;font-size:11px;opacity:.85}
@@ -956,7 +960,7 @@ function render(){
   // Header
   html+='<div class="header"><div class="header-logo"><img src="assets/logo_aruan.png" style="width:32px;height:32px;object-fit:contain"></div><div><div class="header-title">Конструктор КП</div><div class="header-sub">Аруан & Аурус • '+EQUIPMENT_VIEW.length+' позиций</div></div><div class="steps">';
   html+='<div class="steps-group">';
-  html+='<button onclick="newKP()" style="padding:6px 14px;border:none;border-radius:8px;background:#fff;color:var(--blue);font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap">+ Новое КП</button>';
+  html+='<button class="new-kp-btn" onclick="newKP()">+ Новое КП</button>';
   html+='<button class="step-btn '+(step===-1?'active':'')+'" onclick="setState({step:-1})">📋 История</button>';
   html+='</div><div class="steps-flow">';
   // этапы сборки: пройденные с галочкой, текущий подсвечен, предпросмотр
@@ -984,7 +988,7 @@ function render(){
   // Сортировка
   hist.sort(function(a,b){if(hsort==='date_asc')return new Date(a.savedAt)-new Date(b.savedAt);if(hsort==='sum_desc')return (b.total||0)-(a.total||0);if(hsort==='sum_asc')return (a.total||0)-(b.total||0);return new Date(b.savedAt)-new Date(a.savedAt);});
   // Хедер
-  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:12px"><h2 style="font-size:20px;font-weight:800">История коммерческих предложений</h2><button class="btn-primary" onclick="newKP()">+ Новое КП</button></div>';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:12px"><h2 style="font-size:20px;font-weight:800">История коммерческих предложений</h2></div>';
   // Панель фильтров
   html+='<div class="card" style="padding:14px 18px;margin-bottom:12px;display:flex;gap:12px;flex-wrap:wrap;align-items:center">';
   html+='<input class="search-input" id="field_historySearch" style="min-width:240px;flex:1" placeholder="Поиск по клиенту, номеру КП, сумме, телефону, менеджеру..." value="'+state.historySearch+'" oninput="saveFocus();setState({historySearch:this.value})">';
