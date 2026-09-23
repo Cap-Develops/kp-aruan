@@ -375,6 +375,33 @@ function limitOver(value,limit){
   var one=t.match(/(\d+(?:\.\d+)?)/);
   return one?value>parseFloat(one[1]):false;
 }
+/* ═══ ЧТО БУДЕТ ПОСЛЕ ОЧИСТКИ ═══
+   Колонка считается по составу самого КП: какие ступени менеджер поставил,
+   те показатели и приводятся к нормативу. Конкретные числа не выдумываем -
+   пишем «в пределах норматива», потому что это то, что компания гарантирует,
+   а точное остаточное значение зависит от режима и обслуживания. */
+var TREAT_STAGES=[
+  {test:/обезжелез|аэрац|окислен|озонатор|каталитическ/i, fixes:['железо','марганец','сероводород','мутност','привкус','запах']},
+  {test:/умягчен|умягчител|солевой/i,                     fixes:['жестк','жёстк','кальци','магни']},
+  {test:/уголь|сорбент|гак|активированн/i,                fixes:['цветност','окисляем','хлор','запах','привкус','органик','нефтепродукт']},
+  {test:/осмос|ro-|мембран|деминерал/i,                   fixes:['сухой остаток','минерализац','солесодерж','сульфат','хлорид','нитрат','нитрит','жестк','жёстк','железо','марганец','кремни','фторид','натри','бор','стронци']},
+  {test:/грубой очистки|механическ|сетчат|дисковый|картридж|ультратонк|гф\s|фильтр\s*грубой/i, fixes:['мутност','взвешен','осадок']},
+  {test:/уф|ультрафиолет|стерилизатор|обеззаражив/i,      fixes:['бактер','микробн','колиформ','coli','энтерокок','колифаг']},
+];
+/** Ступени, которые реально стоят в этом КП. */
+function kpStages(items){
+  var text=(items||[]).map(function(i){return (i.name||'')+' '+(i.category||'');}).join(' | ');
+  return TREAT_STAGES.filter(function(st){return st.test.test(text);});
+}
+/** Что станет с показателем после предложенной схемы. */
+function afterTreatment(row,stages){
+  var name=String(row.name||'').toLowerCase();
+  var handled=stages.some(function(st){
+    return st.fixes.some(function(key){return name.indexOf(key)>=0;});
+  });
+  if(!handled)return {text:'без изменений',good:false};
+  return {text:row.limit?'в пределах норматива':'снижается до нормы',good:true};
+}
 function _lastAnalysis(){try{return JSON.parse(localStorage.getItem('water_analysis')||'null');}catch(e){return null;}}
 function attachAnalysis(){
   var a=_lastAnalysis();
@@ -662,23 +689,30 @@ function generatePDF(){
      +'<th style="padding:4px 6px;border:0.5px solid #cfe0f0;text-align:left">Показатель</th>'
      +'<th style="padding:4px 6px;border:0.5px solid #cfe0f0;text-align:right;white-space:nowrap">Результат</th>'
      +'<th style="padding:4px 6px;border:0.5px solid #cfe0f0;text-align:center;white-space:nowrap">Ед. изм.</th>'
-     +'<th style="padding:4px 6px;border:0.5px solid #cfe0f0;text-align:center;white-space:nowrap">Норматив</th></tr></thead><tbody>';
+     +'<th style="padding:4px 6px;border:0.5px solid #cfe0f0;text-align:center;white-space:nowrap">Норматив</th>'
+     +'<th style="padding:4px 6px;border:0.5px solid #cfe0f0;text-align:center;white-space:nowrap">После очистки</th></tr></thead><tbody>';
+    var _stages=kpStages(items);
     (_a.rows||[]).forEach(function(r){
       var val=(r.value!==null&&r.value!==undefined)?String(r.value).replace('.',',')
              :((r.below!==null&&r.below!==undefined)?('менее '+String(r.below).replace('.',',')):'—');
       var lim=r.limit?String(r.limit).replace(/(\d)\.(?=\d)/g,'$1,'):'—';
       var over=limitOver(r.value,r.limit);
+      var _after=afterTreatment(r,_stages);
       h+='<tr'+(over?' style="background:#FFF3E0"':'')+'>'
        +'<td style="padding:3px 6px;border:0.5px solid #e5eef7">'+String(r.name||'').replace(/</g,'&lt;')+'</td>'
        +'<td style="padding:3px 6px;border:0.5px solid #e5eef7;text-align:right;font-weight:'+(over?'800':'600')+';color:'+(over?'#E65100':'#1a2332')+'">'+val+'</td>'
        +'<td style="padding:3px 6px;border:0.5px solid #e5eef7;text-align:center;color:#666">'+String(r.unit||'').replace(/</g,'&lt;')+'</td>'
-       +'<td style="padding:3px 6px;border:0.5px solid #e5eef7;text-align:center;color:#666">'+lim+'</td></tr>';
+       +'<td style="padding:3px 6px;border:0.5px solid #e5eef7;text-align:center;color:#666">'+lim+'</td>'
+       +'<td style="padding:3px 6px;border:0.5px solid #e5eef7;text-align:center;color:'+(_after.good?'#2E7D32':'#999')+';font-weight:'+(_after.good?'700':'400')+'">'+_after.text+'</td></tr>';
     });
     h+='</tbody></table>';
     var _over=analysisSummary(_a).over;
     if(_over.length)h+='<div style="margin-top:3mm;font-size:11px;color:#333"><b>Превышения по нормативам протокола:</b> '+_over.map(function(n){return String(n).replace(/</g,'&lt;');}).join(', ')+'.</div>';
     if(_ao.notes)h+='<div style="margin-top:2mm;font-size:11px;color:#666"><b>Особенности объекта:</b> '+String(_ao.notes).replace(/</g,'&lt;')+'</div>';
-    h+='<div style="margin-top:3mm;font-size:9.5px;color:#999">Данные приведены по протоколу лабораторных испытаний, предоставленному заказчиком.</div>';
+    if(_stages.length){
+      h+='<div style="margin-top:3mm;font-size:10px;color:#333">Колонка «после очистки» рассчитана для предложенной схемы. Показатели, которые схема не затрагивает, остаются без изменений.</div>';
+    }
+    h+='<div style="margin-top:2mm;font-size:9.5px;color:#999">Данные приведены по протоколу лабораторных испытаний, предоставленному заказчиком. Остаточные значения зависят от соблюдения режима эксплуатации и своевременного обслуживания.</div>';
     h+='</div></div>';
   }
 
