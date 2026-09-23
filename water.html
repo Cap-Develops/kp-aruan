@@ -131,6 +131,13 @@ tr.pick .val{border-color:var(--bad-b);color:var(--bad-t)}
 .obj input:focus,.obj select:focus,.obj textarea:focus{outline:2px solid var(--blue);outline-offset:-1px;
        border-color:var(--blue)}
 .obj .need{border-color:var(--accent)}
+.obj-hint{display:block;text-transform:none;letter-spacing:0;font-size:12px;font-weight:600;color:var(--text-muted);margin-top:4px}
+.obj-more{border-top:1px solid var(--border);margin:0 16px 14px}
+.obj-more>summary{cursor:pointer;list-style:none;padding:10px 0 2px;font-size:12.5px;font-weight:700;color:var(--blue)}
+.obj-more>summary::-webkit-details-marker{display:none}
+.obj-more>summary::before{content:'▸ ';display:inline-block;transition:transform .15s ease}
+.obj-more[open]>summary::before{content:'▾ '}
+.obj-more .obj{padding:8px 0 0}
 .sum{padding:14px 16px}
 .sum ul{margin:8px 0 0;padding-left:18px}
 .actions{display:flex;gap:10px;padding:14px 16px;border-top:1px solid var(--border);flex-wrap:wrap;align-items:center}
@@ -211,7 +218,7 @@ body.embed .doc{top:0;max-height:calc(100vh - 150px)}
       <!-- Анализ говорит, что в воде. Схему определяет ещё и объект: откуда вода,
            сколько её нужно, как работает. Без этого подбор невозможен. -->
       <div class="card" style="margin-top:16px">
-        <h3>Объект — что нужно знать для подбора</h3>
+        <h3>Объект <span class="obj-hint">обязательны источник и производительность, остальное можно пропустить</span></h3>
         <div class="obj">
           <label>
             <span>Источник воды</span>
@@ -231,6 +238,10 @@ body.embed .doc{top:0;max-height:calc(100vh - 150px)}
             <span>Если расход неизвестен</span>
             <input id="objPoints" type="text" placeholder="точек / человек, напр. 6 точек, 4 чел.">
           </label>
+        </div>
+        <details class="obj-more" id="objMore">
+          <summary>Дополнительно — назначение, режим, давление, особенности</summary>
+          <div class="obj">
           <label>
             <span>Назначение</span>
             <select id="objPurpose">
@@ -260,7 +271,8 @@ body.embed .doc{top:0;max-height:calc(100vh - 150px)}
             <textarea id="objNotes" rows="2"
               placeholder="место под оборудование, вода на котельную, нужен подмес, пожелания заказчика"></textarea>
           </label>
-        </div>
+          </div>
+        </details>
       </div>
 
       <div class="card" style="margin-top:16px">
