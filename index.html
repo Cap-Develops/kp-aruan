@@ -75,7 +75,9 @@ button:active{transform:scale(.97)}
 .seg-switch{display:inline-flex;background:#EEF2F7;border-radius:10px;padding:3px;gap:2px;flex-shrink:0}
 .seg-btn{border:none;background:transparent;padding:7px 14px;border-radius:8px;font-family:inherit;font-size:12.5px;font-weight:700;color:var(--muted);cursor:pointer;white-space:nowrap;transition:all .15s}
 .seg-btn.on{background:linear-gradient(135deg,#1565C0,#1E88E5);color:#fff;box-shadow:0 2px 8px rgba(21,101,192,.3)}
-.search-input{flex:1;min-width:200px;padding:12px 16px;border-radius:10px;border:1.5px solid var(--border);font-size:14px;background:#fff}
+.search-input{flex:1;min-width:200px;padding:12px 16px 12px 42px;border-radius:10px;border:1.5px solid var(--border);font-size:14px;
+  background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='M20 20l-3.6-3.6'/%3E%3C/svg%3E") no-repeat 14px center;
+  background-size:17px 17px}
 .search-select{padding:12px 16px;border-radius:10px;border:1.5px solid var(--border);font-size:13px;background:#fff;cursor:pointer}
 .eq-list{display:flex;flex-direction:column;gap:8px;max-height:calc(100vh - 220px);overflow-y:auto;padding:0 6px 18px;scroll-behavior:smooth}
 .eq-item{background:#fff;border-radius:12px;padding:14px 18px;border:1.5px solid var(--border);display:flex;align-items:center;gap:16px;transition:all .2s ease}
@@ -196,12 +198,12 @@ document.addEventListener('DOMContentLoaded', function () {
 // ═══ MANAGERS ═══
 var MANAGERS=[
   {id:0,name:'',phone:'',ext:'',email:'',photo:''},
-  {id:1,name:'Кривошеев Сергей Сергеевич',phone:'8-800-100-39-54',ext:'10',email:'prom10@aruan.ru',photo:'assets/manager_1.png'},
-  {id:2,name:'Маякова Лилия Анатольевна',phone:'8-800-100-39-54',ext:'13',email:'prom13@aruan.ru',photo:'assets/manager_2.png'},
-  {id:3,name:'Мещерякова Анжелика Владимировна',phone:'8-800-100-39-54',ext:'105',email:'',photo:'assets/manager_3.png'},
-  {id:4,name:'Щукин Игорь Александрович',phone:'8-800-100-39-54',ext:'100',email:'sale100@aruan.ru',photo:'assets/manager_4.png'},
-  {id:5,name:'Войтович Станислав Владимирович',phone:'8-800-100-39-54',ext:'20',email:'prom20@aruan.ru',photo:'assets/manager_5.png'},
-  {id:6,name:'Маяков Дмитрий Анатольевич',phone:'8-800-100-39-54',ext:'14',email:'prom14@aruan.ru',photo:'assets/manager_6.png'}
+  {id:1,name:'Кривошеев Сергей Сергеевич',phone:'8-800-302-20-48',ext:'10',email:'prom10@aruan.ru',photo:'assets/manager_1.png'},
+  {id:2,name:'Маякова Лилия Анатольевна',phone:'8-800-302-20-48',ext:'13',email:'prom13@aruan.ru',photo:'assets/manager_2.png'},
+  {id:3,name:'Мещерякова Анжелика Владимировна',phone:'8-800-301-93-35',ext:'105',email:'',photo:'assets/manager_3.png'},
+  {id:4,name:'Щукин Игорь Александрович',phone:'8-800-301-93-35',ext:'100',email:'sale100@aruan.ru',photo:'assets/manager_4.png'},
+  {id:5,name:'Войтович Станислав Владимирович',phone:'8-800-302-20-48',ext:'20',email:'prom20@aruan.ru',photo:'assets/manager_5.png'},
+  {id:6,name:'Маяков Дмитрий Анатольевич',phone:'8-800-302-20-48',ext:'14',email:'prom14@aruan.ru',photo:'assets/manager_6.png'}
 ];
 function getManager(id){return MANAGERS.find(function(m){return m.id===id;})||MANAGERS[0];}
 
@@ -1097,7 +1099,7 @@ function render(){
   html+='</div></div></div>';
   html+='<div class="step-nav"><button class="btn-outline" onclick="setState({step:-1})">← К списку КП</button>'+'<span class="step-nav-space"></span>'+'<button class="btn-outline viewer-hide" onclick="saveKpAndNotify()">💾 Сохранить</button>'+'<button class="btn-primary" onclick="setState({step:1})">Далее → Выбор оборудования</button></div>';}
   // STEP 1
-  if(step===1){html+='<div class="catalog-grid"><div><div class="card search-bar" style="margin-bottom:12px"><div class="seg-switch"><button class="seg-btn'+(KP_SEG==='prom'?' on':'')+'" onclick="setSegment(\'prom\')">🏭 Пром</button><button class="seg-btn'+(KP_SEG==='byt'?' on':'')+'" onclick="setSegment(\'byt\')">🏠 Быт</button><button class="seg-btn'+(KP_SEG==='all'?' on':'')+'" onclick="setSegment(\'all\')">📦 Все</button></div><input class="search-input" id="field_search" placeholder="🔍 Поиск по названию, характеристикам..." value="'+search+'" oninput="saveFocus();setState({search:this.value})"><select class="search-select" id="field_catFilter" onchange="saveFocus();setState({catFilter:this.value})">'+categories.map(function(c){return '<option'+(c===catFilter?' selected':'')+'>'+c+'</option>';}).join('')+'</select><span style="font-size:12px;color:var(--muted)">Найдено: '+filtered.length+'</span><button class="btn-outline" style="padding:6px 12px;font-size:12px;margin-left:auto;white-space:nowrap" onclick="addCustomItem()">+ Своя позиция</button></div><div class="eq-list">';
+  if(step===1){html+='<div class="catalog-grid"><div><div class="card search-bar" style="margin-bottom:12px"><div class="seg-switch"><button class="seg-btn'+(KP_SEG==='prom'?' on':'')+'" onclick="setSegment(\'prom\')">🏭 Пром</button><button class="seg-btn'+(KP_SEG==='byt'?' on':'')+'" onclick="setSegment(\'byt\')">🏠 Быт</button><button class="seg-btn'+(KP_SEG==='all'?' on':'')+'" onclick="setSegment(\'all\')">📦 Все</button></div><input class="search-input" id="field_search" placeholder="Поиск по названию, характеристикам..." value="'+search+'" oninput="saveFocus();setState({search:this.value})"><select class="search-select" id="field_catFilter" onchange="saveFocus();setState({catFilter:this.value})">'+categories.map(function(c){return '<option'+(c===catFilter?' selected':'')+'>'+c+'</option>';}).join('')+'</select><span style="font-size:12px;color:var(--muted)">Найдено: '+filtered.length+'</span><button class="btn-outline" style="padding:6px 12px;font-size:12px;margin-left:auto;white-space:nowrap" onclick="addCustomItem()">+ Своя позиция</button></div><div class="eq-list">';
   filtered.forEach(function(eq){var ad=items.some(function(i){return i.id===eq.id;});html+='<div class="eq-item'+(ad?' added':'')+'">'+(eq.img?'<img src="images/'+eq.img+'" class="eq-thumb">':'')+'<div style="flex:1;min-width:0"><div class="eq-name">'+eq.name+'</div><div class="eq-tags"><span class="tag tag-cat">'+eq.category+'</span>'+(eq.productivity?'<span class="tag tag-prod">'+eq.productivity+'</span>':'')+'<span class="tag tag-brand">'+(eq.brand&&eq.brand!=="Другой"?eq.brand:'Другое')+'</span></div>'+(eq.specs?'<div class="eq-specs">'+fmtSpecs(eq.specs)+'</div>':'')+'</div><div style="text-align:right;flex-shrink:0"><div class="eq-price">'+fmt(eq.price)+' ₽</div></div><button class="add-btn add" onclick="addItem('+eq.id+')">+</button></div>';});
   html+='</div></div>';
   // Sidebar
