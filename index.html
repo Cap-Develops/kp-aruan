@@ -748,7 +748,10 @@ function generatePDF(){
   signHtml+='<div style="font-size:12px;line-height:1.7"><b>Срок поставки – '+(/^\d+$/.test((''+c.deliveryDays).trim())?c.deliveryDays+' '+plRu(c.deliveryDays,'рабочий день','рабочих дня','рабочих дней'):c.deliveryDays)+'.</b><br><b>Срок гарантии на товар – '+c.warrantyMonths+' '+plRu(c.warrantyMonths,'месяц','месяца','месяцев')+'.</b><br>';
   if(notIncl.length)signHtml+='<span style="font-size:11px;color:#666">В стоимость не входит: '+notIncl.join(', ')+'.</span>';
   signHtml+='</div>';
-  signHtml+='<div style="text-align:right;background:#EBF5FB;padding:6px 14px;border-radius:4px"><div style="font-size:12px;color:#333">Итого:</div><div style="font-size:22px;font-weight:800;color:#0D47A1">'+fmt(total)+' рублей</div>'+(c.withoutVat?'':'<div style="font-size:11px;color:#666">с учетом НДС 22%</div>')+'</div>';
+  // Скидка отдельной строкой: без неё сумма строк таблицы не сходится с итогом, и клиент не понимает, откуда цифра
+  var totalBox='';
+  if(discount>0)totalBox+='<div style="font-size:12px;color:#333">Сумма: '+fmt(subtotal)+' рублей</div><div style="font-size:12px;color:#C62828">Скидка '+discount+'%: -'+fmt(subtotal-total)+' рублей</div>';
+  signHtml+='<div style="text-align:right;background:#EBF5FB;padding:6px 14px;border-radius:4px">'+totalBox+'<div style="font-size:12px;color:#333'+(discount>0?';margin-top:3px;padding-top:3px;border-top:1px solid #BBD7E6':'')+'">Итого:</div><div style="font-size:22px;font-weight:800;color:#0D47A1">'+fmt(total)+' рублей</div>'+(c.withoutVat?'':'<div style="font-size:11px;color:#666">с учетом НДС 22%</div>')+'</div>';
   signHtml+='</div>';
   signHtml+='<div style="margin-top:3mm;display:flex;align-items:center;gap:5mm">';
   signHtml+='<div style="font-size:12px;line-height:1.8"><div>С уважением Коммерческий директор</div><div><b>ООО «ТЕХНОИНТЕЛЛЕКТ»</b></div><div><b>Наумов Иван Павлович</b></div></div>';
